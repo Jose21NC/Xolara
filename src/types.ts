@@ -23,6 +23,8 @@ export interface Experience {
   };
   tags: string[];
   galleryImages: string[];
+  lat?: number;
+  lng?: number;
 }
 
 export interface Booking {
@@ -47,4 +49,12 @@ export interface PassportStamp {
   date: string;
   iconType: 'mountain' | 'utensils' | 'palette' | 'coffee';
   color: string;
+}
+
+export interface AppConfig {
+  greetingTone: 'traditional' | 'formal' | 'slang';
+  language: 'es' | 'en' | 'bilingual';
+  tipFocus: string[];
+  enableNicaSound: boolean;
+  showCo2InLbs: boolean;
 }

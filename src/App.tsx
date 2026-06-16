@@ -8,21 +8,46 @@ import ConfirmedScreen from './screens/ConfirmedScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import PassportScreen from './screens/PassportScreen';
 import ExperiencesFeedScreen from './screens/ExperiencesFeedScreen';
+import ConfigurationScreen from './screens/ConfigurationScreen';
 import { EXPERIENCES_DATA } from './data';
-import { Booking, Experience } from './types';
+import { Booking, Experience, AppConfig } from './types';
 import { Compass, Sparkles, Award, User, MapPin } from 'lucide-react';
 
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<'explore' | 'experiences' | 'passport' | 'profile'>('explore');
-  const [currentScreen, setCurrentScreen] = useState<'explore' | 'map' | 'detail' | 'reservation' | 'confirmed'>('explore');
+  const [currentScreen, setCurrentScreen] = useState<'explore' | 'map' | 'detail' | 'reservation' | 'confirmed' | 'configuration'>('explore');
+
+  // Application Global Preferences State
+  const [config, setConfig] = useState<AppConfig>({
+    greetingTone: 'traditional',
+    language: 'bilingual',
+    tipFocus: ['gastronomy', 'nature', 'crafts'],
+    enableNicaSound: true,
+    showCo2InLbs: false
+  });
 
   // Selected experience details
   const [selectedExperienceId, setSelectedExperienceId] = useState<string>('coffee-journey');
 
   // User booking list state
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([
+    {
+      id: 'bk-initial',
+      experienceId: 'weaving-workshop',
+      experienceTitle: 'Cerámica Ancestral de San Juan de Oriente',
+      experienceImage: 'https://images.unsplash.com/photo-1565192647048-f997ded879ab?auto=format&fit=crop&q=80&w=600',
+      date: '20 de Junio, 2026',
+      time: '10:00 AM',
+      adultsCount: 2,
+      childrenCount: 0,
+      totalPrice: 70,
+      bookingRef: 'XLR-8820',
+      confirmedAt: '15/06/2026',
+      status: 'Confirmed'
+    }
+  ]);
+  const [activeBookingId, setActiveBookingId] = useState<string | null>('bk-initial');
 
   // Social / Bookmark state
   const [likedExperiences, setLikedExperiences] = useState<string[]>(['weaving-workshop']); // pre-liked to match mockup favorite button!
@@ -44,6 +69,10 @@ export default function App() {
         return [...prev, id];
       }
     });
+  };
+
+  const handleUpdateBooking = (bookingId: string, newDate: string, newTime: string) => {
+    setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, date: newDate, time: newTime } : b));
   };
 
   // Select an experience and go to details screen
@@ -105,13 +134,15 @@ export default function App() {
     }
   };
 
-  // Support alerts for simulations
+  // Support alerts for simulations or redirecting to active Profile section!
   const handleContactGuide = () => {
-    alert('Simulación: Conectando con el guía experto local en WhatsApp / Email...');
+    setActiveTab('profile');
+    setCurrentScreen('explore');
   };
 
   const handleManageReservation = () => {
-    alert('Simulación: Abriendo políticas de cancelación o reprogramación...');
+    setActiveTab('profile');
+    setCurrentScreen('explore');
   };
 
   // Bottom Tab click changes screens
@@ -123,6 +154,16 @@ export default function App() {
   // Render correct active view
   const renderScreenContent = () => {
     // 1. Interactive Detailed Overrides
+    if (currentScreen === 'configuration') {
+      return (
+        <ConfigurationScreen 
+          onBack={() => setCurrentScreen('explore')}
+          config={config}
+          onUpdateConfig={setConfig}
+        />
+      );
+    }
+
     if (currentScreen === 'map') {
       return (
         <MapScreen 
@@ -191,6 +232,8 @@ export default function App() {
         return (
           <PassportScreen 
             bookings={bookings}
+            config={config}
+            onOpenConfig={() => setCurrentScreen('configuration')}
           />
         );
       
@@ -200,6 +243,8 @@ export default function App() {
             bookings={bookings}
             onCancelBooking={handleCancelBooking}
             onSelectBooking={handleSelectBooking}
+            onUpdateBooking={handleUpdateBooking}
+            onOpenConfig={() => setCurrentScreen('configuration')}
           />
         );
       

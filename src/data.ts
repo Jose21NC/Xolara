@@ -3,180 +3,191 @@ import { Experience } from './types';
 export const EXPERIENCES_DATA: Experience[] = [
   {
     id: 'coffee-journey',
-    title: 'Coffee Journey in the Sierra',
-    location: 'Sierra Nevada Mountains',
-    country: 'Colombia',
+    title: 'Ruta del Café Orgánico en Matagalpa',
+    location: 'Matagalpa, Selva Negra',
+    country: 'Nicaragua',
     category: 'Agriculture',
-    duration: '6 Hours',
-    durationHours: 6,
-    groupSize: 'Max 6 people',
-    rating: 4.9,
-    reviewsCount: 120,
-    pricePerPerson: 90,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBtzU-FU9_WLXeFAP5hVNH54MFFrNi4YahAw6GzAc8VJqOYf1rGyTZQJpJCeoMCLEyoh7zKXV2Gz3pfev5G6nSkrQiECnZy0_gVEdl_yYgx0sumgxGQ5IDx5TU3HvKvuxUul3ASl9Pju2oMuUrI1WvVJjMo1flJh1JZhy3vwt8kJ5RhcBfuMBRTpjBWGhWHZxSymh40qe8UcI5sJdG4dFH1AOaoCBltsUcnpy9Bj4zbpHULnBwA0RxgEZnDti-OM5XmncihwIbp2sRU',
-    aboutCommunity: 'Nestled in the misty highlands, the Arhuaco community has cultivated coffee for generations, blending traditional ecological knowledge with sustainable practices. This journey offers a rare window into their daily lives, where every bean is handpicked with reverence for the earth. You\'ll be welcomed by local farmers who will share their ancestral stories and deep-rooted connection to the land.',
+    duration: '5 Horas',
+    durationHours: 5,
+    groupSize: 'Máx 6 personas',
+    rating: 4.95,
+    reviewsCount: 142,
+    pricePerPerson: 55,
+    lat: 12.9224,
+    lng: -85.9160,
+    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=600',
+    aboutCommunity: 'Ubicada en las neblinosas montañas del norte de Nicaragua, la cooperativa local de caficultores de Matagalpa ha implementado técnicas agroecológicas que protegen la biodiversidad. Esta inmersión te conecta directamente con las familias cosechadoras, permitiéndote recorrer senderos boscosos, recolectar granos maduros bajo sombra de árboles nativos y aprender de sus esfuerzos de conservación.',
     whatYouWillDo: [
       {
-        title: 'Morning Harvesting',
-        desc: 'Join families in the fields to learn the delicate art of selecting only the ripest red cherries.'
+        title: 'Recolección Sostenible',
+        desc: 'Aprende a identificar y recolectar manualmente solo las cerezas rojas maduras de café Arábica bajo la guía de un productor local.'
       },
       {
-        title: 'Traditional Processing',
-        desc: 'Help wash and sun-dry the beans on extensive wooden patios using centuries-old methods.'
+        title: 'Despulpe y Secado al Sol',
+        desc: 'Ayuda en el beneficio húmedo artesanal y extiende los granos húmedos en los patios tradicionales para su deshidratación natural.'
       },
       {
-        title: 'Roasting & Tasting',
-        desc: 'Experience the roasting process over an open fire and enjoy a tasting session guided by a local expert.'
+        title: 'Tueste sobre Fogón de Leña',
+        desc: 'Descubre el legendario secreto de tostado nicaragüense usando comales de barro y disfruta de una taza fresca con rosquillas de la zona.'
       }
     ],
-    authenticityScore: 98,
-    communityImpactText: 'Your visit directly supports 4 local families involved in artisanal coffee production, helping preserve their traditional harvesting methods.',
+    authenticityScore: 99,
+    communityImpactText: 'Tu visita apoya financieramente a 6 familias caficultoras organizadas, financiando directamente la transición a abonos ecológicos y la protección del hábitat de aves migratorias.',
     communityImpactBullets: [
-      '15% of fee supports local reforestation efforts.',
-      'Directly employs 4 families in the Sierra region.',
-      'Funds agricultural workshops for village youth.'
+      'El 20% de los fondos se destina al vivero comunitario de reforestación.',
+      'Genera ingresos directos a las cooperativas lideradas por mujeres.',
+      'Financia kits de paneles solares para hogares rurales sin conexión eléctrica.'
     ],
     howToGetThere: {
-      title: 'Finca El Recuerdo',
-      description: 'Km 12, Via Principal, Sierra Norte.',
+      title: 'Finca Ecológica La Hermandad',
+      description: 'Km 142, Carretera Matagalpa - El Tuma La Dalia, Nicaragua.',
       mapImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDGDjeJGKemRBFLeeV0zn9kCGtAX902VHlFnQ5WtyEEK6-IbcoOxf3KwMmHNPowhAVv7CRDwcAUuA7uPqc_F3xDMHhTmRbD3TRl9EdVN9cE5lTAU_Ec8_QJ7vurEpSPv81z9_MO80OO2Q7g5yZBdiOINJghCzAet1jRb3ez2FCBLxLZg54UqpfwTxU8oMqgHnTqH9cXaH-L-5ElQVwdcs6fUE5T6RABtQJythUUp4f5IXiNHcZbujsAIW_2he3Rs73x5v6KWplENqad'
     },
-    tags: ['Agriculture', 'Hands-on'],
+    tags: ['Matagalpa', 'Café', 'Sostenibilidad'],
     galleryImages: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBtzU-FU9_WLXeFAP5hVNH54MFFrNi4YahAw6GzAc8VJqOYf1rGyTZQJpJCeoMCLEyoh7zKXV2Gz3pfev5G6nSkrQiECnZy0_gVEdl_yYgx0sumgxGQ5IDx5TU3HvKvuxUul3ASl9Pju2oMuUrI1WvVJjMo1flJh1JZhy3vwt8kJ5RhcBfuMBRTpjBWGhWHZxSymh40qe8UcI5sJdG4dFH1AOaoCBltsUcnpy9Bj4zbpHULnBwA0RxgEZnDti-OM5XmncihwIbp2sRU',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBKqgWhFqV2nOFrRDu8meo2L0beLkNHFR4AO-3APdmSdd0GHLMekgOLR7rLciNKB3BXWUMPJUjWTamb-whldckmhIDYPUnfINQvnR8A_NMP5JEZrFXva1BckuOdJGNVsM9slzu3mflJolhxSsTkbFnNIu7uCp34JwbdJO4Tr6qKiEQu0R3G6P7JmkpjfFYrEU4us0MsUyuHhKAVdAaidhqbabbKMpWJ6QJxH-ZemDTWFZMPUZ7nwkM2qf104i8370dsEv7orxdlgOwP',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBnKDWnnceBQJwxv9-ipXfWtXnL_2UkzXhpc7FwKNOHWCJ_dR6OuXiIIPs-E3bJLlIFaWgKUZ8l8vapcpA5RNqms3b4HaqTeYheBrlnWzjV6SDpd1dceee-wfrKYm3vA65wJZP2oOzeMim-yBo2WL76IF8r5ahATbLwmtF0qJsieikdFclDHx9Jj7Q7IyAWHdeJ8cV0tJUcpSDJxSPZCIRlt3I16DvVDhW8AQYf71IdGCKzRfxxBeQSdothkYyS36BHjapGK6bwr6be'
+      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=600',
+      'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80&w=600'
     ]
   },
   {
     id: 'weaving-workshop',
-    title: 'Traditional Weaving Workshop',
-    location: 'Oaxaca',
-    country: 'Mexico',
+    title: 'Cerámica Ancestral de San Juan de Oriente',
+    location: 'San Juan de Oriente, Masaya',
+    country: 'Nicaragua',
     category: 'Crafts',
-    duration: '4 Hours',
+    duration: '4 Horas',
     durationHours: 4,
-    groupSize: 'Max 4 people',
-    rating: 4.9,
-    reviewsCount: 88,
-    pricePerPerson: 45,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBnKDWnnceBQJwxv9-ipXfWtXnL_2UkzXhpc7FwKNOHWCJ_dR6OuXiIIPs-E3bJLlIFaWgKUZ8l8vapcpA5RNqms3b4HaqTeYheBrlnWzjV6SDpd1dceee-wfrKYm3vA65wJZP2oOzeMim-yBo2WL76IF8r5ahATbLwmtF0qJsieikdFclDHx9Jj7Q7IyAWHdeJ8cV0tJUcpSDJxSPZCIRlt3I16DvVDhW8AQYf71IdGCKzRfxxBeQSdothkYyS36BHjapGK6bwr6be',
-    aboutCommunity: 'Join Master artisan Juana and her family in Teotitlán del Valle, a historical village famous for its hand-woven wool rugs. This region uses natural dyes sourced from local flora like cochineal, wild marigolds, and pecan leaves. Learn how traditional Zapotec patterns tell the mythological stories of solar cycles and seasonal rhythms.',
+    groupSize: 'Máx 5 personas',
+    rating: 4.88,
+    reviewsCount: 96,
+    pricePerPerson: 35,
+    lat: 11.9056,
+    lng: -86.0743,
+    image: 'https://images.unsplash.com/photo-1565192647048-f997ded879ab?auto=format&fit=crop&q=80&w=600',
+    aboutCommunity: 'San Juan de Oriente es un pintoresco pueblo con profundas raíces chorotegas donde casi cada hogar alberga un taller de alfarería. El maestro artesano Néstor te abrirá las puertas de su taller familiar para enseñarte a moldear y pulir el barro empleando pulidores de piedra de río y pigmentos minerales derivados de arcillas volcánicas de la laguna de Apoyo.',
     whatYouWillDo: [
       {
-        title: 'Natural Dye Extraction',
-        desc: 'Grind insects and leaves on stone metates to brew dynamic dye colors including rich scarlet and gold.'
+        title: 'Modelado en Torno de Pie',
+        desc: 'Siente la elasticidad y textura del barro local mientras utilizas el torno impulsado con el pie para crear tu propia vasija.'
       },
       {
-        title: 'Loom Setup',
-        desc: 'Experience the tension-led backstrap loom alignment, passing raw carded wool through the warp.'
+        title: 'Decorado Precolombino con Bruñidor',
+        desc: 'Aprende a plasmar grecas decorativas y figuras sagradas imitando antiguos grabados prehispánicos con punta de bambú.'
       },
       {
-        title: 'Shuttle Weaving',
-        desc: 'Learn standard counting geometries to weave your own mini-rug with traditional heritage motifs.'
+        title: 'Pulido con Piedras de Río',
+        desc: 'Frota repetidamente la pieza con óxidos naturales de hierro para lograr ese brillo satinado idéntico a las reliquias de museo.'
       }
     ],
-    authenticityScore: 99,
-    communityImpactText: 'Juana\'s workshop directly sustains custom co-operative weaving techniques, empowering 6 Zapotec master artisans and their families with circular wage growth.',
+    authenticityScore: 98,
+    communityImpactText: 'Esta experiencia combate la migración rural aportando salarios dignos a creadores locales y financiando talleres gratuitos que traspasan el oficio tradicional a los niños de la comunidad.',
     communityImpactBullets: [
-      '20% goes directly to women-led weaver unions.',
-      'Sustains cochineal production farms locally.',
-      'Keeps pre-Hispanic Zapotec loom crafts alive with modern design.'
+      'Sustenta directamente el taller familiar de Néstor y 4 decoradores independientes.',
+      'Preserva iconografía ancestral nicaragüense frente al turismo industrializado.',
+      'Folleto explicativo interactivo de regalo del herbario local usado en tintes.'
     ],
     howToGetThere: {
-      title: 'Taller de Juana',
-      description: 'Calle Hidalgo 45, Teotitlán del Valle, Oaxaca.',
+      title: 'Taller de Barro Néstor Guerrero',
+      description: 'Detrás de la Iglesia de San Juan de Oriente, Masaya, Nicaragua.',
       mapImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDGDjeJGKemRBFLeeV0zn9kCGtAX902VHlFnQ5WtyEEK6-IbcoOxf3KwMmHNPowhAVv7CRDwcAUuA7uPqc_F3xDMHhTmRbD3TRl9EdVN9cE5lTAU_Ec8_QJ7vurEpSPv81z9_MO80OO2Q7g5yZBdiOINJghCzAet1jRb3ez2FCBLxLZg54UqpfwTxU8oMqgHnTqH9cXaH-L-5ElQVwdcs6fUE5T6RABtQJythUUp4f5IXiNHcZbujsAIW_2he3Rs73x5v6KWplENqad'
     },
-    tags: ['Crafts', 'Heritage'],
+    tags: ['Masaya', 'Alfarería', 'Chorotega'],
     galleryImages: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBnKDWnnceBQJwxv9-ipXfWtXnL_2UkzXhpc7FwKNOHWCJ_dR6OuXiIIPs-E3bJLlIFaWgKUZ8l8vapcpA5RNqms3b4HaqTeYheBrlnWzjV6SDpd1dceee-wfrKYm3vA65wJZP2oOzeMim-yBo2WL76IF8r5ahATbLwmtF0qJsieikdFclDHx9Jj7Q7IyAWHdeJ8cV0tJUcpSDJxSPZCIRlt3I16DvVDhW8AQYf71IdGCKzRfxxBeQSdothkYyS36BHjapGK6bwr6be',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBJml7d2BHBK-4rUKbZKcSQXU7K_0GQihW8YQTgVAFQglkIWprIvZITnIqBbAXepmkxE4cYSxn1owkoEIegtZZgdQ3-ybFVpUVTYitGZOVzNF6VcDmQP4iYTr7R7GwQ-47MZtDrvFCebBOEYO6LKjW-1LxFrXigZBeofb9tR54SZCpe8B1IDoLcIxtbK3zWBjqul27-MJvlHD2c6Ls8ABPcm-ixwlHqVM-M17UhyoOPEYex597rk4yB4yQalYyW3M_YdHZdFO29F0_X'
+      'https://images.unsplash.com/photo-1565192647048-f997ded879ab?auto=format&fit=crop&q=80&w=600'
     ]
   },
   {
     id: 'cooking-masterclass',
-    title: 'Ancestral Cooking Masterclass',
-    location: 'Cusco',
-    country: 'Peru',
+    title: 'Cocina Colonial y Taller del Vigorón',
+    location: 'Granada, El Recreo',
+    country: 'Nicaragua',
     category: 'Culinary',
-    duration: '5 Hours',
-    durationHours: 5,
-    groupSize: 'Max 8 people',
-    rating: 4.8,
-    reviewsCount: 94,
-    pricePerPerson: 60,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDO4n-YO_bEBBC0PsemOiD8O1FqmxYUPhhJ7C2qAFg2NurVW6V3LNrYzHugFlnB3h9qikc1k1s0sFZHGOXQnIFNpDooTgKfFwJGtsIb3Fm_0iB7kKZ3bSbC79EIOoDtMiZUoWPrbhqR96IoHO5UTwETcXP_X6laPyfLjiqUB9wl4xsBdFGqLJCh2DfXIAtSZQifrAARSqja-Rilcu26ITM8dnoL8bQIxhEp6REuw_2zqHkzMKqZL884PRtfuBpWkwAfDLqt-NG5faEE',
-    aboutCommunity: 'Unveil the mysteries of Andean cuisine beside the Sacred Valley near Cusco. This experience focuses on pre-Inca cooking techniques like "Pachamanca", where ingredients are slowly baked underground in a pit lined with volcanic rocks and layered with aromatic native herbs.',
+    duration: '3.5 Horas',
+    durationHours: 3.5,
+    groupSize: 'Máx 8 personas',
+    rating: 4.90,
+    reviewsCount: 112,
+    pricePerPerson: 40,
+    lat: 11.9300,
+    lng: -85.9560,
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=600',
+    aboutCommunity: 'A orillas del Gran Lago de Nicaragua, la ciudad colonial de Granada alberga grandes secretos gastronómicos. En el patio interior de la Sra. Auxiliadora, aprenderás a preparar el vigorón granadino, el plato estrella nicaragüense envuelto tradicionalmente en hoja de chagüite (plátano), con ingredientes frescos comprados esa mañana de agricultores ecológicos locales.',
     whatYouWillDo: [
       {
-        title: 'Sacred Valley Market Pick-up',
-        desc: 'Gather native potato varieties (out of over 3000 options), colorful corn ears, and fresh huacatay leaves.'
+        title: 'Selección de Ingredientes',
+        desc: 'Descubre los mercados locales y aprende a elegir la mejor yuca nicaragüense, repollo fresco y miltomate maduro.'
       },
       {
-        title: 'Stone Heating & Pit Building',
-        desc: 'Help heat volcanic stones in a firewood trench, stacking tubers, marinated meats, and beans carefully within the earth.'
+        title: 'Preparación de Ensalada con Chicharrón',
+        desc: 'Pica los ingredientes con precisión criolla, marina la ensalada usando vinagre casero y cocina chicharrón crujiente.'
       },
       {
-        title: 'The Ancestral Feast',
-        desc: 'Unearth the smoked, steamed delicacies, thanking Mother Earth (Pachamama) through ancient celebratory toasts.'
+        title: 'Ancestral Cacao en Jícara',
+        desc: 'Muele granos de cacao fresco tostado con arroz y canela para batir un tradicional "Fresco de Cacao" artesanal.'
       }
     ],
     authenticityScore: 97,
-    communityImpactText: 'Directly supports 3 farming communities supplying heritage corn and potato strains, protecting local agricultural biodiversity.',
+    communityImpactText: 'Sustenta la red de pequeños agricultores agrícolas de Granada y Carazo, disminuyendo intermediarios de mercado e inyectando un 70% del costo del pasaje al equipo de Sra. Auxiliadora.',
     communityImpactBullets: [
-      'Empowers traditional farmers preserving raw crop types.',
-      '10% of fees fund organic soil management seed kits.',
-      'Sponsors free cooking vocational slots for regional youths.'
+      'Ayuda a 3 distribuidoras rurales de tubérculos y hojas de chagüite.',
+      'Financia la compra de fogones eficientes de baja emisión de humo en la comunidad.',
+      'Recetas impresas en papel reciclado ecológico para los viajeros.'
     ],
     howToGetThere: {
-      title: 'Quwa Kitchen',
-      description: 'Av. Mollepata 512, San Sebastian, Cusco.',
+      title: 'La Cocina de Doña Auxiliadora',
+      description: 'Calle La Calzada, esquina opuesta al convento San Francisco, Granada, Nicaragua.',
       mapImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDGDjeJGKemRBFLeeV0zn9kCGtAX902VHlFnQ5WtyEEK6-IbcoOxf3KwMmHNPowhAVv7CRDwcAUuA7uPqc_F3xDMHhTmRbD3TRl9EdVN9cE5lTAU_Ec8_QJ7vurEpSPv81z9_MO80OO2Q7g5yZBdiOINJghCzAet1jRb3ez2FCBLxLZg54UqpfwTxU8oMqgHnTqH9cXaH-L-5ElQVwdcs6fUE5T6RABtQJythUUp4f5IXiNHcZbujsAIW_2he3Rs73x5v6KWplENqad'
     },
-    tags: ['Culinary', 'Earth-to-Table'],
+    tags: ['Granada', 'Gastronomía', 'Tradición'],
     galleryImages: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuDO4n-YO_bEBBC0PsemOiD8O1FqmxYUPhhJ7C2qAFg2NurVW6V3LNrYzHugFlnB3h9qikc1k1s0sFZHGOXQnIFNpDooTgKfFwJGtsIb3Fm_0iB7kKZ3bSbC79EIOoDtMiZUoWPrbhqR96IoHO5UTwETcXP_X6laPyfLjiqUB9wl4xsBdFGqLJCh2DfXIAtSZQifrAARSqja-Rilcu26ITM8dnoL8bQIxhEp6REuw_2zqHkzMKqZL884PRtfuBpWkwAfDLqt-NG5faEE'
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=600'
     ]
   },
   {
     id: 'market-walk',
-    title: 'Artisan Market Walk',
-    location: 'Oaxaca',
-    country: 'Mexico',
-    category: 'Crafts',
-    duration: '3 Hours',
-    durationHours: 3,
-    groupSize: 'Max 10 people',
-    rating: 4.7,
-    reviewsCount: 76,
-    pricePerPerson: 25,
-    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBKqgWhFqV2nOFrRDu8meo2L0beLkNHFR4AO-3APdmSdd0GHLMekgOLR7rLciNKB3BXWUMPJUjWTamb-whldckmhIDYPUnfINQvnR8A_NMP5JEZrFXva1BckuOdJGNVsM9slzu3mflJolhxSsTkbFnNIu7uCp34JwbdJO4Tr6qKiEQu0R3G6P7JmkpjfFYrEU4us0MsUyuHhKAVdAaidhqbabbKMpWJ6QJxH-ZemDTWFZMPUZ7nwkM2qf104i8370dsEv7orxdlgOwP',
-    aboutCommunity: 'Wander deep into the central markets of Oaxaca guided by local expert Maria. Sample rich moles, talk with local purveyors, and admire handcrafted textiles and pottery in a vibrant, community-centered atmosphere.',
+    title: 'Senderismo Eco-Volcánico y Reforestación',
+    location: 'Volcán Masaya',
+    country: 'Nicaragua',
+    category: 'Nature',
+    duration: '4.5 Horas',
+    durationHours: 4.5,
+    groupSize: 'Máx 12 personas',
+    rating: 4.85,
+    reviewsCount: 89,
+    pricePerPerson: 48,
+    lat: 11.9839,
+    lng: -86.1608,
+    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600',
+    aboutCommunity: 'El Volcán Masaya es una de las grandes maravillas geológicas de Centroamérica, conocido históricamente como "La Boca del Infierno". Junto a guardabosques de las comunidades aledañas, explorarás los campos de lava petrificada y aportarás tu grano de arena plantando un árbol forestal nativo para mitigar las emisiones de gases de azufre e impulsar el microclima regional.',
     whatYouWillDo: [
       {
-        title: 'Mole Tasting',
-        desc: 'Compare three native mole variations (Negro, Amarillo, Coloradito) in an authentic spice stall.'
+        title: 'Trek de los Senderos de Lava',
+        desc: 'Camina entre formaciones volcánicas milenarias explicadas por guardabosques certificados del parque nacional.'
       },
       {
-        title: 'Meeting Clay Masters',
-        desc: 'Meet local barros negros (black clay) potters and observe their signature hand-firing process.'
+        title: 'Reforestación Voluntaria',
+        desc: 'Planta brotes de madero negro o guayacán en las faldas fértiles protegidas para mitigar el desgaste de suelos.'
+      },
+      {
+        title: 'Cráter Santiago de Noche o Día',
+        desc: 'Observa la fumarola constante del cráter activo, examinando minerales de azufre expelidos de la tierra.'
       }
     ],
-    authenticityScore: 95,
-    communityImpactText: 'Sustains 5 independent micro-stalls within the historic Mercado de Abastos, ensuring sustainable non-extractive tourism flow.',
+    authenticityScore: 96,
+    communityImpactText: 'Sustenta la labor de la Asociación de Guardaparques Locales y apoya financieramente los viveros municipales de conservación del departamento de Masaya.',
     communityImpactBullets: [
-      'All tour resources spent supporting native stall owners directly.',
-      'Helps maintain small artisanal family guilds in Oaxaca city outskirts.'
+      'Impulsa empleos de conservación ambiental alternativa para juventud local.',
+      'Sponsoriza la reforestación activa de 10 árboles nativos por cada viajero.',
+      'Contribuya al equipamiento de medición sísmico-gaseoso escolar regional.'
     ],
     howToGetThere: {
-      title: 'Mercado Organico de Oaxaca',
-      description: 'Bustamante 303, Oaxaca Centro.',
+      title: 'Vivero Guardas Volcán Masaya',
+      description: 'Km 23, Carretera Masaya, Nicaragua.',
       mapImage: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDGDjeJGKemRBFLeeV0zn9kCGtAX902VHlFnQ5WtyEEK6-IbcoOxf3KwMmHNPowhAVv7CRDwcAUuA7uPqc_F3xDMHhTmRbD3TRl9EdVN9cE5lTAU_Ec8_QJ7vurEpSPv81z9_MO80OO2Q7g5yZBdiOINJghCzAet1jRb3ez2FCBLxLZg54UqpfwTxU8oMqgHnTqH9cXaH-L-5ElQVwdcs6fUE5T6RABtQJythUUp4f5IXiNHcZbujsAIW_2he3Rs73x5v6KWplENqad'
     },
-    tags: ['Local', 'Explore'],
+    tags: ['Masaya', 'Aventura', 'Conservación'],
     galleryImages: [
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBKqgWhFqV2nOFrRDu8meo2L0beLkNHFR4AO-3APdmSdd0GHLMekgOLR7rLciNKB3BXWUMPJUjWTamb-whldckmhIDYPUnfINQvnR8A_NMP5JEZrFXva1BckuOdJGNVsM9slzu3mflJolhxSsTkbFnNIu7uCp34JwbdJO4Tr6qKiEQu0R3G6P7JmkpjfFYrEU4us0MsUyuHhKAVdAaidhqbabbKMpWJ6QJxH-ZemDTWFZMPUZ7nwkM2qf104i8370dsEv7orxdlgOwP'
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=600'
     ]
   }
 ];
@@ -184,52 +195,60 @@ export const EXPERIENCES_DATA: Experience[] = [
 export const MAP_PINS = [
   {
     id: 'weaving-workshop',
-    top: '30%',
-    left: '35%',
+    top: '52%',
+    left: '42%',
     icon: 'palette',
     color: '#a03f28',
-    title: 'Traditional Weaving'
+    title: 'Cerámica Masaya'
   },
   {
     id: 'coffee-journey',
-    top: '48%',
-    left: '60%',
+    top: '25%',
+    left: '52%',
     icon: 'park',
     color: '#3a674f',
-    title: 'Coffee Journey'
+    title: 'Café Matagalpa'
   },
   {
     id: 'cooking-masterclass',
     top: '65%',
-    left: '45%',
+    left: '55%',
     icon: 'restaurant',
     color: '#805600',
-    title: 'Ancestral Cooking'
+    title: 'Vigorón Granada'
+  },
+  {
+    id: 'market-walk',
+    top: '42%',
+    left: '35%',
+    icon: 'mountain',
+    color: '#1a4e7a',
+    title: 'Volcán Masaya Trek'
   }
 ];
 
 export const RECENT_PASSPORT_STAMPS = [
   {
     id: 'p1',
-    title: 'Andes Trek',
+    title: 'Volcán Mombacho',
     category: 'Nature',
-    date: 'Oct 2023',
+    date: 'Mayo 2026',
     iconType: 'mountain',
     color: '#3a674f'
   },
   {
     id: 'p2',
-    title: 'Oaxaca Culinary',
+    title: 'Granada Gastronómico',
     category: 'Culinary',
-    date: 'Aug 2023',
+    date: 'Abril 2026',
     iconType: 'utensils',
     color: '#805600'
   },
   {
     id: 'p3',
-    title: 'Teotitlán Loom',
+    title: 'Cerámica Masaya',
     category: 'Crafts',
-    date: 'Jun 2023',
+    date: 'Marzo 2026',
     iconType: 'palette',
     color: '#a03f28'
   }
