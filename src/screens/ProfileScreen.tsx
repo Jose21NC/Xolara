@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Settings, CreditCard, HelpCircle, Share2, ClipboardList, BookOpen, Star, 
-  Trash2, ArrowRight, X, Calendar, Clock, MessageSquare, Phone, Send, Check, AlertCircle, RefreshCw
+  Trash2, ArrowRight, X, Calendar, Clock, MessageSquare, Phone, Send, Check, AlertCircle, RefreshCw, LogIn, LogOut,
+  Mountain, Utensils, Palette, Coffee
 } from 'lucide-react';
 import { Booking } from '../types';
 import { RECENT_PASSPORT_STAMPS } from '../data';
+import { useFirebase } from '../contexts/FirebaseContext';
 
 interface ProfileScreenProps {
   bookings: Booking[];
@@ -61,9 +63,14 @@ export default function ProfileScreen({
   onUpdateBooking,
   onOpenConfig
 }: ProfileScreenProps) {
+  const { user, signIn, logOut, loading } = useFirebase();
   const [profileName, setProfileName] = useState('Elena Santos');
   const [isEditing, setIsEditing] = useState(false);
   const [editVal, setEditVal] = useState(profileName);
+
+  useEffect(() => {
+    if (user && user.displayName) setProfileName(user.displayName);
+  }, [user]);
 
   // RESERVATION MANAGER drawer state
   const [managingBooking, setManagingBooking] = useState<Booking | null>(null);
@@ -212,8 +219,8 @@ export default function ProfileScreen({
           {/* Avatar frame */}
           <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-brand-primary shadow-md">
             <img 
-              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200" 
-              alt="Elena Santos Avatar" 
+              src={user?.photoURL || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200"} 
+              alt={user?.displayName || "Elena Santos Avatar"} 
               className="w-full h-full object-cover grayscale contrast-110 sepia-[40%]" 
             />
           </div>
@@ -236,8 +243,10 @@ export default function ProfileScreen({
               </div>
             ) : (
               <div className="flex flex-col items-center">
-                <h3 className="font-serif text-lg font-bold text-brand-text-dark leading-tight">{profileName}</h3>
-                <p className="text-[11px] text-brand-text-muted font-bold mt-0.5 uppercase tracking-wide">Exploradora en León, Nicaragua</p>
+                <h3 className="font-serif text-lg font-bold text-brand-text-dark leading-tight">{user ? user.displayName : profileName}</h3>
+                <p className="text-[11px] text-brand-text-muted font-bold mt-0.5 uppercase tracking-wide">
+                  {user ? 'Explorador Conectado' : 'Exploradora en León, Nicaragua'}
+                </p>
               </div>
             )}
           </div>
@@ -428,7 +437,7 @@ export default function ProfileScreen({
                 className="w-12 h-12 rounded-full border-2 border-dashed flex items-center justify-center text-base mb-1.5"
                 style={{ borderColor: stamp.color, color: stamp.color }}
               >
-                {stamp.iconType === 'mountain' ? '🏔️' : stamp.iconType === 'utensils' ? '🍽️' : '🎨'}
+                {stamp.iconType === 'mountain' ? <Mountain className="w-5 h-5 text-current" strokeWidth={2}/> : stamp.iconType === 'utensils' ? <Utensils className="w-5 h-5 text-current" strokeWidth={2}/> : <Palette className="w-5 h-5 text-current" strokeWidth={2}/>}
               </div>
               <h5 className="text-[11px] font-bold text-brand-text-dark truncate w-full leading-tight">{stamp.title}</h5>
               <span className="text-[9px] text-[#8a726c] font-bold mt-0.5 uppercase tracking-wide">{stamp.date}</span>
@@ -441,7 +450,7 @@ export default function ProfileScreen({
               className="flex-shrink-0 w-28 bg-[#fdfaf5] border border-brand-primary/10 p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-md relative overflow-hidden animate-pulse"
             >
               <div className="w-12 h-12 rounded-full border-2 border-dashed flex items-center justify-center text-base mb-1.5 border-brand-primary text-brand-primary">
-                ☕
+                <Coffee className="w-5 h-5 text-current" strokeWidth={2} />
               </div>
               <h5 className="text-[11px] font-bold text-brand-text-dark truncate w-full leading-tight">{b.experienceTitle}</h5>
               <span className="text-[9px] text-brand-secondary font-bold mt-0.5 uppercase tracking-wide">Oct 2023</span>
@@ -453,6 +462,30 @@ export default function ProfileScreen({
       {/* General Settings options */}
       <section className="px-5 mt-2 mb-6">
         <div className="bg-white rounded-2xl border border-brand-primary/5 shadow-sm divide-y divide-[#f7f2ea]">
+          {user ? (
+            <div 
+              onClick={logOut}
+              className="p-3.5 flex items-center justify-between hover:bg-red-50 transition-colors cursor-pointer group"
+            >
+              <div className="flex items-center gap-3">
+                <LogOut className="w-4 h-4 text-red-500" />
+                <span className="text-xs font-bold text-red-500 transition-colors">Cerrar Sesión Segura</span>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-red-500/65" />
+            </div>
+          ) : (
+            <div 
+              onClick={signIn}
+              className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group"
+            >
+              <div className="flex items-center gap-3">
+                <LogIn className="w-4 h-4 text-brand-primary" />
+                <span className="text-xs font-bold text-brand-primary transition-colors">Vincular con Cuenta Google</span>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-brand-primary/65" />
+            </div>
+          )}
+
           <div className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
             <div className="flex items-center gap-3">
               <ClipboardList className="w-4 h-4 text-brand-text-muted" />

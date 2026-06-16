@@ -1,0 +1,73 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Phase 4.1: Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() { return request.auth != null; }
+    function isVerified() { return request.auth.token.email_verified == true; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'createdAt']) &&
+        data.keys().size() >= 3 &&
+        data.uid is string && data.uid.size() <= 128 && data.uid == request.auth.uid &&
+        data.email is string && data.email.size() <= 256 &&
+        data.createdAt == request.time;
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && isValidId(userId) && userId == request.auth.uid && isValidUser(incoming());
+      allow update: if isSignedIn() && userId == request.auth.uid &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL']) &&
+        (incoming().get('displayName', '') is string) && (incoming().get('displayName', '').size() <= 100) &&
+        (incoming().get('photoURL', '') is string) && (incoming().get('photoURL', '').size() <= 500);
+      // No delete or list
+    }
+
+    function isValidExperience(data) {
+      return data.keys().hasAll(['title', 'location', 'country', 'category', 'image', 'createdBy', 'createdAt']) &&
+        data.title is string && data.title.size() <= 200 && data.title.size() > 0 &&
+        data.location is string && data.location.size() <= 200 &&
+        data.country is string && data.country.size() <= 100 &&
+        data.category is string && data.category.size() <= 50 &&
+        data.image is string && data.image.size() <= 1000 &&
+        data.createdBy == request.auth.uid &&
+        data.createdAt == request.time;
+    }
+
+    match /experiences/{experienceId} {
+      allow read: if true; // Everyone can read experiences
+      allow create: if isSignedIn() && isValidId(experienceId) && isValidExperience(incoming());
+      allow update: if false; // Only authors/admins could update eventually
+    }
+
+    function isValidBooking(data) {
+      return data.keys().hasAll(['userId', 'experienceId', 'date', 'time', 'totalPrice', 'status', 'createdAt']) &&
+        data.userId == request.auth.uid &&
+        data.experienceId is string && data.experienceId.size() <= 128 &&
+        data.date is string && data.date.size() <= 50 &&
+        data.time is string && data.time.size() <= 50 &&
+        data.totalPrice is number &&
+        data.status in ['Confirmed', 'Pending', 'Completed'] &&
+        data.createdAt == request.time;
+    }
+
+    match /bookings/{bookingId} {
+      allow get, list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(bookingId) && isValidBooking(incoming());
+      allow update: if isSignedIn() && existing().userId == request.auth.uid &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status']) &&
+        incoming().status in ['Confirmed', 'Pending', 'Completed'] &&
+        incoming().userId == existing().userId; // Immutability
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+  }
+}

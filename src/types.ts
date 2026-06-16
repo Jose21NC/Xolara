@@ -25,10 +25,14 @@ export interface Experience {
   galleryImages: string[];
   lat?: number;
   lng?: number;
+  createdBy?: string;
+  hostName?: string;
+  createdAt?: any;
 }
 
 export interface Booking {
   id: string;
+  userId?: string;
   experienceId: string;
   experienceTitle: string;
   experienceImage: string;
@@ -39,6 +43,7 @@ export interface Booking {
   totalPrice: number;
   bookingRef: string;
   confirmedAt: string;
+  createdAt?: any;
   status: 'Confirmed' | 'Pending' | 'Completed';
 }
 

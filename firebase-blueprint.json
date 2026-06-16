@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the application",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Experience": {
+      "title": "Experience",
+      "description": "An authentic local experience or place",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "location": { "type": "string" },
+        "country": { "type": "string" },
+        "category": { "type": "string" },
+        "duration": { "type": "string" },
+        "durationHours": { "type": "number" },
+        "groupSize": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviewsCount": { "type": "number" },
+        "pricePerPerson": { "type": "number" },
+        "image": { "type": "string" },
+        "aboutCommunity": { "type": "string" },
+        "whatYouWillDo": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "desc": { "type": "string" }
+            }
+          }
+        },
+        "authenticityScore": { "type": "number" },
+        "communityImpactText": { "type": "string" },
+        "communityImpactBullets": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "galleryImages": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" },
+        "howToGetThereTitle": { "type": "string" },
+        "howToGetThereDescription": { "type": "string" },
+        "howToGetThereMapImage": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "location", "country", "category", "image"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "A user's booking of an experience",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "experienceId": { "type": "string" },
+        "experienceTitle": { "type": "string" },
+        "experienceImage": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "adultsCount": { "type": "number" },
+        "childrenCount": { "type": "number" },
+        "totalPrice": { "type": "number" },
+        "bookingRef": { "type": "string" },
+        "confirmedAt": { "type": "string" },
+        "status": { "type": "string", "enum": ["Confirmed", "Pending", "Completed"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "experienceId", "date", "time", "totalPrice", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/experiences/{experienceId}": {
+      "schema": { "$ref": "#/entities/Experience" },
+      "description": "Available experiences and places"
+    },
+    "/bookings/{bookingId}": {
+      "schema": { "$ref": "#/entities/Booking" },
+      "description": "User bookings"
+    }
+  }
+}

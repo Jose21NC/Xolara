@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PhoneShell from './components/PhoneShell';
 import ExploreScreen from './screens/ExploreScreen';
 import MapScreen from './screens/MapScreen';
@@ -9,14 +9,18 @@ import ProfileScreen from './screens/ProfileScreen';
 import PassportScreen from './screens/PassportScreen';
 import ExperiencesFeedScreen from './screens/ExperiencesFeedScreen';
 import ConfigurationScreen from './screens/ConfigurationScreen';
+import CreateExperienceScreen from './screens/CreateExperienceScreen';
 import { EXPERIENCES_DATA } from './data';
 import { Booking, Experience, AppConfig } from './types';
 import { Compass, Sparkles, Award, User, MapPin } from 'lucide-react';
+import { collection, onSnapshot, query, doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from './firebase';
+import { useFirebase } from './contexts/FirebaseContext';
 
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<'explore' | 'experiences' | 'passport' | 'profile'>('explore');
-  const [currentScreen, setCurrentScreen] = useState<'explore' | 'map' | 'detail' | 'reservation' | 'confirmed' | 'configuration'>('explore');
+  const [currentScreen, setCurrentScreen] = useState<'explore' | 'map' | 'detail' | 'reservation' | 'confirmed' | 'configuration' | 'create_exp'>('explore');
 
   // Application Global Preferences State
   const [config, setConfig] = useState<AppConfig>({
@@ -27,27 +31,50 @@ export default function App() {
     showCo2InLbs: false
   });
 
+  // External data state
+  const [experiences, setExperiences] = useState<Experience[]>(EXPERIENCES_DATA);
+  const { user } = useFirebase();
+
+  // Load from Firebase
+  useEffect(() => {
+    const q = query(collection(db, 'experiences'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const exps = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Experience));
+      if (exps.length > 0) {
+        setExperiences(exps);
+      }
+    }, (error) => {
+      console.error('Firestore Error sync experiences:', error);
+    });
+    return () => unsubscribe();
+  }, []);
+
   // Selected experience details
   const [selectedExperienceId, setSelectedExperienceId] = useState<string>('coffee-journey');
 
   // User booking list state
-  const [bookings, setBookings] = useState<Booking[]>([
-    {
-      id: 'bk-initial',
-      experienceId: 'weaving-workshop',
-      experienceTitle: 'Cerámica Ancestral de San Juan de Oriente',
-      experienceImage: 'https://images.unsplash.com/photo-1565192647048-f997ded879ab?auto=format&fit=crop&q=80&w=600',
-      date: '20 de Junio, 2026',
-      time: '10:00 AM',
-      adultsCount: 2,
-      childrenCount: 0,
-      totalPrice: 70,
-      bookingRef: 'XLR-8820',
-      confirmedAt: '15/06/2026',
-      status: 'Confirmed'
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
+
+  // Sync Bookings
+  useEffect(() => {
+    if (!user) {
+      setBookings([]);
+      return;
     }
-  ]);
-  const [activeBookingId, setActiveBookingId] = useState<string | null>('bk-initial');
+    const q = query(collection(db, 'bookings'), /* where('userId', '==', user.uid) */); // For now fetching all or just user's
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const bks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Booking));
+      const userBks = bks.filter(b => b.userId === user.uid);
+      setBookings(userBks);
+      if (userBks.length > 0 && !activeBookingId) {
+        setActiveBookingId(userBks[0].id);
+      }
+    }, (error) => {
+      console.error('Firestore Error sync bookings:', error);
+    });
+    return () => unsubscribe();
+  }, [user]);
 
   // Social / Bookmark state
   const [likedExperiences, setLikedExperiences] = useState<string[]>(['weaving-workshop']); // pre-liked to match mockup favorite button!
@@ -57,7 +84,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Find exact Experience object
-  const activeExperience = EXPERIENCES_DATA.find(e => e.id === selectedExperienceId) || EXPERIENCES_DATA[0];
+  const activeExperience = experiences.find(e => e.id === selectedExperienceId) || experiences[0] || EXPERIENCES_DATA[0];
 
   // Toggle liking
   const handleToggleLike = (id: string, e: React.MouseEvent) => {
@@ -82,7 +109,7 @@ export default function App() {
   };
 
   // Confirm reservation
-  const handleConfirmBooking = (details: {
+  const handleConfirmBooking = async (details: {
     experienceId: string;
     date: string;
     time: string;
@@ -90,12 +117,18 @@ export default function App() {
     childrenCount: number;
     totalPrice: number;
   }) => {
-    const exp = EXPERIENCES_DATA.find(e => e.id === details.experienceId)!;
+    if (!user) {
+      alert("Por favor inicia sesión para reservar.");
+      return;
+    }
+
+    const exp = experiences.find(e => e.id === details.experienceId)!;
     
     // Create new booking ref XLR-8492 style
     const refNum = Math.floor(1000 + Math.random() * 9000);
-    const newBooking: Booking = {
-      id: `bk-${Date.now()}`,
+    const newBookingId = `bk-${Date.now()}`;
+    const newBooking = {
+      userId: user.uid,
       experienceId: details.experienceId,
       experienceTitle: exp.title,
       experienceImage: exp.image,
@@ -105,13 +138,19 @@ export default function App() {
       childrenCount: details.childrenCount,
       totalPrice: details.totalPrice,
       bookingRef: `XLR-${refNum}`,
-      confirmedAt: new Date().toLocaleDateString(),
-      status: 'Confirmed'
+      confirmedAt: new Date().toISOString(),
+      status: 'Confirmed' as const,
+      createdAt: serverTimestamp()
     };
 
-    setBookings(prev => [newBooking, ...prev]);
-    setActiveBookingId(newBooking.id);
-    setCurrentScreen('confirmed');
+    try {
+      await setDoc(doc(db, 'bookings', newBookingId), newBooking);
+      setActiveBookingId(newBookingId);
+      setCurrentScreen('confirmed');
+    } catch (e) {
+      console.error(e);
+      alert("Hubo un error al confirmar tu reserva.");
+    }
   };
 
   // Remove / Cancel reservation
@@ -173,6 +212,7 @@ export default function App() {
           setActiveCategory={setActiveCategory}
           likedExperiences={likedExperiences}
           onToggleLike={handleToggleLike}
+          experiences={experiences}
         />
       );
     }
@@ -199,9 +239,21 @@ export default function App() {
       );
     }
 
+    if (currentScreen === 'create_exp') {
+      return (
+        <CreateExperienceScreen 
+          onBack={() => setCurrentScreen('explore')}
+          onSuccess={() => {
+            setCurrentScreen('explore');
+            setActiveTab('explore');
+          }}
+        />
+      );
+    }
+
     if (currentScreen === 'confirmed') {
       const activeBooking = bookings.find(b => b.id === activeBookingId) || bookings[0];
-      const bookExp = EXPERIENCES_DATA.find(e => e.id === activeBooking.experienceId) || activeExperience;
+      const bookExp = experiences.find(e => e.id === activeBooking?.experienceId) || activeExperience;
       
       return (
         <ConfirmedScreen 
@@ -225,6 +277,8 @@ export default function App() {
             onSelectExperience={handleSelectExperience}
             likedExperiences={likedExperiences}
             onToggleLike={handleToggleLike}
+            experiences={experiences}
+            onCreateNew={() => setCurrentScreen('create_exp')}
           />
         );
       
@@ -260,6 +314,7 @@ export default function App() {
             setSearchQuery={setSearchQuery}
             likedExperiences={likedExperiences}
             onToggleLike={handleToggleLike}
+            experiences={experiences}
           />
         );
     }

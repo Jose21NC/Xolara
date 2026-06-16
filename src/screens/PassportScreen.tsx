@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { 
-  Award, Fingerprint, Calendar, ArrowRight, ArrowLeft, CheckCircle2, Sliders 
+  Award, Fingerprint, Calendar, ArrowRight, ArrowLeft, CheckCircle2, Sliders,
+  Mountain, Utensils, Palette, Coffee, Flame, Lock
 } from 'lucide-react';
 import { Booking, AppConfig } from '../types';
 import CulturalTipsPopup from '../components/CulturalTipsPopup';
+import { useFirebase } from '../contexts/FirebaseContext';
 
 interface PassportScreenProps {
   bookings: Booking[];
@@ -179,7 +181,7 @@ const RealisticStamp = ({
               </text>
             </svg>
             <div className="z-10 flex flex-col items-center mt-1">
-              <span className="text-xl leading-none">🌋</span>
+              <span className="leading-none mt-1"><Mountain className="w-5 h-5 text-current" strokeWidth={2.5} /></span>
               <span className="text-[5.5px] font-black tracking-widest mt-0.5 leading-none">MOMBACHO</span>
               <span className="text-[7.5px] font-black mt-1 bg-white/40 px-1 leading-none">{date}</span>
             </div>
@@ -197,7 +199,7 @@ const RealisticStamp = ({
             </svg>
             <div className="z-10 flex flex-col items-center px-1 justify-center mt-0.5">
               <span className="text-[6px] font-extrabold uppercase tracking-widest leading-none">GRANADA</span>
-              <span className="text-lg my-1">🍽️</span>
+              <span className="my-1"><Utensils className="w-5 h-5 text-current" strokeWidth={2.5} /></span>
               <span className="text-[8px] font-black uppercase tracking-widest leading-none bg-white/50 px-1">{date}</span>
               <span className="text-[5px] font-bold mt-1 text-center truncate leading-none uppercase">SABORES REGIONALES</span>
             </div>
@@ -213,7 +215,7 @@ const RealisticStamp = ({
             </svg>
             <div className="z-10 flex flex-col items-center justify-center text-center px-1">
               <span className="text-[5px] font-extrabold uppercase tracking-widest leading-none">ALFARERO</span>
-              <span className="text-xl my-0.5">🎨</span>
+              <span className="my-0.5"><Palette className="w-5 h-5 text-current" strokeWidth={2.5} /></span>
               <span className="text-[8.5px] font-black tracking-tight leading-none px-1 bg-white/60 mb-0.5">{date}</span>
               <span className="text-[4.5px] font-bold uppercase leading-none">CHOROTEGA</span>
             </div>
@@ -233,7 +235,7 @@ const RealisticStamp = ({
             </svg>
             <div className="z-10 flex flex-col items-center justify-center px-2">
               <span className="text-[5.5px] font-black uppercase tracking-widest leading-none">PARQUE NACIONAL</span>
-              <span className="text-lg my-0.5">🌋</span>
+              <span className="my-0.5"><Flame className="w-5 h-5 text-current" strokeWidth={2.5} /></span>
               <span className="text-[8px] font-black uppercase tracking-widest leading-none bg-white/60 px-1 py-0.5 my-0.5">MASAYA</span>
               <span className="text-[6.5px] font-bold uppercase leading-none">{date}</span>
             </div>
@@ -257,7 +259,7 @@ const RealisticStamp = ({
               </text>
             </svg>
             <div className="z-10 flex flex-col items-center justify-center px-1">
-              <span className="text-base leading-none">☕</span>
+              <span className="leading-none mt-1 mb-0.5"><Coffee className="w-5 h-5 text-current" strokeWidth={2.5} /></span>
               <span className="text-[5.5px] font-black uppercase text-center tracking-tight leading-none max-w-[55px] truncate mt-0.5 bg-white/30 px-0.5">
                 {title.split(' en ')[0].split(' de ')[0]}
               </span>
@@ -273,6 +275,7 @@ const RealisticStamp = ({
 };
 
 export default function PassportScreen({ bookings, config, onOpenConfig }: PassportScreenProps) {
+  const { user } = useFirebase();
   const [selectedStamp, setSelectedStamp] = useState<any | null>(null);
   const [isTipsOpen, setIsTipsOpen] = useState(false);
   
@@ -566,7 +569,7 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
                   <Fingerprint className="w-16 h-16 text-amber-100/90 animate-pulse" strokeWidth={1} />
                   
                   {/* Miniature decorative elements */}
-                  <span className="absolute text-xs text-amber-200 top-3">🌋</span>
+                  <span className="absolute text-amber-200 top-3"><Mountain className="w-4 h-4 text-currentColor" strokeWidth={2.5}/></span>
                   <span className="absolute text-[8px] text-amber-200 left-4 top-1/2 -translate-y-1/2">★</span>
                   <span className="absolute text-[8px] text-amber-200 right-4 top-1/2 -translate-y-1/2">★</span>
                   <span className="absolute text-[8px] text-amber-200/95 bottom-3 tracking-[0.2em] font-serif leading-none uppercase">Xolara</span>
@@ -615,25 +618,29 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
                 <div className="grid grid-cols-5 gap-3.5 mt-2 flex-grow z-10">
                   {/* Portrait photo frame */}
                   <div className="col-span-2 flex flex-col items-center">
-                    <div className="w-full aspect-[4/5] bg-stone-200 rounded border border-brand-primary/20 overflow-hidden relative shadow-md">
-                      <img 
-                        src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200" 
-                        alt="Elena Santos" 
-                        className="w-full h-full object-cover grayscale contrast-115 sepia-[40%]" 
-                      />
+                    <div className="w-full aspect-[4/5] bg-[#efebe1] rounded border border-brand-primary/20 overflow-hidden relative shadow-md flex items-center justify-center">
+                      {user?.photoURL ? (
+                        <img 
+                          src={user.photoURL} 
+                          alt={user.displayName || "User"} 
+                          className="w-full h-full object-cover grayscale contrast-115 sepia-[40%]" 
+                        />
+                      ) : (
+                        <span className="text-[7.5px] font-black uppercase text-brand-primary/40 tracking-widest leading-none rotate-[-90deg]">FOTO SOBERANA</span>
+                      )}
                       {/* Biometric circle seal stamp overlap */}
                       <div className="absolute -bottom-3 -right-3 w-10 h-10 rounded-full border border-dashed border-[#922718]/40 bg-transparent flex items-center justify-center text-[#922718]/30 font-serif text-[4px] font-black scale-120 rotate-12">
                         SELLO OFICIAL
                       </div>
                     </div>
-                    <span className="text-[7.5px] font-black text-[#8c7457] mt-1.5 uppercase tracking-wide">Elena Santos</span>
+                    <span className="text-[7.5px] font-black text-[#8c7457] mt-1.5 uppercase tracking-wide">{user ? user.displayName : 'Explorador Anónimo'}</span>
                   </div>
 
                   {/* Fields lists */}
                   <div className="col-span-3 flex flex-col gap-2.5 text-[8px] text-[#6b563f] pt-1">
                     <div>
                       <span className="block text-[6px] text-brand-text-muted font-black uppercase leading-none">Viajero / Nombres:</span>
-                      <span className="font-black text-[9.5px] text-brand-text-dark font-mono mt-0.5 block">Elena M. Santos</span>
+                      <span className="font-black text-[9.5px] text-brand-text-dark font-mono mt-0.5 block">{user ? user.displayName : 'Anónimo'}</span>
                     </div>
                     <div>
                       <span className="block text-[6px] text-brand-text-muted font-black uppercase leading-none">País de Procedencia:</span>
@@ -835,7 +842,7 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
                     ) : (
                       /* Empty stamps container */
                       <div className="col-span-2 border border-dashed border-[#a89c7d]/40 rounded-2xl p-4 flex flex-col items-center justify-center text-center text-brand-text-muted my-2 bg-stone-50/50">
-                        <span className="text-2xl mb-1 block">🔒</span>
+                        <span className="mb-1 block text-brand-text-muted"><Lock className="w-6 h-6" strokeWidth={2} /></span>
                         <span className="text-[9px] font-bold mt-1 max-w-[180px] leading-relaxed">
                           Tus reservas activas se estamparán aquí como comprobante húmedo nicaragüense tan pronto hagas check-in.
                         </span>

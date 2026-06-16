@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Star, Clock, Crosshair, ArrowLeft, Heart, X, Sparkles, HelpCircle } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps';
-import { EXPERIENCES_DATA, MAP_PINS } from '../data';
+import { MAP_PINS } from '../data';
 import { Experience } from '../types';
 
 interface MapScreenProps {
@@ -11,6 +11,7 @@ interface MapScreenProps {
   setActiveCategory: (category: string) => void;
   likedExperiences: string[];
   onToggleLike: (id: string, e: React.MouseEvent) => void;
+  experiences: Experience[];
 }
 
 const GOOGLE_MAPS_KEY =
@@ -27,7 +28,8 @@ export default function MapScreen({
   activeCategory,
   setActiveCategory,
   likedExperiences,
-  onToggleLike
+  onToggleLike,
+  experiences
 }: MapScreenProps) {
   const [selectedPinId, setSelectedPinId] = useState<string | null>('coffee-journey');
   const [showKeyInstructions, setShowKeyInstructions] = useState(false);
@@ -35,10 +37,10 @@ export default function MapScreen({
   const categories = ['All', 'Crafts', 'Culinary', 'Agriculture', 'Nature'];
 
   // Current selected experience based on pin selection
-  const selectedExperience = EXPERIENCES_DATA.find(exp => exp.id === selectedPinId);
+  const selectedExperience = experiences.find(exp => exp.id === selectedPinId);
 
   // Filtered experiences that have lat/lng defined
-  const filteredExperiences = EXPERIENCES_DATA.filter(exp => {
+  const filteredExperiences = experiences.filter(exp => {
     // filter by category
     const matchesCategory = activeCategory === 'All' || exp.category === activeCategory;
     return matchesCategory && exp.lat !== undefined && exp.lng !== undefined;

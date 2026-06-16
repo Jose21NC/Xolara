@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
 import { Compass, Sparkles, Filter, Star, Clock, MapPin, Heart } from 'lucide-react';
-import { EXPERIENCES_DATA } from '../data';
 import { Experience } from '../types';
 
 interface ExperiencesFeedScreenProps {
   onSelectExperience: (id: string) => void;
   likedExperiences: string[];
   onToggleLike: (id: string, e: React.MouseEvent) => void;
+  experiences: Experience[];
+  onCreateNew: () => void;
 }
 
 export default function ExperiencesFeedScreen({
   onSelectExperience,
   likedExperiences,
-  onToggleLike
+  onToggleLike,
+  experiences,
+  onCreateNew
 }: ExperiencesFeedScreenProps) {
   const [activeTagFilter, setActiveTagFilter] = useState('All');
 
   const tags = ['All', 'Agriculture', 'Crafts', 'Culinary'];
 
   const filtered = activeTagFilter === 'All'
-    ? EXPERIENCES_DATA
-    : EXPERIENCES_DATA.filter(exp => exp.category === activeTagFilter);
+    ? experiences
+    : experiences.filter(exp => exp.category === activeTagFilter);
 
   return (
     <div className="flex flex-col gap-6 pb-24 font-sans">
@@ -32,7 +35,13 @@ export default function ExperiencesFeedScreen({
             <Compass className="w-5 h-5 text-brand-primary" />
             <h2 className="font-serif text-2xl font-bold text-brand-primary">Experiencias</h2>
           </div>
-          <Sparkles className="w-4 h-4 text-brand-tertiary" />
+          <button 
+            onClick={onCreateNew} 
+            className="flex items-center gap-1.5 bg-brand-primary/10 text-brand-primary font-bold px-3 py-1.5 rounded-full text-xs hover:bg-brand-primary/20 active:scale-95 transition-all"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Crear
+          </button>
         </div>
         <p className="text-xs text-brand-text-muted font-medium">
           Descubre e inscríbete en nuestros recorridos inmersivos creados íntegramente por guías locales.

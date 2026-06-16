@@ -1,7 +1,6 @@
 import React from 'react';
 import { Search, SlidersHorizontal, Heart, Star, MapPin, ArrowRight, Flame } from 'lucide-react';
 import { Experience } from '../types';
-import { EXPERIENCES_DATA } from '../data';
 
 interface ExploreScreenProps {
   onSelectExperience: (id: string) => void;
@@ -12,6 +11,7 @@ interface ExploreScreenProps {
   setSearchQuery: (query: string) => void;
   likedExperiences: string[];
   onToggleLike: (id: string, e: React.MouseEvent) => void;
+  experiences: Experience[];
 }
 
 export default function ExploreScreen({
@@ -22,7 +22,8 @@ export default function ExploreScreen({
   searchQuery,
   setSearchQuery,
   likedExperiences,
-  onToggleLike
+  onToggleLike,
+  experiences
 }: ExploreScreenProps) {
   
   const categories = [
@@ -34,7 +35,7 @@ export default function ExploreScreen({
   ];
 
   // Filtering experiences
-  const filteredExperiences = EXPERIENCES_DATA.filter(exp => {
+  const filteredExperiences = experiences.filter(exp => {
     const matchesCategory = activeCategory === 'All' || exp.category === activeCategory;
     const matchesSearch = exp.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           exp.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
