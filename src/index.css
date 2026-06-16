@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Literata', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  
+  --color-brand-primary: #a03f28;        /* Terracotta */
+  --color-brand-secondary: #3a674f;      /* Deep Green */
+  --color-brand-tertiary: #805600;       /* Ochre */
+  --color-brand-bg: #fcf9f3;             /* Bone / Paper Off-White */
+  --color-brand-text-dark: #1c1c18;      /* Deep Charcoal */
+  --color-brand-text-muted: #56423d;     /* Warm grey */
+}
+
+/* Base style overrides to apply our background and fonts */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-text-dark);
+}
+
+/* Custom scrollbar hider */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
