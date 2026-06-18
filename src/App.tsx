@@ -82,6 +82,7 @@ export default function App() {
   // Filters state
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [experienceSearchTerm, setExperienceSearchTerm] = useState<string>('');
 
   // Find exact Experience object
   const activeExperience = experiences.find(e => e.id === selectedExperienceId) || experiences[0] || EXPERIENCES_DATA[0];
@@ -190,6 +191,12 @@ export default function App() {
     setCurrentScreen('explore'); // reset detail overriding states on tab change
   };
 
+  const handleNavigateToExperiences = (searchTerm: string) => {
+    setExperienceSearchTerm(searchTerm);
+    setActiveTab('experiences');
+    setCurrentScreen('explore');
+  };
+
   // Render correct active view
   const renderScreenContent = () => {
     // 1. Interactive Detailed Overrides
@@ -205,37 +212,43 @@ export default function App() {
 
     if (currentScreen === 'map') {
       return (
-        <MapScreen 
-          onBack={() => setCurrentScreen('explore')}
-          onSelectExperience={handleSelectExperience}
-          activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory}
-          likedExperiences={likedExperiences}
-          onToggleLike={handleToggleLike}
-          experiences={experiences}
-        />
+        <div className="animate-fade-in">
+          <MapScreen 
+            onBack={() => setCurrentScreen('explore')}
+            onSelectExperience={handleSelectExperience}
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+            likedExperiences={likedExperiences}
+            onToggleLike={handleToggleLike}
+            experiences={experiences}
+          />
+        </div>
       );
     }
 
     if (currentScreen === 'detail') {
       return (
-        <DetailScreen 
-          experience={activeExperience}
-          onBack={() => setCurrentScreen('explore')}
-          onBook={() => setCurrentScreen('reservation')}
-          isLiked={likedExperiences.includes(selectedExperienceId)}
-          onToggleLike={(e) => handleToggleLike(selectedExperienceId, e)}
-        />
+        <div className="animate-scale-in">
+          <DetailScreen 
+            experience={activeExperience}
+            onBack={() => setCurrentScreen('explore')}
+            onBook={() => setCurrentScreen('reservation')}
+            isLiked={likedExperiences.includes(selectedExperienceId)}
+            onToggleLike={(e) => handleToggleLike(selectedExperienceId, e)}
+          />
+        </div>
       );
     }
 
     if (currentScreen === 'reservation') {
       return (
-        <ReservationScreen 
-          experience={activeExperience}
-          onBack={() => setCurrentScreen('detail')}
-          onConfirmBooking={handleConfirmBooking}
-        />
+        <div className="animate-slide-up">
+          <ReservationScreen 
+            experience={activeExperience}
+            onBack={() => setCurrentScreen('detail')}
+            onConfirmBooking={handleConfirmBooking}
+          />
+        </div>
       );
     }
 
@@ -278,7 +291,7 @@ export default function App() {
             likedExperiences={likedExperiences}
             onToggleLike={handleToggleLike}
             experiences={experiences}
-            onCreateNew={() => setCurrentScreen('create_exp')}
+            initialSearchQuery={experienceSearchTerm}
           />
         );
       
@@ -315,6 +328,7 @@ export default function App() {
             likedExperiences={likedExperiences}
             onToggleLike={handleToggleLike}
             experiences={experiences}
+            onNavigateToExperiences={handleNavigateToExperiences}
           />
         );
     }
@@ -333,70 +347,27 @@ export default function App() {
 
       {/* App Bottom standard glass-navigation menu bar */}
       {showBottomNav && (
-        <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white/95 backdrop-blur-lg shadow-[0_-2px_10px_rgba(42,36,31,0.06)] rounded-t-2xl max-w-sm left-1/2 -translate-x-1/2 border-t border-brand-primary/5">
-          {/* Explore */}
-          <button 
-            onClick={() => handleTabClick('explore')}
-            className={`flex flex-col items-center justify-center text-center transition-all ${
-              activeTab === 'explore'
-                ? 'text-brand-primary font-bold scale-105'
-                : 'text-brand-text-muted opacity-75 hover:opacity-100'
-            }`}
-          >
-            <Compass className={`w-5 h-5 ${activeTab === 'explore' ? 'fill-brand-primary/10' : ''}`} />
-            <span className="text-[10px] mt-1 font-semibold leading-none tracking-wide">Explore</span>
-            {activeTab === 'explore' && (
-              <span className="block w-1 h-1 bg-brand-primary rounded-full mt-1" />
-            )}
-          </button>
-
-          {/* Experiences */}
-          <button 
-            onClick={() => handleTabClick('experiences')}
-            className={`flex flex-col items-center justify-center text-center transition-all ${
-              activeTab === 'experiences'
-                ? 'text-brand-primary font-bold scale-105'
-                : 'text-brand-text-muted opacity-75 hover:opacity-100'
-            }`}
-          >
-            <Sparkles className={`w-5 h-5 ${activeTab === 'experiences' ? 'fill-brand-primary/10' : ''}`} />
-            <span className="text-[10px] mt-1 font-semibold leading-none tracking-wide">Experiences</span>
-            {activeTab === 'experiences' && (
-              <span className="block w-1 h-1 bg-brand-primary rounded-full mt-1" />
-            )}
-          </button>
-
-          {/* Passport */}
-          <button 
-            onClick={() => handleTabClick('passport')}
-            className={`flex flex-col items-center justify-center text-center transition-all ${
-              activeTab === 'passport'
-                ? 'text-brand-primary font-bold scale-105'
-                : 'text-brand-text-muted opacity-75 hover:opacity-100'
-            }`}
-          >
-            <Award className={`w-5 h-5 ${activeTab === 'passport' ? 'fill-brand-primary/10' : ''}`} />
-            <span className="text-[10px] mt-1 font-semibold leading-none tracking-wide">Passport</span>
-            {activeTab === 'passport' && (
-              <span className="block w-1 h-1 bg-brand-primary rounded-full mt-1" />
-            )}
-          </button>
-
-          {/* Profile */}
-          <button 
-            onClick={() => handleTabClick('profile')}
-            className={`flex flex-col items-center justify-center text-center transition-all ${
-              activeTab === 'profile'
-                ? 'text-brand-primary font-bold scale-105'
-                : 'text-brand-text-muted opacity-75 hover:opacity-100'
-            }`}
-          >
-            <User className={`w-5 h-5 ${activeTab === 'profile' ? 'fill-brand-primary/10' : ''}`} />
-            <span className="text-[10px] mt-1 font-semibold leading-none tracking-wide">Profile</span>
-            {activeTab === 'profile' && (
-              <span className="block w-1 h-1 bg-brand-primary rounded-full mt-1" />
-            )}
-          </button>
+        <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-[22rem] z-50 flex justify-around items-center px-3 py-2.5 glass-chrome rounded-full animate-slide-up">
+          {([
+            { key: 'explore', label: 'Explore', Icon: Compass },
+            { key: 'experiences', label: 'Experiences', Icon: Sparkles },
+            { key: 'passport', label: 'Passport', Icon: Award },
+            { key: 'profile', label: 'Profile', Icon: User },
+          ] as const).map(({ key, label, Icon }) => {
+            const isActive = activeTab === key;
+            return (
+              <button
+                key={key}
+                onClick={() => handleTabClick(key)}
+                className={`relative flex flex-col items-center justify-center text-center gap-1 px-3 py-1.5 rounded-full transition-apple tap-feedback ${
+                  isActive ? 'text-brand-primary' : 'text-brand-text-muted hover:text-brand-text-dark'
+                }`}
+              >
+                <Icon className="w-[22px] h-[22px] transition-apple" strokeWidth={isActive ? 2.4 : 1.8} />
+                <span className={`text-[10px] leading-none tracking-wide ${isActive ? 'font-semibold' : 'font-medium'}`}>{label}</span>
+              </button>
+            );
+          })}
         </nav>
       )}
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Settings, CreditCard, HelpCircle, Share2, ClipboardList, BookOpen, Star, 
-  Trash2, ArrowRight, X, Calendar, Clock, MessageSquare, Phone, Send, Check, AlertCircle, RefreshCw, LogIn, LogOut,
+  Settings, Share2, Star, 
+  Trash2, ArrowRight, X, Calendar, Clock, MessageSquare, Send, Check, AlertCircle, RefreshCw,
   Mountain, Utensils, Palette, Coffee
 } from 'lucide-react';
 import { Booking } from '../types';
@@ -63,7 +63,7 @@ export default function ProfileScreen({
   onUpdateBooking,
   onOpenConfig
 }: ProfileScreenProps) {
-  const { user, signIn, logOut, loading } = useFirebase();
+  const { user } = useFirebase();
   const [profileName, setProfileName] = useState('Elena Santos');
   const [isEditing, setIsEditing] = useState(false);
   const [editVal, setEditVal] = useState(profileName);
@@ -182,36 +182,36 @@ export default function ProfileScreen({
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-24 font-sans relative min-h-screen bg-[#fcf9f3]">
+    <div className="flex flex-col gap-6 pb-24 font-sans relative min-h-screen">
       
       {/* Toast Alert message feedback */}
       {toastMessage && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#3a674f] text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 animate-bounce">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 glass-chrome text-brand-text-dark font-semibold text-xs px-4 py-2.5 rounded-full flex items-center gap-2 animate-slide-down">
           <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Top Header */}
       <header className="px-5 pt-4 flex items-center justify-between">
-        <button 
+        <button
           onClick={onOpenConfig}
-          className="text-brand-text-dark hover:bg-neutral-100 p-2 rounded-full transition-all active:scale-90" 
+          className="text-brand-text-dark hover:bg-black/5 p-2 rounded-full transition-all active:scale-90"
           title="Ajustes"
         >
-          <Settings className="w-5 h-5 text-brand-text-dark" />
+          <Settings className="w-5 h-5 text-brand-text-dark" strokeWidth={1.8} />
         </button>
-        <span className="font-serif text-lg font-black text-brand-primary">Mi Perfil Autónomo</span>
-        <button className="text-brand-text-dark hover:bg-neutral-100 p-2 rounded-full" title="Compartir Perfil">
-          <Share2 className="w-5 h-5 text-brand-text-dark" strokeWidth={2.2} />
+        <span className="font-serif text-lg font-semibold text-brand-text-dark">Mi Perfil</span>
+        <button className="text-brand-text-dark hover:bg-black/5 p-2 rounded-full" title="Compartir Perfil">
+          <Share2 className="w-5 h-5 text-brand-text-dark" strokeWidth={1.8} />
         </button>
       </header>
 
       {/* Profile summary card banner */}
       <div className="px-5 animate-fade-in">
-        <div 
-          className="relative rounded-2xl overflow-hidden p-6 text-center flex flex-col items-center gap-3 border border-brand-primary/5 shadow-inner"
+        <div
+          className="relative rounded-[var(--radius-card)] overflow-hidden p-6 text-center flex flex-col items-center gap-3 surface-card"
           style={{
-            backgroundImage: "linear-gradient(rgba(252,249,243,0.85), rgba(252,249,243,0.95)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJml7d2BHBK-4rUKbZKcSQXU7K_0GQihW8YQTgVAFQglkIWprIvZITnIqBbAXepmkxE4cYSxn1owkoEIegtZZgdQ3-ybFVpUVTYitGZOVzNF6VcDmQP4iYTr7R7GwQ-47MZtDrvFCebBOEYO6LKjW-1LxFrXigZBeofb9tR54SZCpe8B1IDoLcIxtbK3zWBjqul27-MJvlHD2c6Ls8ABPcm-ixwlHqVM-M17UhyoOPEYex597rk4yB4yQalYyW3M_YdHZdFO29F0_X')",
+            backgroundImage: "linear-gradient(rgba(244,244,242,0.86), rgba(244,244,242,0.96)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJml7d2BHBK-4rUKbZKcSQXU7K_0GQihW8YQTgVAFQglkIWprIvZITnIqBbAXepmkxE4cYSxn1owkoEIegtZZgdQ3-ybFVpUVTYitGZOVzNF6VcDmQP4iYTr7R7GwQ-47MZtDrvFCebBOEYO6LKjW-1LxFrXigZBeofb9tR54SZCpe8B1IDoLcIxtbK3zWBjqul27-MJvlHD2c6Ls8ABPcm-ixwlHqVM-M17UhyoOPEYex597rk4yB4yQalYyW3M_YdHZdFO29F0_X')",
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
@@ -232,7 +232,7 @@ export default function ProfileScreen({
                   type="text" 
                   value={editVal}
                   onChange={(e) => setEditVal(e.target.value)}
-                  className="bg-white border border-brand-primary/20 rounded-lg px-2.5 py-1 text-sm font-bold text-brand-text-dark"
+                  className="bg-surface border border-black/10 rounded-lg px-2.5 py-1 text-sm font-semibold text-brand-text-dark"
                 />
                 <button 
                   onClick={handleSaveProfile}
@@ -243,7 +243,7 @@ export default function ProfileScreen({
               </div>
             ) : (
               <div className="flex flex-col items-center">
-                <h3 className="font-serif text-lg font-bold text-brand-text-dark leading-tight">{user ? user.displayName : profileName}</h3>
+                <h3 className="font-serif text-lg font-semibold text-brand-text-dark leading-tight">{user ? user.displayName : profileName}</h3>
                 <p className="text-[11px] text-brand-text-muted font-bold mt-0.5 uppercase tracking-wide">
                   {user ? 'Explorador Conectado' : 'Exploradora en León, Nicaragua'}
                 </p>
@@ -257,11 +257,11 @@ export default function ProfileScreen({
                 setEditVal(profileName);
                 setIsEditing(!isEditing);
               }}
-              className="bg-brand-primary text-white hover:bg-brand-primary/95 font-bold py-2 px-5 rounded-full text-[11px] tracking-wide transition-all active:scale-95 shadow-sm leading-none"
+              className="bg-brand-primary text-white hover:bg-brand-primary/95 font-semibold py-2 px-5 rounded-full text-[11px] tracking-wide transition-all active:scale-95 shadow-ios leading-none"
             >
               {isEditing ? 'Cancelar' : 'Editar Perfil'}
             </button>
-            <button className="bg-transparent border border-brand-primary/20 text-brand-text-dark font-bold py-2 px-5 rounded-full text-[11px] tracking-wide transition-all active:scale-95 leading-none hover:bg-neutral-50/20">
+            <button className="glass-chrome text-brand-text-dark font-semibold py-2 px-5 rounded-full text-[11px] tracking-wide transition-all active:scale-95 leading-none">
               Compártelo
             </button>
           </div>
@@ -270,39 +270,39 @@ export default function ProfileScreen({
 
       {/* Community Impact highlights board */}
       <section className="px-5 flex flex-col gap-3 font-sans">
-        <h4 className="font-serif text-sm font-black text-brand-primary uppercase tracking-wider flex items-center gap-1.5 pb-1 border-b border-brand-primary/10">
-          🌱 Impacto de tu Viaje Autónomo
+        <h4 className="font-serif text-sm font-semibold text-brand-text-dark flex items-center gap-1.5 pb-1.5 border-b border-black/5">
+          🌱 Impacto de tus Viajes
         </h4>
-        
+
         <div className="grid grid-cols-2 gap-3">
           {/* Families Supported */}
-          <div className="p-4 bg-[#fffdfa] border border-brand-primary/5 rounded-2xl flex flex-col gap-1 shadow-[0_2px_12px_rgba(42,36,31,0.03)] relative overflow-hidden">
+          <div className="p-4 surface-card flex flex-col gap-1 relative overflow-hidden">
             <div className="w-8 h-8 rounded-full bg-brand-primary/10 flex items-center justify-center text-sm mb-1">
               🧑‍🤝‍🧑
             </div>
-            <span className="text-2xl font-black text-brand-primary">{totalFamiliesActive}</span>
-            <span className="text-[10px] text-brand-text-muted leading-tight font-black uppercase tracking-tight">Familias Socias</span>
+            <span className="text-2xl font-semibold text-brand-primary tabular-nums">{totalFamiliesActive}</span>
+            <span className="text-[10px] text-brand-text-muted leading-tight font-semibold uppercase tracking-tight">Familias Impactadas</span>
           </div>
 
           {/* CO2 Offset */}
-          <div className="p-4 bg-[#fffdfa] border border-brand-primary/5 rounded-2xl flex flex-col gap-1 shadow-[0_2px_12px_rgba(42,36,31,0.03)]">
+          <div className="p-4 surface-card flex flex-col gap-1">
             <div className="w-8 h-8 rounded-full bg-brand-secondary/10 flex items-center justify-center text-sm mb-1">
               ⛰️
             </div>
-            <span className="text-2xl font-black text-brand-secondary">{totalCO2Active}kg</span>
-            <span className="text-[10px] text-brand-text-muted leading-tight font-black uppercase tracking-tight">CO2 Mitigado</span>
+            <span className="text-2xl font-semibold text-brand-secondary tabular-nums">{totalCO2Active}kg</span>
+            <span className="text-[10px] text-brand-text-muted leading-tight font-semibold uppercase tracking-tight">CO2 Mitigado</span>
           </div>
         </div>
 
         {/* Invested in Local Artisans details */}
-        <div className="p-3 bg-brand-secondary/5 border border-brand-secondary/15 rounded-xl flex items-center justify-between shadow-sm">
+        <div className="p-3 surface-card flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-brand-secondary/10 rounded-lg text-lg">
               💰
             </div>
             <div className="flex flex-col">
-              <span className="text-xs font-black text-brand-text-dark">${totalInvestedActive} USD</span>
-              <span className="text-[9px] text-brand-text-muted font-black uppercase tracking-wider">Inyección Directa Local (Comercio Justo)</span>
+              <span className="text-xs font-semibold text-brand-text-dark tabular-nums">${totalInvestedActive} USD</span>
+              <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">Inyección Local Directa</span>
             </div>
           </div>
         </div>
@@ -310,9 +310,9 @@ export default function ProfileScreen({
 
       {/* NEW: DEDICATED APARTADO PARA GESTIONAR RESERVAS Y PARA CONTACTAR AL GUIA */}
       <section className="px-5 flex flex-col gap-3 font-sans">
-        <h4 className="font-serif text-sm font-black text-brand-primary uppercase tracking-wider flex items-center justify-between pb-1 border-b border-brand-primary/10">
+        <h4 className="font-serif text-sm font-semibold text-brand-text-dark flex items-center justify-between pb-1.5 border-b border-black/5">
           <span>📅 Gestor de Reservas y Guías</span>
-          <span className="text-[9px] bg-brand-secondary text-white font-bold px-2 py-0.5 rounded-full">
+          <span className="text-[9px] bg-brand-primary text-white font-semibold px-2 py-0.5 rounded-full tabular-nums">
             {bookings.length} Activas
           </span>
         </h4>
@@ -322,9 +322,9 @@ export default function ProfileScreen({
             {bookings.map((booking) => {
               const guide = GUIDE_INFO[booking.experienceId] || GUIDE_INFO['weaving-workshop'];
               return (
-                <div 
+                <div
                   key={booking.id}
-                  className="bg-white border border-brand-primary/10 rounded-2xl p-4 shadow-sm hover:border-brand-primary/25 transition-all flex flex-col gap-3"
+                  className="surface-card p-4 hover:shadow-ios-lg transition-all flex flex-col gap-3"
                 >
                   <div className="flex items-start gap-3 justify-between">
                     <div className="flex items-center gap-3">
@@ -334,7 +334,7 @@ export default function ProfileScreen({
                         className="w-12 h-12 rounded-xl object-cover" 
                       />
                       <div>
-                        <h5 className="font-serif text-xs font-bold text-brand-text-dark leading-snug line-clamp-1">
+                        <h5 className="font-serif text-xs font-semibold text-brand-text-dark leading-snug line-clamp-1">
                           {booking.experienceTitle}
                         </h5>
                         <div className="flex items-center gap-2 mt-1">
@@ -349,13 +349,13 @@ export default function ProfileScreen({
                         </div>
                       </div>
                     </div>
-                    <span className="bg-[#f0e8db] text-[#553c29] text-[8px] font-black tracking-wider px-2 py-1 rounded-md">
+                    <span className="bg-surface-2 border border-black/5 text-brand-text-muted text-[8px] font-semibold tracking-wider px-2 py-1 rounded-md tabular-nums">
                       Ref: {booking.bookingRef}
                     </span>
                   </div>
 
                   {/* Guide connection segment */}
-                  <div className="bg-brand-bg/50 border border-brand-primary/5 rounded-xl p-2.5 flex items-center justify-between">
+                  <div className="bg-surface-2 border border-black/5 rounded-xl p-2.5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <img 
                         src={guide.avatar} 
@@ -364,16 +364,16 @@ export default function ProfileScreen({
                       />
                       <div>
                         <span className="block text-[8px] font-black text-brand-text-muted uppercase tracking-wider">Tu Guía Local:</span>
-                        <span className="font-serif text-[10px] font-black text-brand-text-dark">{guide.name}</span>
+                        <span className="font-serif text-[10px] font-semibold text-brand-text-dark">{guide.name}</span>
                       </div>
                     </div>
 
-                    <button 
+                    <button
                       onClick={() => {
                         setManagingBooking(booking);
                         handleStartChat(booking);
                       }}
-                      className="bg-brand-secondary text-white text-[10px] font-bold py-1.5 px-3 rounded-xl flex items-center gap-1 shadow-sm active:scale-95 transition-all hover:bg-brand-secondary/95"
+                      className="bg-brand-primary text-white text-[10px] font-semibold py-1.5 px-3 rounded-xl flex items-center gap-1 shadow-ios active:scale-95 transition-all hover:bg-brand-primary/95"
                     >
                       <MessageSquare className="w-3 h-3" />
                       Contactar
@@ -388,7 +388,7 @@ export default function ProfileScreen({
                         setReschedDate('');
                         setIsRescheduling(true);
                       }}
-                      className="flex-1 bg-white border border-brand-primary/15 hover:bg-neutral-50 text-brand-text-dark font-bold text-[10px] py-2 rounded-xl text-center active:scale-95 transition-all flex items-center justify-center gap-1"
+                      className="flex-1 bg-surface border border-black/8 hover:border-brand-primary/30 text-brand-text-dark font-semibold text-[10px] py-2 rounded-xl text-center active:scale-95 transition-all flex items-center justify-center gap-1"
                     >
                       <RefreshCw className="w-3 h-3 text-brand-primary" />
                       Reprogramar Fecha
@@ -413,7 +413,7 @@ export default function ProfileScreen({
             })}
           </div>
         ) : (
-          <div className="border border-dashed border-brand-primary/15 rounded-2xl p-5 text-center bg-white flex flex-col items-center justify-center gap-2">
+          <div className="border border-dashed border-black/10 rounded-[var(--radius-card)] p-5 text-center bg-surface flex flex-col items-center justify-center gap-2">
             <span className="text-xl">📭</span>
             <p className="text-xs text-brand-text-muted font-bold">No tienes reservas activas en este momento.</p>
             <p className="text-[10px] text-brand-text-muted max-w-[220px]">Reserva una experiencia comunitaria en la pestaña de exploración para conectarte con un guía.</p>
@@ -424,14 +424,14 @@ export default function ProfileScreen({
       {/* Recet Passport Stamps list */}
       <section className="px-5 flex flex-col gap-3 font-sans">
         <div className="flex justify-between items-baseline">
-          <h4 className="font-serif text-sm font-bold text-brand-primary uppercase tracking-wide">Sellos Recientes de Pasaporte</h4>
+          <h4 className="font-serif text-sm font-semibold text-brand-text-dark">Sellos Recientes de Pasaporte</h4>
         </div>
 
         <div className="flex gap-3 overflow-x-auto hide-scrollbar py-2 -mx-5 px-5">
           {RECENT_PASSPORT_STAMPS.map(stamp => (
             <div 
               key={stamp.id}
-              className="flex-shrink-0 w-28 bg-white border border-brand-primary/5 p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm relative overflow-hidden"
+              className="flex-shrink-0 w-28 surface-card p-3 flex flex-col items-center justify-center text-center relative overflow-hidden"
             >
               <div 
                 className="w-12 h-12 rounded-full border-2 border-dashed flex items-center justify-center text-base mb-1.5"
@@ -447,7 +447,7 @@ export default function ProfileScreen({
           {bookings.map((b) => (
             <div 
               key={`dynamic-${b.id}`}
-              className="flex-shrink-0 w-28 bg-[#fdfaf5] border border-brand-primary/10 p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-md relative overflow-hidden animate-pulse"
+              className="flex-shrink-0 w-28 surface-card p-3 flex flex-col items-center justify-center text-center relative overflow-hidden"
             >
               <div className="w-12 h-12 rounded-full border-2 border-dashed flex items-center justify-center text-base mb-1.5 border-brand-primary text-brand-primary">
                 <Coffee className="w-5 h-5 text-current" strokeWidth={2} />
@@ -459,65 +459,12 @@ export default function ProfileScreen({
         </div>
       </section>
 
-      {/* General Settings options */}
-      <section className="px-5 mt-2 mb-6">
-        <div className="bg-white rounded-2xl border border-brand-primary/5 shadow-sm divide-y divide-[#f7f2ea]">
-          {user ? (
-            <div 
-              onClick={logOut}
-              className="p-3.5 flex items-center justify-between hover:bg-red-50 transition-colors cursor-pointer group"
-            >
-              <div className="flex items-center gap-3">
-                <LogOut className="w-4 h-4 text-red-500" />
-                <span className="text-xs font-bold text-red-500 transition-colors">Cerrar Sesión Segura</span>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-red-500/65" />
-            </div>
-          ) : (
-            <div 
-              onClick={signIn}
-              className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group"
-            >
-              <div className="flex items-center gap-3">
-                <LogIn className="w-4 h-4 text-brand-primary" />
-                <span className="text-xs font-bold text-brand-primary transition-colors">Vincular con Cuenta Google</span>
-              </div>
-              <ArrowRight className="w-3.5 h-3.5 text-brand-primary/65" />
-            </div>
-          )}
-
-          <div className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
-            <div className="flex items-center gap-3">
-              <ClipboardList className="w-4 h-4 text-brand-text-muted" />
-              <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">Configuración de Cuenta</span>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-brand-text-muted/65" />
-          </div>
-
-          <div className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-4 h-4 text-brand-text-muted" />
-              <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">Métodos de Pago</span>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-brand-text-muted/65" />
-          </div>
-
-          <div className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
-            <div className="flex items-center gap-3">
-              <HelpCircle className="w-4 h-4 text-brand-text-muted" />
-              <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">Soporte Comunitario Xolara</span>
-            </div>
-            <ArrowRight className="w-3.5 h-3.5 text-brand-text-muted/65" />
-          </div>
-        </div>
-      </section>
-
       {/* ========================================================================= */}
       {/* OVERLAY RESERVATION MANAGER drawer & CHAT CONTAINER PANEL */}
       {/* ========================================================================= */}
       {managingBooking && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-end justify-center backdrop-blur-xs transition-opacity duration-300">
-          <div className="bg-[#fcf9f3] w-full max-w-md rounded-t-[32px] border-t border-brand-primary/10 shadow-2xl flex flex-col max-h-[85vh] relative animate-slide-up">
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center backdrop-blur-sm transition-opacity duration-300">
+          <div className="glass-chrome w-full max-w-md rounded-t-[var(--radius-sheet)] flex flex-col max-h-[85vh] relative animate-slide-up">
             
             {/* Drawer Drag handle visual element */}
             <div className="w-12 h-1 bg-brand-text-muted/20 rounded-full mx-auto my-3 flex-shrink-0" />
@@ -568,7 +515,7 @@ export default function ProfileScreen({
                             className={`p-3 rounded-2xl text-xs font-semibold leading-relaxed shadow-sm ${
                               isUser 
                                 ? 'bg-brand-primary text-white rounded-tr-none' 
-                                : 'bg-[#efe7db] text-brand-text-dark rounded-tl-none'
+                                : 'bg-surface-2 border border-black/5 text-brand-text-dark rounded-tl-none'
                             }`}
                           >
                             {m.text}
@@ -586,7 +533,7 @@ export default function ProfileScreen({
                         <span className="text-[7.5px] text-brand-text-muted mr-1 mb-0.5 font-bold uppercase">
                           Escribiendo...
                         </span>
-                        <div className="bg-[#efe7db] text-brand-text-dark p-2.5 px-4 rounded-2xl rounded-tl-none text-xs flex items-center gap-1.5 font-bold">
+                        <div className="bg-surface-2 border border-black/5 text-brand-text-dark p-2.5 px-4 rounded-2xl rounded-tl-none text-xs flex items-center gap-1.5 font-bold">
                           <span className="w-1.5 h-1.5 bg-brand-text-muted rounded-full animate-bounce" />
                           <span className="w-1.5 h-1.5 bg-brand-text-muted rounded-full animate-bounce [animation-delay:0.2s]" />
                           <span className="w-1.5 h-1.5 bg-brand-text-muted rounded-full animate-bounce [animation-delay:0.4s]" />
@@ -606,7 +553,7 @@ export default function ProfileScreen({
                         <button
                           key={q}
                           onClick={() => handleSendFAQMessage(q, ans)}
-                          className="bg-white border border-brand-secondary/20 hover:border-brand-secondary text-brand-secondary font-bold text-[10px] py-1.5 px-3 rounded-full shadow-xs whitespace-nowrap active:scale-95 transition-all flex-shrink-0"
+                          className="bg-surface border border-black/8 hover:border-brand-primary/40 text-brand-primary font-semibold text-[10px] py-1.5 px-3 rounded-full whitespace-nowrap active:scale-95 transition-all flex-shrink-0"
                         >
                           {q}
                         </button>
@@ -630,7 +577,7 @@ export default function ProfileScreen({
                         name="msg" 
                         type="text" 
                         placeholder="Escribe un mensaje al guía..." 
-                        className="flex-grow bg-white border border-brand-primary/15 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand-primary"
+                        className="flex-grow bg-surface border border-black/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:border-brand-primary"
                         autoComplete="off"
                       />
                       <button 
@@ -661,14 +608,14 @@ export default function ProfileScreen({
                     </p>
                   </div>
 
-                  <div className="flex flex-col gap-3 bg-white p-4 rounded-2xl border border-brand-primary/5 shadow-inner">
+                  <div className="flex flex-col gap-3 surface-card p-4">
                     <label className="block">
                       <span className="block text-[8px] font-black text-brand-text-muted uppercase tracking-wider mb-1">Nueva Fecha de Viaje:</span>
                       <input 
                         type="date" 
                         value={reschedDate} 
                         onChange={(e) => setReschedDate(e.target.value)}
-                        className="w-full bg-neutral-50 border border-brand-primary/15 rounded-xl p-2.5 text-xs font-bold text-brand-text-dark"
+                        className="w-full bg-surface border border-black/10 rounded-xl p-2.5 text-xs font-semibold text-brand-text-dark"
                         min="2026-06-15"
                       />
                     </label>
@@ -678,7 +625,7 @@ export default function ProfileScreen({
                       <select 
                         value={reschedTime}
                         onChange={(e) => setReschedTime(e.target.value)}
-                        className="w-full bg-neutral-50 border border-brand-primary/15 rounded-xl p-2.5 text-xs font-bold text-brand-text-dark"
+                        className="w-full bg-surface border border-black/10 rounded-xl p-2.5 text-xs font-semibold text-brand-text-dark"
                       >
                         <option value="08:00 AM">08:00 AM (Fresca Mañana)</option>
                         <option value="10:00 AM">10:00 AM (Recomendado)</option>
@@ -691,14 +638,14 @@ export default function ProfileScreen({
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={() => setIsRescheduling(false)}
-                      className="flex-1 bg-white border border-brand-primary/15 hover:bg-neutral-50 text-brand-text-dark text-xs font-bold py-3 rounded-xl transition-all"
+                      className="flex-1 glass-chrome text-brand-text-dark text-xs font-semibold py-3 rounded-xl transition-all"
                     >
                       Cancelar
                     </button>
                     <button
                       onClick={handleApplyReschedule}
                       disabled={!reschedDate}
-                      className="flex-1 bg-[#3a674f] hover:bg-[#325843] disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                      className="flex-1 bg-brand-primary hover:bg-brand-primary/95 disabled:opacity-40 disabled:pointer-events-none text-white text-xs font-semibold py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-ios"
                     >
                       <Check className="w-4 h-4" />
                       Guardar Fecha
@@ -717,14 +664,14 @@ export default function ProfileScreen({
                 <div className="flex flex-col gap-4">
                   
                   {/* Mini-card with active booking */}
-                  <div className="bg-white border border-brand-primary/10 rounded-2xl p-4 flex gap-3 relative overflow-hidden">
-                    <img 
-                      src={managingBooking.experienceImage} 
-                      alt={managingBooking.experienceTitle} 
-                      className="w-16 h-16 object-cover rounded-xl flex-shrink-0" 
+                  <div className="surface-card p-4 flex gap-3 relative overflow-hidden">
+                    <img
+                      src={managingBooking.experienceImage}
+                      alt={managingBooking.experienceTitle}
+                      className="w-16 h-16 object-cover rounded-xl flex-shrink-0"
                     />
                     <div>
-                      <h4 className="font-serif text-sm font-bold text-brand-text-dark leading-tight">
+                      <h4 className="font-serif text-sm font-semibold text-brand-text-dark leading-tight">
                         {managingBooking.experienceTitle}
                       </h4>
                       <p className="text-[10px] text-brand-text-muted font-bold mt-1 uppercase tracking-tight">
@@ -745,7 +692,7 @@ export default function ProfileScreen({
                     {/* Send Message */}
                     <button
                       onClick={() => handleStartChat(managingBooking)}
-                      className="p-3 bg-white hover:bg-neutral-50/70 border border-brand-primary/10 rounded-xl flex items-center justify-between text-left transition-all active:scale-98 group"
+                      className="p-3 bg-surface hover:border-brand-primary/30 border border-black/8 rounded-xl flex items-center justify-between text-left transition-all active:scale-98 group"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-brand-secondary/10 flex items-center justify-center text-brand-secondary">
@@ -765,7 +712,7 @@ export default function ProfileScreen({
                         setReschedDate('');
                         setIsRescheduling(true);
                       }}
-                      className="p-3 bg-white hover:bg-neutral-50/70 border border-brand-primary/10 rounded-xl flex items-center justify-between text-left transition-all active:scale-98 group"
+                      className="p-3 bg-surface hover:border-brand-primary/30 border border-black/8 rounded-xl flex items-center justify-between text-left transition-all active:scale-98 group"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary">

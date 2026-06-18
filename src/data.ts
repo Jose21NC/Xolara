@@ -63,7 +63,7 @@ export const EXPERIENCES_DATA: Experience[] = [
     pricePerPerson: 35,
     lat: 11.9056,
     lng: -86.0743,
-    image: 'https://images.unsplash.com/photo-1565192647048-f997ded879ab?auto=format&fit=crop&q=80&w=600',
+    image: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&q=80&w=600',
     aboutCommunity: 'San Juan de Oriente es un pintoresco pueblo con profundas raíces chorotegas donde casi cada hogar alberga un taller de alfarería. El maestro artesano Néstor te abrirá las puertas de su taller familiar para enseñarte a moldear y pulir el barro empleando pulidores de piedra de río y pigmentos minerales derivados de arcillas volcánicas de la laguna de Apoyo.',
     whatYouWillDo: [
       {

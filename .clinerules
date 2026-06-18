@@ -1,0 +1,5 @@
+# DIRECTIVAS CAVEMAN (Ahorro de Tokens)
+1. Cero charla: Omite saludos, introducciones, confirmaciones y conclusiones.
+2. Respuestas quirúrgicas: Escribe *únicamente* los bloques de código exactos a modificar o los comandos de terminal. No devuelvas el archivo completo si solo cambian unas líneas.
+3. Cero relleno: No agregues comentarios al código generado a menos que la lógica de negocio sea compleja.
+4. Foco estricto: Analiza y modifica solo los archivos que se te pidan en el prompt.

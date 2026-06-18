@@ -68,11 +68,11 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
   );
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
-      <div className="bg-[#fcf9f3] w-full max-w-sm rounded-[28px] border-2 border-brand-primary/10 shadow-2xl flex flex-col max-h-[85vh] relative overflow-hidden animate-scale-up text-brand-text-dark font-sans">
-        
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="glass-chrome w-full max-w-sm rounded-[var(--radius-sheet)] flex flex-col max-h-[85vh] relative overflow-hidden animate-scale-in text-brand-text-dark font-sans">
+
         {/* Clay header banner */}
-        <div className="bg-gradient-to-r from-[#a03f28] to-[#805600] text-stone-100 p-5 relative flex-shrink-0">
+        <div className="bg-brand-primary text-stone-100 p-5 relative flex-shrink-0">
           <div className="absolute top-2.5 right-6 text-[8px] tracking-[0.25em] font-mono opacity-50 uppercase">CONSEJERO SOBERANO</div>
           
           <button 
@@ -94,7 +94,7 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
         </div>
 
         {/* Dynamic sub tab bar selector */}
-        <div className="flex border-b border-brand-primary/10 bg-white select-none text-[11px] font-black uppercase text-brand-text-muted flex-shrink-0">
+        <div className="flex border-b border-black/5 bg-surface/70 select-none text-[11px] font-semibold uppercase text-brand-text-muted flex-shrink-0">
           <button 
             onClick={() => setActiveSubTab('etiquette')} 
             className={`flex-1 py-3 text-center border-b-2 transition-all ${activeSubTab === 'etiquette' ? 'border-brand-primary text-brand-primary font-black bg-stone-50/50' : 'border-transparent hover:text-brand-text-dark'}`}
@@ -126,9 +126,9 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
             <div className="space-y-4 animate-fade-in text-[11px]">
               
               {/* Dialect translation hello banner */}
-              <div className="bg-[#ede7d9]/30 rounded-2xl p-4 border border-brand-primary/5 shadow-inner">
+              <div className="bg-surface-2 rounded-[var(--radius-card)] p-4 border border-black/5">
                 <div className="flex justify-between items-baseline mb-1">
-                  <span className="font-serif text-sm font-black text-brand-primary">{greetings.title}</span>
+                  <span className="font-serif text-sm font-semibold text-brand-primary">{greetings.title}</span>
                   <span className="text-[7px] font-mono bg-brand-primary/10 text-brand-primary px-1.5 py-0.5 rounded uppercase tracking-wider font-extrabold">{greetings.badge}</span>
                 </div>
                 <p className="text-[#654e46] leading-relaxed font-bold italic">
@@ -140,7 +140,7 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
               <div className="space-y-3">
                 {/* Rule 1: Greetings */}
                 {config.tipFocus.includes('language') && (
-                  <div className="p-3 bg-[#fff] border border-brand-primary/5 rounded-xl flex gap-2.5">
+                  <div className="p-3 bg-surface border border-black/5 rounded-xl flex gap-2.5">
                     <span className="text-lg">👋</span>
                     <div>
                       <span className="block font-black text-brand-text-dark text-xs mb-0.5">El Saludo es Sagrado</span>
@@ -164,7 +164,7 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
 
                 {/* Rule 3: Economic sovereignty */}
                 {config.tipFocus.includes('crafts') && (
-                  <div className="p-3 bg-[#fff] border border-brand-primary/5 rounded-xl flex gap-2.5">
+                  <div className="p-3 bg-surface border border-black/5 rounded-xl flex gap-2.5">
                     <span className="text-lg">🤝</span>
                     <div>
                       <span className="block font-black text-brand-text-dark text-xs mb-0.5">Comercio Justo y No Regateo Drástico</span>
@@ -177,7 +177,7 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
 
                 {/* Rule 4: Ecology in nature */}
                 {config.tipFocus.includes('nature') && (
-                  <div className="p-3 bg-[#fff] border border-brand-primary/5 rounded-xl flex gap-2.5">
+                  <div className="p-3 bg-surface border border-black/5 rounded-xl flex gap-2.5">
                     <span className="text-lg">🍃</span>
                     <div>
                       <span className="block font-black text-brand-text-dark text-xs mb-0.5">Soberanía de los Bosques</span>
@@ -325,7 +325,7 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
                   value={searchWord}
                   onChange={(e) => setSearchWord(e.target.value)}
                   placeholder="Buscar modismos nicaragüenses..." 
-                  className="w-full bg-white border border-brand-primary/10 rounded-xl py-2 pl-9 pr-3 text-[11px] focus:outline-none focus:border-brand-primary"
+                  className="w-full bg-surface border border-black/8 rounded-xl py-2 pl-9 pr-3 text-[11px] focus:outline-none focus:border-brand-primary"
                   autoComplete="off"
                 />
               </div>
@@ -334,7 +334,7 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
               <div className="space-y-3.5 max-h-[280px] overflow-y-auto pr-1">
                 {filteredSlang.length > 0 ? (
                   filteredSlang.map((item, index) => (
-                    <div key={index} className="p-3 bg-white border-b border-brand-primary/5 rounded-xl shadow-xs">
+                    <div key={index} className="p-3 bg-surface border border-black/5 rounded-xl shadow-ios">
                       <div className="flex justify-between items-baseline mb-1">
                         <span className="text-brand-primary font-mono text-[11px] font-black">{item.word}</span>
                         <span className="text-[7.5px] text-[#805600] font-black tracking-wider uppercase bg-[#805600]/10 px-1.5 py-0.5 rounded">Voz Popular</span>
@@ -361,7 +361,7 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
         </div>
 
         {/* Footnote stamp verification */}
-        <div className="p-3 bg-[#ede7d9]/20 border-t border-brand-primary/5 flex items-center justify-between text-[8px] text-brand-text-muted font-bold flex-shrink-0">
+        <div className="p-3 bg-surface-2/60 border-t border-black/5 flex items-center justify-between text-[8px] text-brand-text-muted font-semibold flex-shrink-0">
           <span className="flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-brand-secondary" />
             Auditado por Cooperativa Agrícola

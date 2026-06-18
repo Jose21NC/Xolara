@@ -14,13 +14,9 @@ interface MapScreenProps {
   experiences: Experience[];
 }
 
-const GOOGLE_MAPS_KEY =
-  process.env.GOOGLE_MAPS_PLATFORM_KEY ||
-  (import.meta as any).env?.VITE_GOOGLE_MAPS_PLATFORM_KEY ||
-  (globalThis as any).GOOGLE_MAPS_PLATFORM_KEY ||
-  '';
+const GOOGLE_MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_PLATFORM_KEY || '';
 
-const hasValidKey = Boolean(GOOGLE_MAPS_KEY) && GOOGLE_MAPS_KEY !== 'YOUR_API_KEY';
+const hasValidKey = Boolean(GOOGLE_MAPS_KEY) && GOOGLE_MAPS_KEY !== 'YOUR_API_KEY' && GOOGLE_MAPS_KEY.length > 20;
 
 export default function MapScreen({
   onBack,
@@ -50,73 +46,54 @@ export default function MapScreen({
   const NICARAGUA_CENTER = { lat: 12.18, lng: -85.98 };
 
   return (
-    <div className="relative w-full h-screen font-sans flex flex-col bg-[#fcf9f3]">
-      
+    <div className="relative w-full h-screen font-sans flex flex-col bg-brand-bg">
+
       {/* Absolute Header overlays */}
-      <div className="absolute top-0 left-0 w-full z-30 pt-4 px-4 pb-12 bg-gradient-to-b from-white/95 via-white/40 to-transparent pointer-events-none">
-        
+      <div className="absolute top-0 left-0 w-full z-30 pt-4 px-4 pb-12 pointer-events-none bg-gradient-to-b from-white via-white to-transparent">
+
         {/* Header toolbar */}
-        <div className="flex items-center justify-between gap-2 mb-3 pointer-events-auto">
-          <button 
+        <div className="flex items-center gap-2 mb-3 pointer-events-auto">
+          <button
             onClick={onBack}
-            className="bg-white/90 backdrop-blur-md text-brand-text-dark border border-brand-primary/10 rounded-full p-2.5 shadow-md active:scale-95 transition-all"
+            className="glass-chrome text-brand-text-dark rounded-full p-2.5 active:scale-95 transition-all"
             title="Volver"
           >
             <ArrowLeft className="w-4 h-4 text-brand-text-dark" strokeWidth={2.5} />
           </button>
-          
-          <div className="flex flex-col items-center">
-            <h2 className="font-serif text-sm font-bold bg-white/95 backdrop-blur-sm py-1 px-4 rounded-full shadow-sm text-brand-primary border border-brand-primary/10 tracking-wide">
-              Xolara • Nicaragua
-            </h2>
+
+          {/* Category filters moved up */}
+          <div className="flex gap-1.5 overflow-x-auto hide-scrollbar flex-1">
+            {categories.map(cat => {
+              const isActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider border transition-all duration-300 ${
+                    isActive
+                      ? 'bg-brand-primary text-white border-brand-primary shadow-ios'
+                      : 'glass-chrome text-brand-text-dark'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
           </div>
-
-          <button 
-            onClick={() => setShowKeyInstructions(!showKeyInstructions)}
-            className={`rounded-full p-2.5 shadow-md transition-all border pointer-events-auto ${
-              showKeyInstructions 
-                ? 'bg-brand-primary text-white border-brand-primary' 
-                : 'bg-white/90 text-brand-text-muted hover:text-brand-text-dark border-brand-primary/10'
-            }`}
-            title="Configurar Google Maps"
-          >
-            <HelpCircle className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Category filters */}
-        <div className="flex gap-1.5 overflow-x-auto hide-scrollbar py-1 pointer-events-auto">
-          {categories.map(cat => {
-            const isActive = activeCategory === cat;
-            return (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all duration-300 ${
-                  isActive
-                    ? 'bg-brand-primary text-white border-brand-primary shadow-md'
-                    : 'bg-white/90 text-brand-text-dark border-brand-primary/10 hover:bg-white shadow-sm'
-                }`}
-              >
-                {cat}
-              </button>
-            );
-          })}
         </div>
       </div>
 
       {/* Map rendering logic */}
       <div className="flex-grow w-full relative h-full">
         {hasValidKey ? (
-          <APIProvider apiKey={GOOGLE_MAPS_KEY} version="weekly">
+          <APIProvider apiKey={GOOGLE_MAPS_KEY}>
             <Map
+              mapId="bf51a910020fa25a"
               defaultCenter={NICARAGUA_CENTER}
               defaultZoom={9.2}
-              mapId="XOLARA_NICARAGUA_MAP"
-              internalUsageAttributionIds={['gmp_mcp_codeassist_v1_aistudio']}
               style={{ width: '100%', height: '100%' }}
-              disableDefaultUI={true}
-              zoomControl={true}
+              disableDefaultUI={false}
+              gestureHandling="greedy"
             >
               {filteredExperiences.map(exp => {
                 const isSelected = selectedPinId === exp.id;
@@ -236,9 +213,9 @@ export default function MapScreen({
       </div>
 
       {/* Target focus button */}
-      <button 
+      <button
         onClick={() => setSelectedPinId('coffee-journey')}
-        className="absolute bottom-60 right-4 z-20 bg-white hover:bg-neutral-50 text-brand-text-dark border border-brand-primary/10 shadow-lg rounded-full p-3 active:scale-95 transition-all"
+        className="absolute bottom-60 right-4 z-20 glass-chrome text-brand-text-dark rounded-full p-3 active:scale-95 transition-all"
         title="Centrar ubicación"
       >
         <Crosshair className="w-5 h-5 text-brand-secondary" strokeWidth={2.5} />
@@ -246,9 +223,9 @@ export default function MapScreen({
 
       {/* Google Maps setup instruction drawer panel */}
       {showKeyInstructions && (
-        <div className="absolute top-16 left-4 right-4 z-40 p-4 bg-white rounded-2xl border border-brand-primary/15 shadow-2xl flex flex-col gap-2.5">
+        <div className="absolute top-16 left-4 right-4 z-40 p-4 glass-chrome rounded-[var(--radius-card)] flex flex-col gap-2.5">
           <div className="flex justify-between items-center text-brand-primary">
-            <span className="font-serif text-sm font-black flex items-center gap-1">
+            <span className="font-serif text-sm font-semibold flex items-center gap-1">
               🔑 Conexión de Google Maps API
             </span>
             <button onClick={() => setShowKeyInstructions(false)} className="p-1 rounded-full hover:bg-neutral-100">
@@ -274,8 +251,8 @@ export default function MapScreen({
 
       {/* Bottom slide-up panel displaying active selected item */}
       {selectedExperience && (
-        <div className="absolute bottom-0 left-0 w-full z-30 p-4 bg-gradient-to-t from-white via-white to-white/95 rounded-t-[32px] border-t border-brand-primary/10 shadow-[0_-8px_24px_rgba(42,36,31,0.08)] transition-all">
-          
+        <div className="absolute bottom-0 left-0 w-full z-30 p-4 glass-chrome rounded-t-[var(--radius-sheet)] transition-all">
+
           {/* Handle bar decor */}
           <div className="w-12 h-1 bg-brand-text-muted/20 rounded-full mx-auto mb-3.5" />
 
@@ -296,7 +273,7 @@ export default function MapScreen({
                 <span className="truncate">{selectedExperience.location}</span>
               </div>
               
-              <h3 className="font-serif text-[14px] font-bold text-brand-text-dark leading-tight line-clamp-1">
+              <h3 className="font-serif text-[14px] font-semibold text-brand-text-dark leading-tight line-clamp-1">
                 {selectedExperience.title}
               </h3>
               
@@ -319,7 +296,7 @@ export default function MapScreen({
                 
                 <button
                   onClick={() => onSelectExperience(selectedExperience.id)}
-                  className="bg-brand-primary text-white text-[10px] font-bold py-1.5 px-3.5 rounded-full shadow-md active:scale-95 hover:opacity-90 transition-all leading-none"
+                  className="bg-brand-primary text-white text-[10px] font-semibold py-1.5 px-3.5 rounded-full shadow-ios active:scale-95 hover:opacity-90 transition-all leading-none"
                 >
                   Ver Detalles
                 </button>

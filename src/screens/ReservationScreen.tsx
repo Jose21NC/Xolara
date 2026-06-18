@@ -71,12 +71,12 @@ export default function ReservationScreen({
         >
           <ArrowLeft className="w-5 h-5 text-brand-text-dark" strokeWidth={2.5} />
         </button>
-        <h2 className="font-serif text-xl font-bold text-brand-text-dark">Reserva</h2>
+        <h2 className="font-serif text-xl font-semibold text-brand-text-dark">Reserva</h2>
       </header>
 
       {/* Experience Summary Thumbnail block */}
       <div className="px-5">
-        <div className="p-3 bg-white rounded-2xl border border-brand-primary/5 shadow-sm flex items-center gap-3">
+        <div className="p-3 surface-card flex items-center gap-3">
           <div className="w-16 h-16 rounded-xl overflow-hidden bg-neutral-150 shrink-0">
             <img 
               src={experience.image} 
@@ -85,8 +85,8 @@ export default function ReservationScreen({
             />
           </div>
           <div className="flex flex-col min-w-0">
-            <span className="text-[9px] font-bold text-brand-primary uppercase tracking-wider">{experience.category}</span>
-            <h3 className="font-serif text-sm font-bold text-brand-text-dark truncate leading-tight mt-0.5">{experience.title}</h3>
+            <span className="text-[9px] font-semibold text-brand-primary uppercase tracking-wider">{experience.category}</span>
+            <h3 className="font-serif text-sm font-semibold text-brand-text-dark truncate leading-tight mt-0.5">{experience.title}</h3>
             <div className="flex items-center gap-1.5 text-[10px] text-brand-text-muted mt-1 font-medium">
               <Clock className="w-3.5 h-3.5 text-brand-text-muted" />
               <span>{experience.duration}</span>
@@ -98,8 +98,8 @@ export default function ReservationScreen({
       {/* SELECT DATE section */}
       <section className="px-5 flex flex-col gap-2">
         <div className="flex justify-between items-baseline mb-1">
-          <h4 className="text-[11px] font-bold text-[#8a726c] uppercase tracking-widest">Selecciona Fecha</h4>
-          <span className="text-[11px] font-bold text-brand-primary">Octubre 2023</span>
+          <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest">Selecciona Fecha</h4>
+          <span className="text-[11px] font-semibold text-brand-primary">Octubre 2023</span>
         </div>
 
         {/* Days horizontally scrolling */}
@@ -110,10 +110,10 @@ export default function ReservationScreen({
               <button
                 key={index}
                 onClick={() => setSelectedDateIndex(index)}
-                className={`flex-shrink-0 w-12 h-16 rounded-xl flex flex-col items-center justify-center border transition-all ${
+                className={`flex-shrink-0 w-12 h-16 rounded-xl flex flex-col items-center justify-center border transition-all tap-feedback ${
                   isSelected
-                    ? 'bg-brand-primary text-white border-brand-primary shadow-md scale-105'
-                    : 'bg-white text-brand-text-muted border-brand-primary/10 hover:bg-neutral-50'
+                    ? 'bg-brand-primary text-white border-brand-primary shadow-ios'
+                    : 'bg-surface text-brand-text-muted border-black/5 hover:border-brand-primary/30'
                 }`}
               >
                 <span className="text-[10px] uppercase font-bold tracking-wide opacity-80">{d.label}</span>
@@ -126,7 +126,7 @@ export default function ReservationScreen({
 
       {/* SELECT TIME chips section */}
       <section className="px-5 flex flex-col gap-2">
-        <h4 className="text-[11px] font-bold text-[#8a726c] uppercase tracking-widest mb-1">Horario</h4>
+        <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest mb-1">Horario</h4>
         
         <div className="grid grid-cols-2 gap-2.5">
           {times.map(t => {
@@ -135,10 +135,10 @@ export default function ReservationScreen({
               <button
                 key={t}
                 onClick={() => setSelectedTime(t)}
-                className={`py-3 px-4 rounded-xl text-xs font-bold border transition-all text-center leading-none ${
+                className={`py-3 px-4 rounded-xl text-xs font-semibold border transition-all text-center leading-none tap-feedback ${
                   isSelected
-                    ? 'bg-brand-primary/10 text-brand-primary border-brand-primary/40 shadow-sm'
-                    : 'bg-white text-brand-text-dark border-brand-primary/10 hover:bg-neutral-50'
+                    ? 'bg-brand-primary/10 text-brand-primary border-brand-primary/40'
+                    : 'bg-surface text-brand-text-dark border-black/5 hover:border-brand-primary/30'
                 }`}
               >
                 {t}
@@ -150,11 +150,11 @@ export default function ReservationScreen({
 
       {/* PARTICIPANTS selector row fields */}
       <section className="px-5 flex flex-col gap-3">
-        <h4 className="text-[11px] font-bold text-[#8a726c] uppercase tracking-widest mb-1">Participantes</h4>
+        <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest mb-1">Participantes</h4>
 
         <div className="flex flex-col gap-2.5">
           {/* Adults counter */}
-          <div className="p-3 bg-white rounded-xl border border-brand-primary/10 flex items-center justify-between shadow-sm">
+          <div className="p-3.5 surface-card flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs font-bold text-brand-text-dark">Adultos</span>
               <span className="text-[10px] text-brand-text-muted tracking-wide mt-0.5">Mayores de 13 años</span>
@@ -178,7 +178,7 @@ export default function ReservationScreen({
           </div>
 
           {/* Children counter */}
-          <div className="p-3 bg-white rounded-xl border border-brand-primary/10 flex items-center justify-between shadow-sm">
+          <div className="p-3.5 surface-card flex items-center justify-between">
             <div className="flex flex-col">
               <span className="text-xs font-bold text-brand-text-dark">Niños</span>
               <span className="text-[10px] text-brand-text-muted tracking-wide mt-0.5">Edad de 2 a 12 años</span>
@@ -216,16 +216,16 @@ export default function ReservationScreen({
       </div>
 
       {/* Sticky Bottom Reservation Confirm Bar */}
-      <div className="fixed bottom-0 left-0 w-full z-40 bg-white/95 backdrop-blur-md px-5 py-3.5 border-t border-brand-primary/10 shadow-[0_-4px_16px_rgba(42,36,31,0.06)] max-w-sm rounded-t-3xl left-1/2 -translate-x-1/2">
+      <div className="fixed bottom-0 left-0 w-full z-40 glass-chrome px-5 py-3.5 max-w-sm rounded-t-[var(--radius-sheet)] left-1/2 -translate-x-1/2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="text-[9px] text-[#8a726c] uppercase tracking-wider font-extrabold">Total ({totalQuantity} Pers)</span>
-            <span className="text-xl font-extrabold text-[#1c1c18]">${totalPrice}</span>
+            <span className="text-[9px] text-brand-text-muted uppercase tracking-wider font-semibold">Total ({totalQuantity} Pers)</span>
+            <span className="text-xl font-semibold text-brand-text-dark tabular-nums">${totalPrice}</span>
           </div>
 
-          <button 
+          <button
             onClick={handleConfirm}
-            className="flex-1 bg-brand-primary hover:bg-brand-primary/95 text-white active:scale-95 transition-all text-xs font-bold py-3.5 px-5 rounded-full flex items-center justify-center gap-1.5 shadow-md leading-none"
+            className="flex-1 bg-brand-primary hover:bg-brand-primary/95 text-white active:scale-95 transition-all text-xs font-semibold py-3.5 px-5 rounded-full flex items-center justify-center gap-1.5 shadow-ios leading-none"
           >
             <span>Confirmar Reserva</span>
             <ArrowRight className="w-3.5 h-3.5 text-white stroke-[2.5]" />

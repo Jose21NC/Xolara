@@ -67,16 +67,16 @@ export default function CreateExperienceScreen({ onBack, onSuccess }: CreateExpe
   };
 
   return (
-    <div className="flex flex-col bg-[#fcf9f3] min-h-screen">
+    <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-[#fcf9f3]/95 backdrop-blur-md px-5 py-4 flex items-center justify-between border-b border-brand-primary/10">
-        <button 
+      <div className="sticky top-0 z-20 glass-chrome px-5 py-4 flex items-center justify-between">
+        <button
           onClick={onBack}
-          className="p-2 -ml-2 rounded-full hover:bg-neutral-200 transition-colors"
+          className="p-2 -ml-2 rounded-full hover:bg-black/5 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-brand-text-dark" />
         </button>
-        <span className="font-serif text-lg font-black text-brand-primary">Nueva Experiencia</span>
+        <span className="font-serif text-lg font-semibold text-brand-text-dark">Nueva Experiencia</span>
         <div className="w-9" />
       </div>
 
@@ -97,7 +97,7 @@ export default function CreateExperienceScreen({ onBack, onSuccess }: CreateExpe
               value={formData.title}
               onChange={handleChange}
               placeholder="Ej. Taller Inmersivo de Barro"
-              className="px-4 py-3 rounded-xl border border-brand-primary/15 bg-white text-sm font-semibold focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
+              className="px-4 py-3 rounded-xl border border-black/10 bg-surface text-sm font-semibold focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all"
             />
           </div>
 
@@ -108,7 +108,7 @@ export default function CreateExperienceScreen({ onBack, onSuccess }: CreateExpe
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="px-4 py-3 rounded-xl border border-brand-primary/15 bg-white text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all appearance-none"
+                className="px-4 py-3 rounded-xl border border-black/10 bg-surface text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all appearance-none"
               >
                 <option value="Crafts">Artesanía</option>
                 <option value="Culinary">Gastronomía</option>
@@ -125,7 +125,7 @@ export default function CreateExperienceScreen({ onBack, onSuccess }: CreateExpe
                 min="0"
                 value={formData.pricePerPerson}
                 onChange={handleChange}
-                className="px-4 py-3 rounded-xl border border-brand-primary/15 bg-white text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all"
+                className="px-4 py-3 rounded-xl border border-black/10 bg-surface text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all"
               />
             </div>
           </div>
@@ -139,7 +139,7 @@ export default function CreateExperienceScreen({ onBack, onSuccess }: CreateExpe
                 value={formData.location}
                 onChange={handleChange}
                 placeholder="Ej. San Juan de Oriente"
-                className="px-4 py-3 rounded-xl border border-brand-primary/15 bg-white text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all"
+                className="px-4 py-3 rounded-xl border border-black/10 bg-surface text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all"
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -150,7 +150,7 @@ export default function CreateExperienceScreen({ onBack, onSuccess }: CreateExpe
                 value={formData.duration}
                 onChange={handleChange}
                 placeholder="Ej. 3 Horas"
-                className="px-4 py-3 rounded-xl border border-brand-primary/15 bg-white text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all"
+                className="px-4 py-3 rounded-xl border border-black/10 bg-surface text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all"
               />
             </div>
           </div>
@@ -164,7 +164,7 @@ export default function CreateExperienceScreen({ onBack, onSuccess }: CreateExpe
               onChange={handleChange}
               rows={3}
               placeholder="Describe lo que se hará y cómo impacta localmente..."
-              className="px-4 py-3 rounded-xl border border-brand-primary/15 bg-white text-sm font-semibold focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all resize-none"
+              className="px-4 py-3 rounded-xl border border-black/10 bg-surface text-sm font-semibold focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all resize-none"
             />
           </div>
 
@@ -179,19 +179,19 @@ export default function CreateExperienceScreen({ onBack, onSuccess }: CreateExpe
                   value={formData.image}
                   onChange={handleChange}
                   placeholder="https://..."
-                  className="pl-9 pr-4 py-3 w-full rounded-xl border border-brand-primary/15 bg-white text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all"
+                  className="pl-9 pr-4 py-3 w-full rounded-xl border border-black/10 bg-surface text-sm font-semibold focus:outline-none focus:border-brand-primary transition-all"
                 />
               </div>
             </div>
             {formData.image && (
-              <img src={formData.image} alt="Preview" className="w-full h-32 object-cover rounded-xl mt-2 border border-brand-primary/10" onError={(e) => (e.currentTarget.style.display = 'none')} onLoad={(e) => (e.currentTarget.style.display = 'block')} />
+              <img src={formData.image} alt="Preview" className="w-full h-32 object-cover rounded-xl mt-2 border border-black/10" onError={(e) => (e.currentTarget.style.display = 'none')} onLoad={(e) => (e.currentTarget.style.display = 'block')} />
             )}
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 bg-[#3a674f] hover:bg-[#325843] text-white py-4 rounded-xl font-bold font-serif text-sm shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            className="mt-4 bg-brand-primary hover:bg-brand-primary/95 text-white py-4 rounded-xl font-semibold font-serif text-sm shadow-ios transition-all active:scale-[0.98] flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {loading ? 'Publicando...' : 'Publicar Experiencia Comunitaria'}
