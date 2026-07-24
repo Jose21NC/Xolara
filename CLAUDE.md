@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Xolara — a mobile-first React app for booking artisanal, community-centric travel experiences (Nicaragua-focused). UI copy is in **Spanish**; code identifiers are in English. Originated as a Google AI Studio applet.
+Xolara — a mobile-first React app for booking artisanal, community-centric travel experiences (Nicaragua-focused). UI copy is in **Spanish**; code identifiers are in English.
 
 ## Commands
 
@@ -37,7 +37,7 @@ There is **no test runner** configured. `npm run lint` runs `tsc --noEmit` — u
 
 ## Firebase
 
-- `src/firebase.ts` initializes the app from `firebase-applet-config.json` (committed; this is an AI Studio applet config, not a secret-bearing file). Note Firestore uses a **named database**: `getFirestore(app, firebaseConfig.firestoreDatabaseId)`, not the default DB.
+- `src/firebase.ts` initializes the app from `firebase-config.json` (committed; this is a Firebase config, not a secret-bearing file). Note Firestore uses a **named database**: `getFirestore(app, firebaseConfig.firestoreDatabaseId)`, not the default DB.
 - `src/contexts/FirebaseContext.tsx` (`FirebaseProvider`, wrapped around `<App/>` in `main.tsx`) exposes `useFirebase()` → `{ user, loading, signIn, logOut }`. Its `signIn` uses **Google popup** auth.
 - `firestore.rules` is the security source of truth and is intentionally strict (default-deny `match /{document=**}`, then per-collection allow rules with structural validation helpers like `isValidExperience`/`isValidBooking`). `security_spec.md` documents the intended invariants. When changing what gets written to `users`/`experiences`/`bookings`, the rules' required-keys and field-size/type checks must be kept in sync or writes will be rejected.
 

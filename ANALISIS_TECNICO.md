@@ -78,8 +78,7 @@ Xolara/
 │       └── CreateExperienceScreen.tsx
 │
 ├── assets/                        # Recursos estáticos
-├── firebase-applet-config.json    # Config Firebase
-├── firebase-blueprint.json        # Schema Firestore
+├── firebase-config.json           # Config Firebase
 ├── firestore.rules                # Reglas de seguridad
 ├── security_spec.md               # Especificación seguridad
 ├── context.md                     # Documentación proyecto
@@ -355,7 +354,7 @@ match /bookings/{bookingId} {
 
 - **Tool**: Vite 6.2.3
 - **Dev server**: Puerto 3000
-- **HMR**: Habilitado (deshabilitado en AI Studio)
+- **HMR**: Habilitado
 - **Output**: ESM nativo
 
 ---

@@ -136,8 +136,7 @@ Xolara tiene una **base técnica sólida** y un **concepto innovador**. Con las 
 ## 🔗 Enlaces Útiles
 
 - **Repositorio**: [GitHub - Xolara](https://github.com/Jose21NC/Xolara.git)
-- **AI Studio**: [Ver app](https://ai.studio/apps/dcbcf297-4fe4-4798-9802-141227c6612b)
-- **Firebase Console**: [Configuración](./firebase-applet-config.json)
+- **Firebase Console**: [Configuración](./firebase-config.json)
 
 ---
 

@@ -64,6 +64,7 @@ const RealisticStamp = ({
   isDynamic?: boolean;
   rotate?: number;
   onClick: () => void;
+  key?: string;
 }) => {
   const isMombacho = id === 'p1';
   const isGranada = id === 'p2';
@@ -753,7 +754,9 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
       {/* Cultural Tips Popup */}
       {isTipsOpen && (
         <CulturalTipsPopup 
+          isOpen={isTipsOpen}
           onClose={() => setIsTipsOpen(false)}
+          bookings={bookings}
           config={config}
         />
       )}
