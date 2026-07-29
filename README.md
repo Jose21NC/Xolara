@@ -1,146 +1,274 @@
 # Xolara
 
-A mobile-first React app for discovering and booking artisanal, community-centric travel experiences in Nicaragua. UI copy is in **Spanish**; code identifiers are in English.
+Descubre y reserva experiencias turísticas artesanales y comunitarias en Nicaragua.
 
-**Visual-only deliverable** — no backend, no Firebase, no Google Maps. All data is local/seed.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19-61DAFB)](https://react.dev/)
+[![Express](https://img.shields.io/badge/Express-4.21-000000)](https://expressjs.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-Self_Hosted-3FCF8E)](https://supabase.com/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED)](https://www.docker.com/)
 
-## Tech Stack
+---
 
-| Category | Technology |
-|----------|------------|
-| Framework | React 19 |
-| Language | TypeScript 5.8 |
-| Build tool | Vite 6 |
-| Styling | Tailwind CSS v4 (`@tailwindcss/vite`) |
-| Animations | Motion (Framer Motion) |
-| Icons | Lucide React |
-| Validation | Zod 4 |
-| Package manager | pnpm 11+ |
+## Stack
 
-## Features
+| Capa | Tecnología |
+|------|-----------|
+| **Frontend** | React 19 + TypeScript 5.8 + Vite 6 |
+| **Estilos** | Tailwind CSS v4 + Motion (Framer Motion) + Lucide React |
+| **Validación** | Zod 4 (compartido entre frontend y backend) |
+| **Backend** | Express 4.21 + TypeScript (ESM) |
+| **Base de datos** | PostgreSQL 16 (vía Supabase) |
+| **Autenticación** | Supabase GoTrue (JWT HS256, email/password) |
+| **Infraestructura** | Docker Compose (5 servicios) |
+| **Admin DB** | Supabase Studio (puerto 3001) |
+| **Paquetería** | pnpm 11+ (frontend), npm (backend) |
 
-- **15+ reusable components** — `ExperienceCard`, `BottomNavBar`, `CategoryPills`, `SearchBar`, `FilterModal`, `HeroSection`, `CTABar`, `PassportStampList`, `ProfileHeader`, `ErrorBoundary`, `PhoneShell`, `TopAppBar`, `SectionHeader`, `InfoStats`, `ImpactDashboard`, `CulturalTipsPopup`, `ActionList`
-- **10 screens** — Explore, Experiences Feed, Detail, Reservation, Confirmed, Passport, Profile, Configuration, Create Experience, Map
-- **State machine navigation** — single-screen app with no router; `activeTab` + `currentScreen` state drives all navigation
-- **Role-based access control** — `visitor`, `traveler`, `guide`, `admin` roles with hierarchical permission checks (`src/lib/roles.ts`)
-- **Zod validation** — schemas for bookings, experiences, and app config with Spanish error messages (`src/lib/validation/schemas.ts`)
-- **Error boundary** — catches render errors and shows a recoverable UI (`src/components/ErrorBoundary.tsx`)
-- **Session management** — 30-minute TTL sessions persisted to `localStorage` (`src/lib/security/session.ts`)
-- **Input sanitization** — HTML, input, and URL sanitization utilities (`src/lib/security/sanitize.ts`)
-- **Mobile-first design** — optimized for 390px width, rendered inside a centered `PhoneShell` frame
-- **Apple-inspired UI** — glass morphism surfaces, custom keyframe animations, `prefers-reduced-motion` and `prefers-reduced-transparency` support
-- **Seed data** — 4 curated experiences with community impact details, map pins, and passport stamps
+---
 
-## Prerequisites
+## Arquitectura
 
-- **Node.js** >= 20
-- **pnpm** (npm is blocked via `.npmrc`)
+```
+┌───────────────────────────────────────────────────────┐
+│                    Navegador                          │
+│              http://localhost:3000                     │
+└─────────────────────┬─────────────────────────────────┘
+                      │
+              ┌───────┴───────┐
+              │   Nginx       │  (producción) o Vite Dev Server (desarrollo)
+              │  (proxy pass) │
+              └───────┬───────┘
+                      │
+         ┌────────────┼────────────┐
+         │            │            │
+   ┌─────▼────┐ ┌────▼────┐ ┌─────▼─────┐
+   │  Express │ │ GoTrue  │ │ Supabase  │
+   │  API     │ │ Auth    │ │ Studio    │
+   │ :4000    │ │ :9999   │ │ :3001     │
+   └─────┬────┘ └─────────┘ └───────────┘
+         │
+   ┌─────▼─────┐
+   │ PostgreSQL │
+   │     :5432  │
+   └───────────┘
+```
 
-## Getting Started
+### Flujo de datos
+
+1. **Frontend** (React SPA) se comunica con **Express API** para todas las operaciones CRUD
+2. **Express** verifica JWTs, ejecuta lógica de negocio, y consulta **PostgreSQL** directamente
+3. **Supabase GoTrue** maneja el registro/login y emite JWTs firmados con HS256
+4. **Supabase Studio** es solo para administración de base de datos (no necesario en runtime)
+5. **Nginx** en producción sirve el frontend estático y proxy inverso `/api/` → Express
+
+---
+
+## Empezar
+
+### Prerrequisitos
+
+- Node.js >= 20
+- pnpm (frontend) + npm (backend)
+- Docker + Docker Compose (para PostgreSQL + Auth)
+
+### 1. Clonar e instalar
 
 ```bash
-# Install dependencies
+git clone https://github.com/Jose21NC/Xolara.git
+cd Xolara
+
+# Frontend
 pnpm install
 
-# Start dev server on port 3000
+# Backend
+cd backend && npm install && cd ..
+```
+
+### 2. Variables de entorno
+
+```bash
+cp .env.example backend/.env
+```
+
+Ajusta `JWT_SECRET` en producción.
+
+### 3. Levantar base de datos + autenticación
+
+```bash
+docker compose up db auth studio
+```
+
+Esto inicia PostgreSQL (puerto 5432), GoTrue Auth (puerto 9999), y Studio (puerto 3001). La primera vez ejecuta `supabase/seed.sql` que crea las tablas y siembra 4 experiencias.
+
+### 4. Iniciar backend (dev)
+
+```bash
+cd backend
+npx tsx watch src/index.ts
+```
+
+API en `http://localhost:4000`. Health check: `GET /api/health`.
+
+### 5. Iniciar frontend (dev)
+
+```bash
+# En otra terminal, desde la raíz
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Frontend en `http://localhost:3000`.
 
-## Available Scripts
+---
 
-| Script | Description |
-|--------|-------------|
-| `pnpm dev` | Vite dev server on port 3000 (host `0.0.0.0`) |
-| `pnpm build` | Production build to `dist/` |
-| `pnpm preview` | Serve the production build |
-| `pnpm lint` | Type-check only: `tsc --noEmit` |
-| `pnpm clean` | Clear Vite cache |
+## Scripts
 
-There is **no test runner** and **no eslint** configured. `pnpm lint` runs `tsc --noEmit` — use it to verify type correctness.
+### Frontend
 
-## Project Structure
+| Comando | Description |
+|---------|-------------|
+| `pnpm dev` | Vite dev server en :3000 |
+| `pnpm build` | Build producción a `dist/` |
+| `pnpm lint` | `tsc --noEmit` |
+| `pnpm clean` | Limpia caché Vite |
+
+### Backend
+
+| Comando | Description |
+|---------|-------------|
+| `npm run dev` | `tsx watch` con hot-reload |
+| `npm run build` | `tsc` a `dist/` |
+| `npm start` | Node producción desde `dist/` |
+
+### Docker
+
+| Comando | Description |
+|---------|-------------|
+| `docker compose up db auth` | Solo base de datos + auth (dev) |
+| `docker compose up` | Stack completo (producción) |
+| `docker compose up --build` | Reconstruir imágenes y arrancar |
+
+---
+
+## Estructura del proyecto
 
 ```
-src/
-├── App.tsx                  # Root — all app state lives here
-├── main.tsx                 # Entry point
-├── types.ts                 # Shared TypeScript interfaces
-├── data.ts                  # Seed data (experiences, map pins, passport stamps)
-├── index.css                # Tailwind v4 theme + custom animations
-├── components/              # 19 reusable UI components
-│   ├── PhoneShell.tsx       # Centered phone frame container
-│   ├── BottomNavBar.tsx     # Tab navigation bar
-│   ├── ExperienceCard.tsx   # Card for experience listings
-│   ├── ErrorBoundary.tsx    # React error boundary
-│   ├── FilterModal.tsx      # Category/price filter sheet
-│   ├── SearchBar.tsx        # Search input
-│   └── ...                  # (13 more components)
-├── screens/                 # 10 full-screen views
-│   ├── ExploreScreen.tsx    # Home/explore tab
-│   ├── DetailScreen.tsx     # Experience detail
-│   ├── ReservationScreen.tsx# Booking form
-│   ├── ConfirmedScreen.tsx  # Booking confirmation
-│   ├── PassportScreen.tsx   # Travel passport stamps
-│   ├── ProfileScreen.tsx    # User profile + bookings
-│   └── ...                  # (4 more screens)
-└── lib/                     # Utilities
-    ├── roles.ts             # RBAC: role hierarchy + permission checks
-    ├── security/
-    │   ├── sanitize.ts      # HTML/input/URL sanitization
-    │   └── session.ts       # Session create/get/destroy with TTL
-    └── validation/
-        └── schemas.ts       # Zod schemas (booking, experience, config)
+Xolara/
+├── src/                        # Frontend React
+│   ├── App.tsx                 # State machine raíz
+│   ├── contexts/
+│   │   └── AuthContext.tsx     # Auth provider (reemplaza localStorage session)
+│   ├── lib/
+│   │   ├── api.ts              # Cliente API tipado con JWT
+│   │   ├── supabase.ts         # Cliente Supabase JS
+│   │   └── validation/         # Zod schemas
+│   ├── components/             # 19 UI components
+│   └── screens/                # 10 pantallas
+├── backend/
+│   ├── Dockerfile              # Multi-stage (20-alpine)
+│   ├── src/
+│   │   ├── index.ts            # Entry point
+│   │   ├── app.ts              # Express app setup
+│   │   ├── config.ts           # Env vars tipadas
+│   │   ├── routes/             # auth, experiences, bookings, likes, passport, guides, config
+│   │   ├── middleware/          # JWT auth + error handler
+│   │   ├── validators/         # Zod schemas (servidor)
+│   │   └── db/pool.ts          # PostgreSQL connection pool
+├── supabase/
+│   ├── docker-compose.yml      # Supabase standalone (dev)
+│   └── seed.sql                # Schema + seed data
+├── frontend/
+│   ├── Dockerfile              # Vite build → Nginx
+│   └── nginx.conf              # SPA + API proxy
+├── scripts/
+│   ├── generate-keys.sh        # Genera ANON_KEY + SERVICE_ROLE_KEY
+│   └── copy-env.sh             # Setup rápido de .env
+├── docker-compose.yml          # Orquesta todo (5 servicios)
+└── .env.example                # Variables de entorno
 ```
 
-## Architecture
+---
 
-### Single-Screen State Machine
+## API REST
 
-Xolara has **no router**. Navigation is driven by two pieces of state in `App.tsx`:
+Documentación completa en [`docs/API.md`](docs/API.md).
 
-- **`activeTab`** — `'explore' | 'experiences' | 'passport' | 'profile'` — the bottom nav tabs
-- **`currentScreen`** — `'explore' | 'detail' | 'reservation' | 'confirmed' | 'configuration' | 'create_exp'` — full-screen overlays that take precedence over the active tab
+| Método | Endpoint | Auth | Descripción |
+|--------|----------|------|-------------|
+| POST | `/api/auth/signup` | ✗ | Registro de usuario |
+| POST | `/api/auth/signin` | ✗ | Inicio de sesión |
+| GET | `/api/auth/me` | ✓ | Perfil del usuario actual |
+| GET | `/api/experiences` | ✗ | Lista de experiencias |
+| GET | `/api/experiences/:id` | ✗ | Detalle de experiencia |
+| POST | `/api/experiences` | guide+ | Crear experiencia |
+| PUT | `/api/experiences/:id` | guide+ | Editar experiencia |
+| DELETE | `/api/experiences/:id` | admin | Eliminar experiencia |
+| GET | `/api/bookings` | ✓ | Mis reservas |
+| POST | `/api/bookings` | traveler+ | Crear reserva (genera XLR- ref y passport stamp) |
+| PUT | `/api/bookings/:id` | ✓ | Modificar fecha/hora |
+| DELETE | `/api/bookings/:id` | ✓ | Cancelar reserva |
+| POST | `/api/likes/:expId` | ✓ | Like/unlike toggle |
+| GET | `/api/likes` | ✓ | Mis likes |
+| GET | `/api/passport` | ✓ | Mis sellos passport |
+| GET | `/api/guides/:expId` | ✗ | Info del guía de una experiencia |
+| GET | `/api/config` | ✓ | Mi configuración |
+| PUT | `/api/config` | ✓ | Actualizar configuración |
+| GET | `/api/health` | ✗ | Health check |
 
-`renderScreenContent()` resolves which screen to show: `currentScreen` overlays are checked first, then it falls back to the `activeTab` switch. The bottom nav bar only renders when `currentScreen === 'explore'` (overlays hide it).
+---
 
-Screens are presentational and receive data + callbacks as props from `App.tsx`. All state (bookings, likes, config, filters) is local React state — no Redux, no Context beyond what's there.
+## Base de datos
 
-### Data Flow
+7 tablas en `public`:
 
-- Experiences: static seed data from `EXPERIENCES_DATA` in `src/data.ts`
-- Bookings: managed in local React state, created via `handleConfirmBooking` with generated `bk-<timestamp>` IDs and `XLR-<nnnn>` refs
-- `likedExperiences`, `config`, `activeCategory`, `searchQuery`: local React state
+| Tabla | Propósito |
+|-------|-----------|
+| `profiles` | Extiende `auth.users` con nombre, rol, avatar |
+| `experiences` | Experiencias turísticas (CRUD, seed de 4) |
+| `bookings` | Reservas con ref `XLR-nnnn` y status |
+| `likes` | Favoritos por usuario (join table) |
+| `passport_stamps` | Sellos generados automáticamente al reservar |
+| `app_configs` | Preferencias por usuario |
+| `guides` | Perfiles de guías vinculados a experiencias |
 
-## Styling
+El schema completo está en `supabase/seed.sql`.
 
-- **Tailwind CSS v4** via the `@tailwindcss/vite` plugin. There is **no `tailwind.config.js`** — the theme is defined in `src/index.css` under the `@theme` block.
-- **Brand colors** — `brand-primary` (terracotta `#a8472f`), `brand-secondary` (deep green `#3a674f`), `brand-bg` (bone `#fff8f6`)
-- **Typography** — `Syne` for headings, `Outfit` for body text (via Google Fonts)
-- **Custom keyframe animations** — `animate-fade-in`, `animate-scale-in`, `animate-slide-up`, `animate-slide-down`
-- **Utility classes** — `glass-chrome`, `surface-card`, `transition-apple`, `tap-feedback`, `hide-scrollbar`, `backdrop-blur-ios`
-- **Accessibility** — `prefers-reduced-motion` collapses all animations; `prefers-reduced-transparency` makes glass surfaces opaque
-- **Apple-like aesthetic** — soft shadows, depth, glass morphism, paper grain overlay
+---
 
-## Import Alias
+## Seguridad
 
-The `@` import alias maps to the repo root, configured in `vite.config.ts` and `tsconfig.json`:
+- **Autenticación**: JWT HS256 via Supabase GoTrue + Express middleware
+- **Contraseñas**: PBKDF2 con SHA-512 y salt aleatorio (Node crypto)
+- **RBAC**: 4 roles (visitor → traveler → guide → admin) verificados en cada endpoint
+- **Sanitización**: `src/lib/security/sanitize.ts` en frontend
+- **Validación**: Zod 4 en frontend y backend (schemas independientes)
+- **CORS**: Origen configurable via `CORS_ORIGIN`
+- **Headers de seguridad**: Configurados en `vercel.json` y `frontend/nginx.conf`
 
-```ts
-import { EXPERIENCES_DATA } from '@/data';
+---
+
+## Despliegue
+
+### Docker (recomendado)
+
+```bash
+docker compose up --build -d
 ```
 
-## Deployment
+Esto construye y arranca:
+1. PostgreSQL + GoTrue Auth + Studio
+2. Express API (puerto 4000)
+3. Frontend vía Nginx (puerto 3000)
 
-Deploy to **Vercel** with zero configuration:
+### Vercel (frontend standalone)
 
 ```bash
 pnpm build
 ```
 
-The output is a static `dist/` directory. No environment variables are required — the app has no backend, no API keys, and no server-side logic.
+El frontend solo se despliega a `dist/`. El backend debe estar en un VPS con Docker.
 
-## License
+---
+
+## Licencia
 
 MIT

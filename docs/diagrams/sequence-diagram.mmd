@@ -1,42 +1,58 @@
 sequenceDiagram
     autonumber
-    participant User as User
-    participant App as App.tsx<br/>(State Machine)
-    participant Explore as ExploreScreen
-    participant Card as ExperienceCard
-    participant Detail as DetailScreen
-    participant Reserv as ReservationScreen
-    participant Valid as Zod Validation
-    participant Handler as handleConfirmBooking
-    participant Confirmed as ConfirmedScreen
+    participant Browser as Browser (React)
+    participant AuthCtx as AuthContext
+    participant API as API Client
+    participant Express as Express API
+    participant Middleware as JWT Middleware
+    participant GoTrue as GoTrue Auth
+    participant DB as PostgreSQL
 
-    User->>Explore: Open app
-    App->>Explore: Render (activeTab=explore, currentScreen=explore)
+    Note over Browser,DB: ─── REGISTRATION / LOGIN ───
 
-    User->>Card: Tap experience card
-    Card->>App: setCurrentScreen('detail')
-    Note over App: currentScreen overrides activeTab<br/>Bottom nav hidden
-    App->>Detail: Render DetailScreen(experience)
+    Browser->>AuthCtx: signIn(email, password)
+    AuthCtx->>API: POST /api/auth/signin { email, pass }
+    API->>Express: /api/auth/signin
+    Express->>DB: SELECT user + encrypted_password
+    DB-->>Express: user row
+    Express->>Express: verifyPassword(pass, hash)
+    Express->>Express: jwt.sign({ sub, role, ... })
+    Express-->>API: { token, user }
+    API-->>AuthCtx: store token + user
+    AuthCtx-->>Browser: user logged in
 
-    User->>Detail: Tap "Reservar" button
-    Detail->>App: setCurrentScreen('reservation')
-    App->>Reserv: Render ReservationScreen(experience)
+    Note over Browser,DB: ─── BOOKING FLOW (authenticated) ───
 
-    User->>Reserv: Fill form<br/>(date, time, adults, children)
-    User->>Reserv: Tap "Confirmar Reserva"
+    Browser->>API: GET /api/experiences
+    API->>Express: /api/experiences
+    Express->>DB: SELECT * FROM experiences
+    DB-->>Express: 4 rows
+    Express-->>API: experiences[]
+    API-->>Browser: render cards
 
-    Reserv->>Valid: validate(bookingSchema, formData)
-    alt Validation fails
-        Valid-->>Reserv: { success: false, errors: [...] }
-        Reserv->>User: Show validation errors
-    else Validation succeeds
-        Valid-->>Reserv: { success: true, data: BookingInput }
-        Reserv->>Handler: handleConfirmBooking(validatedData)
+    Browser->>API: POST /api/experiences/:id/book
+    Note over API: JWT injected from AuthContext
+    API->>Express: POST /api/bookings { expId, date, time, ... }
+    Express->>Middleware: verify(JWT, JWT_SECRET)
+    Middleware-->>Express: { userId, userRole }
 
-        Note over Handler: Generate booking.id = 'bk-'<br/>Generate bookingRef = 'XLR-'<br/>Calculate totalPrice<br/>Set status = 'Confirmed'
+    Express->>Express: validate body (Zod)
+    Express->>DB: BEGIN
+    Express->>DB: INSERT INTO bookings (id, user_id, ..., booking_ref)
+    Express->>DB: INSERT INTO passport_stamps (user_id, title, ...)
+    Express->>DB: COMMIT
+    DB-->>Express: booking row + stamp row
 
-        Handler->>App: setBookings([...bookings, newBooking])
-        Handler->>App: setCurrentScreen('confirmed')
-        App->>Confirmed: Render ConfirmedScreen(booking)
-        Confirmed->>User: Display confirmation<br/>+ booking reference
-    end
+    Express->>Express: generate XLR-nnnn ref
+    Express-->>API: { booking, status: "Confirmed", ref: "XLR-4821" }
+    API-->>Browser: confirmation screen
+
+    Note over Browser,DB: ─── PROFILE / DASHBOARD ───
+
+    Browser->>API: GET /api/bookings
+    API->>Express: GET /api/bookings (JWT)
+    Express->>Middleware: verify JWT
+    Express->>DB: SELECT * FROM bookings JOIN experiences WHERE user_id = $1
+    DB-->>Express: bookings[]
+    Express-->>API: [{ ref, status, date, ... }]
+    API-->>Browser: profile screen with history

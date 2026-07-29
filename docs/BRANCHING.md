@@ -2,47 +2,52 @@
 
 ## Branch Model
 
-| Branch | Purpose | Source | Deploys to |
-|--------|---------|--------|------------|
-| `main` | Production-ready code | PR from `develop` | Production |
-| `develop` | Integration branch for ongoing work | PR from `feature/*` / `fix/*` | Preview |
-| `feature/*` | New features | `develop` | — |
-| `fix/*` | Bug fixes | `develop` | — |
+| Branch | Propósito | Origen | Deploy |
+|--------|-----------|--------|--------|
+| `main` | Código listo para producción | PR desde `develop` | Producción |
+| `develop` | Integración de trabajo en curso | PR desde `feature/*` / `fix/*` | Preview |
+| `feature/*` | Nuevas características | `develop` | — |
+| `fix/*` | Corrección de bugs | `develop` | — |
 
-## Naming Conventions
+## Nomenclatura
 
-- Feature branches: `feature/<short-description>` (e.g. `feature/booking-flow`)
-- Fix branches: `fix/<short-description>` (e.g. `fix/date-format-bug`)
+- `feature/<descripcion-corta>` — ej. `feature/supabase-backend`
+- `fix/<descripcion-corta>` — ej. `fix/jwt-expiration`
 
-## Workflow
-
-1. Branch off `develop` for all work.
-2. Open a PR back into `develop`.
-3. After review + CI green, merge into `develop`.
-4. Periodically, `develop` is promoted to `main` via PR for production release.
+## Flujo de trabajo
 
 ```
 feature/* ──PR──▶ develop ──PR──▶ main
 fix/*    ──PR──▶ develop ──PR──▶ main
 ```
 
-## Commit Convention
+1. Crear rama desde `develop` para todo trabajo
+2. Abrir PR contra `develop`
+3. CI debe pasar (lint + build) antes de merge
+4. Aprobación de al menos 1 reviewer
+5. Merge a `develop`
+6. Periódicamente, PR de `develop` a `main` para release
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+## Conventional Commits
 
-| Prefix | Use case |
-|--------|----------|
-| `feat:` | New feature |
+| Prefix | Uso |
+|--------|-----|
+| `feat:` | Nueva funcionalidad |
 | `fix:` | Bug fix |
-| `chore:` | Build, tooling, dependencies |
-| `docs:` | Documentation only |
-| `refactor:` | Code change that neither fixes a bug nor adds a feature |
-| `style:` | Formatting, missing semicolons, etc. |
-| `test:` | Adding or updating tests |
+| `chore:` | Build, tooling, dependencias |
+| `docs:` | Documentación |
+| `refactor:` | Cambio que no es fix ni feature |
+| `style:` | Formato, linting |
 
 ## PR Requirements
 
-- Clear description of what changed and why.
-- At least 1 approval required.
-- CI must pass (lint + build).
-- No merge conflicts with the target branch.
+- Descripción clara de qué cambió y por qué
+- Checklist: lint pasa, build pasa, self-review, sin console.log
+- Sin conflictos con la rama target
+- Tests (cuando existan) deben pasar
+
+## Stack actual
+
+- **Frontend**: React 19 + TypeScript + Vite + Tailwind v4 → pnpm
+- **Backend**: Express 4 + TypeScript + PostgreSQL → npm (proyecto separado)
+- **Infra**: Docker Compose multi-servicio

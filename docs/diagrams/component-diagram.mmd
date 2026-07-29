@@ -1,114 +1,51 @@
 graph TB
-    subgraph External["External Dependencies"]
-        React["React 19"]
-        Motion["Framer Motion"]
-        Lucide["Lucide React"]
-        Zod["Zod"]
-        Tailwind["Tailwind CSS v4"]
-        Vite["Vite"]
+    subgraph Browser["Browser"]
+        React["React SPA<br/>src/"]
+        Auth["AuthContext<br/>src/contexts/"]
+        Client["API Client<br/>src/lib/api.ts"]
+        Supabase["Supabase Client<br/>src/lib/supabase.ts"]
     end
 
-    subgraph Lib["Lib Modules"]
-        Validation["validation/schemas.ts<br/>bookingSchema, experienceSchema,<br/>configSchema, validate()"]
-        Roles["roles.ts<br/>hasPermission(), canAccess(),<br/>getRoleName()"]
-        Session["security/session.ts<br/>createSession(), getSession(),<br/>destroySession(), isSessionValid()"]
-        Sanitize["security/sanitize.ts<br/>sanitizeHTML(), sanitizeInput(),<br/>sanitizeURL()"]
+    subgraph Express["Express API — backend/src/"]
+        App["app.ts"]
+        Middleware["middleware/<br/>auth.ts<br/>errorHandler.ts"]
+        Routes["routes/<br/>auth.ts, experiences.ts<br/>bookings.ts, likes.ts<br/>passport.ts, guides.ts<br/>config.ts"]
+        Validators["validators/<br/>schemas.ts (Zod)"]
+        DB_Pool["db/pool.ts"]
     end
 
-    subgraph App["App Root — src/App.tsx"]
-        StateMachine["State Machine<br/>activeTab + currentScreen"]
-        Handlers["Handlers<br/>handleConfirmBooking,<br/>handleLike, handleBook"]
-        Data["Data Layer<br/>EXPERIENCES_DATA,<br/>MAP_PINS, LOCAL_STATE"]
+    subgraph SupabaseServices["Supabase (Docker)"]
+        GoTrue["GoTrue Auth<br/>:9999"]
+        PG["PostgreSQL 16<br/>:5432"]
+        Studio["Studio Admin<br/>:3001"]
     end
 
-    subgraph Screens["Screen Components (10)"]
-        ExploreScreen["ExploreScreen"]
-        DetailScreen["DetailScreen"]
-        ReservationScreen["ReservationScreen"]
-        ConfirmedScreen["ConfirmedScreen"]
-        ExperiencesFeedScreen["ExperiencesFeedScreen"]
-        ProfileScreen["ProfileScreen"]
-        PassportScreen["PassportScreen"]
-        ConfigurationScreen["ConfigurationScreen"]
-        CreateExperienceScreen["CreateExperienceScreen"]
-        MapScreen["MapScreen"]
+    subgraph Infra["Infrastructure (Docker Compose)"]
+        Nginx["Nginx<br/>frontend/nginx.conf"]
+        Compose["docker-compose.yml"]
+        Seed["supabase/seed.sql<br/>7 tables + seed data"]
     end
 
-    subgraph Shared["Shared Components (19)"]
-        TopAppBar["TopAppBar"]
-        BottomNavBar["BottomNavBar"]
-        PhoneShell["PhoneShell"]
-        HeroSection["HeroSection"]
-        SearchBar["SearchBar"]
-        CategoryPills["CategoryPills"]
-        ExperienceCard["ExperienceCard"]
-        ExperienceCardRow["ExperienceCardRow"]
-        FilterModal["FilterModal"]
-        ProfileHeader["ProfileHeader"]
-        ImpactDashboard["ImpactDashboard"]
-        PassportStampList["PassportStampList"]
-        SectionHeader["SectionHeader"]
-        ActionList["ActionList"]
-        DetailHero["DetailHero"]
-        InfoStats["InfoStats"]
-        CTABar["CTABar"]
-        CulturalTipsPopup["CulturalTipsPopup"]
-        ErrorBoundary["ErrorBoundary"]
-    end
+    React --> Auth
+    Auth --> Client
+    Client --> App
 
-    subgraph Types["Type System"]
-        TypesTS["types.ts<br/>Experience, Booking,<br/>PassportStamp, AppConfig"]
-    end
+    App --> Middleware
+    App --> Routes
+    Routes --> Validators
+    Routes --> DB_Pool
 
-    App --> StateMachine
-    App --> Handlers
-    App --> Data
+    DB_Pool --> PG
+    GoTrue --> PG
+    Studio --> PG
 
-    StateMachine --> Screens
+    Nginx --> React
+    Nginx --> App
 
-    Handlers --> Validation
-    Handlers --> Roles
-    Handlers --> Session
-    Handlers --> Sanitize
+    React --> Supabase
+    Supabase --> GoTrue
 
-    ExploreScreen --> HeroSection
-    ExploreScreen --> SearchBar
-    ExploreScreen --> CategoryPills
-    ExploreScreen --> ExperienceCard
-    ExploreScreen --> ExperienceCardRow
-    ExploreScreen --> FilterModal
-    ExploreScreen --> SectionHeader
-    ExploreScreen --> CulturalTipsPopup
-
-    DetailScreen --> DetailHero
-    DetailScreen --> InfoStats
-    DetailScreen --> CTABar
-    DetailScreen --> ActionList
-
-    ReservationScreen --> CTABar
-
-    ProfileScreen --> ProfileHeader
-    ProfileScreen --> ImpactDashboard
-    ProfileScreen --> ActionList
-
-    PassportScreen --> PassportStampList
-    PassportScreen --> SectionHeader
-
-    CreateExperienceScreen --> CTABar
-
-    AllScreens["All Screens"] --> TopAppBar
-    App --> PhoneShell
-    App --> BottomNavBar
-    App --> ErrorBoundary
-
-    React --> App
-    Motion --> Screens
-    Lucide --> Shared
-    Zod --> Validation
-    Tailwind --> Shared
-    Tailwind --> Screens
-    Vite --> App
-
-    TypesTS --> Screens
-    TypesTS --> Shared
-    TypesTS --> Lib
+    Seed --> PG
+    Compose --> Nginx
+    Compose --> Express
+    Compose --> SupabaseServices

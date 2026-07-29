@@ -1,138 +1,125 @@
-%% ⚠️ AVISO — Diagrama de CLASES de TypeScript (código frontend).
-%% No representa una base de datos ni un backend.
-%% Todas las clases son interfaces de TypeScript en src/types.ts
-%% y módulos de utilidad en src/lib/.
+%% ⚠️ AVISO — Diagrama de CLASES de TypeScript + esquema DB.
+%% Las entidades de DB son tablas PostgreSQL reales (supabase/seed.sql).
+%% Los módulos de backend son servicios Express en backend/src/.
 %%
-%% WARNING — TypeScript CLASS diagram (frontend code only).
-%% Does NOT represent a database or backend.
-%% All classes are TypeScript interfaces in src/types.ts
-%% and utility modules in src/lib/.
+%% WARNING — TypeScript + DB schema class diagram.
+%% DB entities are real PostgreSQL tables (supabase/seed.sql).
+%% Backend modules are Express services in backend/src/.
 
 classDiagram
-    class Experience {
-        +string id
+    class Experience_DB {
+        <<DB Table>>
+        +UUID id PK
         +string title
         +string location
         +string country
         +enum category
         +string duration
-        +number durationHours
-        +string groupSize
+        +number duration_hours
+        +string group_size
         +number rating
-        +number reviewsCount
-        +number pricePerPerson
+        +number price_per_person
         +string image
-        +string aboutCommunity
-        +object[] whatYouWillDo
-        +number authenticityScore
-        +string communityImpactText
-        +string[] communityImpactBullets
-        +object howToGetThere
+        +string about_community
+        +jsonb what_you_will_do
+        +jsonb community_impact_bullets
+        +jsonb how_to_get_there
         +string[] tags
-        +string[] galleryImages
-        +number? lat
-        +number? lng
-        +string? createdBy
-        +string? hostName
+        +UUID created_by FK
+        +number lat
+        +number lng
     }
 
-    class Booking {
-        +string id
-        +string? userId
-        +string experienceId
-        +string experienceTitle
-        +string experienceImage
-        +string date
-        +string time
-        +number adultsCount
-        +number childrenCount
-        +number totalPrice
-        +string bookingRef
-        +string confirmedAt
+    class Booking_DB {
+        <<DB Table>>
+        +UUID id PK
+        +UUID user_id FK
+        +UUID experience_id FK
+        +date date
+        +time time
+        +int adults_count
+        +int children_count
+        +number total_price
+        +string booking_ref
         +enum status
+        +timestamptz confirmed_at
     }
 
-    class PassportStamp {
-        +string id
+    class Profile_DB {
+        <<DB Table>>
+        +UUID id PK FK
+        +string display_name
+        +enum role
+        +string avatar_url
+    }
+
+    class PassportStamp_DB {
+        <<DB Table>>
+        +UUID id PK
+        +UUID user_id FK
         +string title
         +string category
-        +string date
-        +enum iconType
+        +string icon_type
         +string color
+        +UUID booking_id FK
     }
 
-    class AppConfig {
-        +enum greetingTone
-        +enum language
-        +string[] tipFocus
-        +boolean enableNicaSound
-        +boolean showCo2InLbs
+    class ExpressAPI {
+        <<Backend>>
+        +GET /api/experiences
+        +GET /api/experiences/:id
+        +POST /api/experiences
+        +GET /api/bookings
+        +POST /api/bookings
+        +GET /api/likes
+        +POST /api/likes/:id
+        +GET /api/passport
+        +GET /api/guides/:id
+        +GET /api/config
+        +PUT /api/config
     }
 
-    class bookingSchema {
-        <<Zod Schema>>
-        +experienceId: string min(1)
-        +date: string min(1)
-        +time: string min(1)
-        +adultsCount: int min(1) max(20)
-        +childrenCount: int min(0) max(15)
-        +totalPrice: number positive
+    class AuthMiddleware {
+        <<Backend>>
+        +jwt.verify(token, JWT_SECRET)
+        +extract userId + userRole
+        +check RBAC permissions
     }
 
-    class experienceSchema {
-        <<Zod Schema>>
-        +title: string min(3) max(100)
-        +category: enum
-        +location: string min(2) max(100)
-        +duration: string min(1)
-        +pricePerPerson: number min(1) max(1000)
-        +aboutCommunity: string min(10) max(500)
-        +image: string url
+    class Validators {
+        <<Backend>>
+        +signUpSchema Zod
+        +signInSchema Zod
+        +bookingSchema Zod
+        +experienceSchema Zod
+        +configSchema Zod
     }
 
-    class configSchema {
-        <<Zod Schema>>
-        +greetingTone: enum
-        +language: enum
-        +tipFocus: string[] min(1)
-        +enableNicaSound: boolean
-        +showCo2InLbs: boolean
+    class AuthContext {
+        <<Frontend>>
+        +signIn(email, password)
+        +signUp(email, password, name, role)
+        +signOut()
+        +user: User
+        +token: string
     }
 
-    class Session {
-        <<interface>>
-        +string userId
-        +enum role
-        +string displayName
-        +number createdAt
-        +number lastActivity
+    class APIClient {
+        <<Frontend>>
+        +apiFetch<T>(path, options)
+        +auto JWT injection
+        +typed endpoints
     }
 
-    class sanitize {
-        <<module>>
-        +sanitizeHTML(input: string): string
-        +sanitizeInput(input: string): string
-        +sanitizeURL(url: string): string
-    }
+    Booking_DB --> Experience_DB : FK experience_id
+    Booking_DB --> Profile_DB : FK user_id
+    PassportStamp_DB --> Profile_DB : FK user_id
+    PassportStamp_DB --> Booking_DB : FK booking_id
 
-    class roles {
-        <<module>>
-        +hasPermission(userRole, requiredRole): boolean
-        +canAccess(userRole, resource): boolean
-        +getRoleName(role): string
-    }
+    AuthMiddleware --> ExpressAPI : protects routes
+    Validators --> ExpressAPI : validates input
+    ExpressAPI --> Booking_DB : SQL
+    ExpressAPI --> Experience_DB : SQL
 
-    class session {
-        <<module>>
-        +createSession(role, displayName): Session
-        +getSession(): Session | null
-        +destroySession(): void
-        +isSessionValid(): boolean
-    }
-
-    Booking --> Experience : references via experienceId
-    bookingSchema ..> Booking : validates
-    experienceSchema ..> Experience : validates
-    configSchema ..> AppConfig : validates
-    Session --> roles : uses Role enum
-    session ..> Session : manages
+    AuthContext --> APIClient : uses
+    APIClient --> ExpressAPI : HTTP + JWT

@@ -1,77 +1,111 @@
-%% ⚠️ AVISO — Este es un DIAGRAMA CONCEPTUAL del modelo de datos interno.
-%% Xolara NO tiene base de datos. Todas las entidades aquí representadas
-%% son tipos de TypeScript (src/types.ts) con datos semilla (src/data.ts).
-%% No existe persistencia externa, servidor, ni SQL.
-%% 
-%% WARNING — This is a CONCEPTUAL DIAGRAM of the internal data model.
-%% Xolara has NO database. All entities shown are TypeScript types
-%% (src/types.ts) with seed data (src/data.ts).
-%% There is no external persistence, server, or SQL.
+%% ⚠️ AVISO — MODELO ENTIDAD-RELACIÓN de PostgreSQL.
+%% Xolara tiene base de datos real via Supabase autoalojado.
+%% Todas las tablas existen en el schema public de PostgreSQL.
+%% seed.sql contiene DDL + datos iniciales.
+%%
+%% WARNING — PostgreSQL ENTITY-RELATIONSHIP diagram.
+%% Xolara has a real database via self-hosted Supabase.
+%% All tables exist in the public PostgreSQL schema.
+%% seed.sql contains DDL + initial data.
 
 erDiagram
-    EXPERIENCE {
-        string id PK
-        string title
-        string location
-        string country
-        enum category "Crafts|Culinary|Music|Nature|Agriculture"
-        string duration
-        number durationHours
-        string groupSize
-        number rating
-        number reviewsCount
-        number pricePerPerson
-        string image
-        string aboutCommunity
-        json whatYouWillDo
-        number authenticityScore
-        string communityImpactText
-        string communityImpactBullets
-        json howToGetThere
-        string[] tags
-        string[] galleryImages
-        number lat "nullable"
-        number lng "nullable"
-        string createdBy "nullable"
-        string hostName "nullable"
+    PROFILES {
+        uuid id PK "FK → auth.users(id)"
+        text display_name
+        enum role "visitor|traveler|guide|admin"
+        text avatar_url
+        timestamptz created_at
     }
 
-    BOOKING {
-        string id PK
-        string userId "nullable"
-        string experienceId FK
-        string experienceTitle
-        string experienceImage
-        string date
-        string time
-        number adultsCount
-        number childrenCount
-        number totalPrice
-        string bookingRef "unique"
-        string confirmedAt
-        enum status "Confirmed|Pending|Completed"
+    EXPERIENCES {
+        uuid id PK
+        text title
+        text location
+        text country "default Nicaragua"
+        enum category "Crafts|Culinary|Agriculture|Nature|Music"
+        text duration "ej. 5 Horas"
+        numeric duration_hours
+        text group_size "ej. Máx 6 personas"
+        numeric rating
+        int reviews_count
+        numeric price_per_person
+        text image
+        text about_community
+        jsonb what_you_will_do
+        int authenticity_score
+        text community_impact_text
+        jsonb community_impact_bullets
+        jsonb how_to_get_there
+        text[] tags
+        text[] gallery_images
+        numeric lat
+        numeric lng
+        uuid created_by FK
+        text host_name
+        timestamptz created_at
     }
 
-    PASSPORT_STAMP {
-        string id PK
-        string title
-        string category
-        string date
-        enum iconType "mountain|utensils|palette|coffee"
-        string color
+    BOOKINGS {
+        uuid id PK
+        uuid user_id FK
+        uuid experience_id FK
+        date date
+        time time
+        int adults_count ">= 1"
+        int children_count
+        numeric total_price
+        text booking_ref "XLR-nnnn unique"
+        enum status "Confirmed|Pending|Completed|Cancelled"
+        timestamptz confirmed_at
     }
 
-    APP_CONFIG {
-        enum greetingTone "traditional|formal|slang"
+    LIKES {
+        uuid user_id PK FK
+        uuid experience_id PK FK
+        timestamptz created_at
+    }
+
+    PASSPORT_STAMPS {
+        uuid id PK
+        uuid user_id FK
+        text title
+        text category
+        text date
+        text icon_type
+        text color
+        uuid booking_id FK
+        timestamptz created_at
+    }
+
+    APP_CONFIGS {
+        uuid user_id PK FK
+        enum greeting_tone "traditional|formal|slang"
         enum language "es|en|bilingual"
-        string[] tipFocus
-        boolean enableNicaSound
-        boolean showCo2InLbs
+        text[] tip_focus
+        boolean enable_nica_sound
+        boolean show_co2_in_lbs
+        timestamptz updated_at
     }
 
-    BOOKING }o--|| EXPERIENCE : "references experienceId"
+    GUIDES {
+        uuid id PK
+        uuid profile_id FK UK
+        uuid experience_id FK
+        text welcome_msg
+        jsonb faq
+        timestamptz created_at
+    }
 
-    note for EXPERIENCE "Seeded from src/data.ts<br/>No database — all data<br/>is local/seed"
-    note for BOOKING "Created via handleConfirmBooking<br/>Stored in React state<br/>Not persisted to backend"
-    note for PASSPORT_STAMP "Generated from completed bookings<br/>RECENT_PASSPORT_STAMPS seed data"
-    note for APP_CONFIG "User preferences<br/>Managed in React state<br/>Validated by configSchema"
+    PROFILES ||--o{ BOOKINGS : "makes"
+    PROFILES ||--o{ LIKES : "likes"
+    PROFILES ||--o{ PASSPORT_STAMPS : "earns"
+    PROFILES ||--o| APP_CONFIGS : "configures"
+    PROFILES ||--o| GUIDES : "is a guide"
+    EXPERIENCES ||--o{ BOOKINGS : "has"
+    EXPERIENCES ||--o{ LIKES : "liked by"
+    EXPERIENCES ||--o{ GUIDES : "assigned guide"
+    BOOKINGS ||--o{ PASSPORT_STAMPS : "generates"
+
+    note for PROFILES "extends auth.users<br/>Row Level Security enabled"
+    note for BOOKINGS "booking_ref auto-generated<br/>XLR-nnnn format"
+    note for PASSPORT_STAMPS "auto-created on booking confirm<br/>icon_type derived from category"

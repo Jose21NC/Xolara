@@ -1,54 +1,79 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance when working with code in this repository.
 
 ## Project
 
-Xolara — a mobile-first React app for discovering and booking artisanal, community-centric travel experiences in Nicaragua. UI copy is in **Spanish**; code identifiers are in English.
+Xolara — mobile-first React app for discovering and booking artisanal travel experiences in Nicaragua. UI copy is in **Spanish**; code identifiers are in English.
 
-**Visual-only deliverable** — no backend, no Firebase, no Google Maps. All data is local/seed.
+**Now with a full backend**: Express API + PostgreSQL (via Supabase) + Docker Compose.
 
 ## Commands
 
+### Frontend (pnpm ONLY — npm is blocked via `.npmrc`)
 ```bash
-pnpm install        # install deps (pnpm ONLY — npm is blocked via .npmrc)
-pnpm run dev        # Vite dev server on port 3000 (host 0.0.0.0)
-pnpm run build      # production build to dist/
-pnpm run preview    # serve the production build
-pnpm run lint       # type-check only: tsc --noEmit (NOT eslint)
-pnpm run clean      # clear vite cache
+pnpm install        # Install deps
+pnpm dev            # Vite dev server :3000
+pnpm build          # Build to dist/
+pnpm lint           # tsc --noEmit
+pnpm clean          # Clear Vite cache
 ```
 
-There is **no test runner** and **no eslint** configured. `pnpm run lint` runs `tsc --noEmit` — use it to verify type correctness.
+### Backend (npm — separate project, no .npmrc restriction)
+```bash
+cd backend
+npm install
+npm run dev         # tsx watch (hot-reload) :4000
+npm run build       # tsc compile to dist/
+npm start           # Run compiled production
 
-**Do NOT use `npm`** — it is blocked in `.npmrc`.
+npx tsc --noEmit    # Type-check only
+```
+
+### Docker
+```bash
+docker compose up               # Full stack
+docker compose up db auth       # Database + Auth only (hybrid dev)
+docker compose up --build       # Rebuild + start
+```
 
 ## Architecture
 
-**Single-screen state machine, no router.** `src/App.tsx` is the root and holds all application state (navigation, config, experiences, bookings, likes, filters). Navigation is driven by two pieces of state, not URLs:
+### Frontend → Express API → PostgreSQL
 
-- `activeTab`: `'explore' | 'experiences' | 'passport' | 'profile'` — the bottom nav tabs.
-- `currentScreen`: `'explore' | 'detail' | 'reservation' | 'confirmed' | 'configuration' | 'create_exp'` — full-screen overlays that take precedence over the active tab.
+```
+Frontend (React SPA) ──HTTP──▶ Express API ──SQL──▶ PostgreSQL
+                                     │
+                               JWT verify ← GoTrue Auth
+```
 
-`renderScreenContent()` resolves which screen to show: `currentScreen` overlays are checked first, then it falls back to the `activeTab` switch. The bottom nav bar only renders when `currentScreen === 'explore'` (overlays hide it). Screens are presentational and receive data + callbacks as props from `App.tsx`.
+- **Frontend**: React 19 state machine (`activeTab` + `currentScreen`), no router
+- **Backend**: Express 4, TypeScript ESM, 7 route modules (auth, experiences, bookings, likes, passport, guides, config)
+- **Auth**: JWT HS256, PBKDF2 password hashing, RBAC (visitor/traveler/guide/admin)
+- **Database**: PostgreSQL 16 via Supabase, 7 tables, seed data in `supabase/seed.sql`
 
-**Screens** live in `src/screens/`. **Shared types** are in `src/types.ts` (`Experience`, `Booking`, `AppConfig`, `PassportStamp`). **Seed data** is in `src/data.ts` (`EXPERIENCES_DATA`, `MAP_PINS`, `RECENT_PASSPORT_STAMPS`).
+### Dev workflow (hybrid)
+```bash
+# Terminal 1
+docker compose up db auth
 
-**Data flow (all local, no backend):**
-- Experiences: static seed data from `EXPERIENCES_DATA` in `src/data.ts`.
-- Bookings: managed in local React state in `App.tsx`. Created via `handleConfirmBooking` with a generated `bk-<timestamp>` id and `XLR-<nnnn>` ref.
-- `likedExperiences`, `config` (`AppConfig`), `activeCategory`, `searchQuery` are local React state.
+# Terminal 2
+cd backend && cp ../.env.example .env && npm run dev
 
-## Styling & UI conventions
+# Terminal 3
+pnpm dev
+```
 
-- **Tailwind CSS v4** via the `@tailwindcss/vite` plugin. There is no `tailwind.config.js` — the theme is defined in `src/index.css` under `@theme` (brand colors `brand-primary` terracotta, `brand-secondary` deep green, `brand-bg` bone; font-heading Syne, font-body Outfit). Add design tokens there, not in a JS config.
-- Custom keyframe animations (`animate-fade-in`, `animate-scale-in`, `animate-slide-up`, etc.) and utilities (`glass-effect`, `backdrop-blur-ios`, `transition-apple`, `tap-feedback`, `hide-scrollbar`) are defined in `src/index.css`. Aesthetic target: Apple-like minimalism (soft shadows, depth, glass). `motion` (Framer Motion) is the preferred animation library for new work.
-- The whole app renders inside `PhoneShell` (a centered `max-w-md` phone frame).
+### Styling
+- **Tailwind CSS v4** via `@tailwindcss/vite` plugin (no tailwind.config.js)
+- Theme in `src/index.css` `@theme` block
+- Brand: `brand-primary` terracotta, `brand-secondary` green, `brand-bg` bone
+- Fonts: Syne (headings), Outfit (body)
 
-## Import alias
-
-The `@` import alias maps to the repo root (`vite.config.ts` + `tsconfig.json` paths).
-
-## Working style
-
-Make surgical, focused edits — return only the changed blocks/lines, not whole files, when only a few lines change; avoid comments on obvious code; only touch the files named in the request.
+### Key files
+- `src/App.tsx` — Root state machine
+- `src/contexts/AuthContext.tsx` — Auth provider (replaces simulated localStorage session)
+- `src/lib/api.ts` — Typed API client with JWT injection
+- `backend/src/routes/` — All Express route handlers
+- `supabase/seed.sql` — Database schema + 4 seed experiences
+- `docker-compose.yml` — Orchestrates all 5 services
