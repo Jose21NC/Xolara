@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Settings, Share2, Star, 
   Trash2, ArrowRight, X, Calendar, Clock, MessageSquare, Send, Check, AlertCircle, RefreshCw,
-  Mountain, Utensils, Palette, Coffee
+  Mountain, Utensils, Coffee
 } from 'lucide-react';
 import { Booking } from '../types';
 import { RECENT_PASSPORT_STAMPS } from '../data';
-import { useFirebase } from '../contexts/FirebaseContext';
+import ProfileHeader from '../components/ProfileHeader';
+import PassportStampList from '../components/PassportStampList';
 
 interface ProfileScreenProps {
   bookings: Booking[];
@@ -63,14 +64,9 @@ export default function ProfileScreen({
   onUpdateBooking,
   onOpenConfig
 }: ProfileScreenProps) {
-  const { user } = useFirebase();
   const [profileName, setProfileName] = useState('Elena Santos');
   const [isEditing, setIsEditing] = useState(false);
   const [editVal, setEditVal] = useState(profileName);
-
-  useEffect(() => {
-    if (user && user.displayName) setProfileName(user.displayName);
-  }, [user]);
 
   // RESERVATION MANAGER drawer state
   const [managingBooking, setManagingBooking] = useState<Booking | null>(null);
@@ -182,7 +178,7 @@ export default function ProfileScreen({
   };
 
   return (
-    <div className="flex flex-col gap-6 pb-24 font-sans relative min-h-screen">
+    <div className="flex flex-col gap-6 pb-24 font-body relative min-h-screen">
       
       {/* Toast Alert message feedback */}
       {toastMessage && (
@@ -200,72 +196,23 @@ export default function ProfileScreen({
         >
           <Settings className="w-5 h-5 text-brand-text-dark" strokeWidth={1.8} />
         </button>
-        <span className="font-serif text-lg font-semibold text-brand-text-dark">Mi Perfil</span>
+        <span className="font-heading text-lg font-semibold text-[#412c21]">Mi Perfil</span>
         <button className="text-brand-text-dark hover:bg-black/5 p-2 rounded-full" title="Compartir Perfil">
           <Share2 className="w-5 h-5 text-brand-text-dark" strokeWidth={1.8} />
         </button>
       </header>
 
-      {/* Profile summary card banner */}
-      <div className="px-5 animate-fade-in">
-        <div
-          className="relative rounded-[var(--radius-card)] overflow-hidden p-6 text-center flex flex-col items-center gap-3 surface-card"
-          style={{
-            backgroundImage: "linear-gradient(rgba(244,244,242,0.86), rgba(244,244,242,0.96)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJml7d2BHBK-4rUKbZKcSQXU7K_0GQihW8YQTgVAFQglkIWprIvZITnIqBbAXepmkxE4cYSxn1owkoEIegtZZgdQ3-ybFVpUVTYitGZOVzNF6VcDmQP4iYTr7R7GwQ-47MZtDrvFCebBOEYO6LKjW-1LxFrXigZBeofb9tR54SZCpe8B1IDoLcIxtbK3zWBjqul27-MJvlHD2c6Ls8ABPcm-ixwlHqVM-M17UhyoOPEYex597rk4yB4yQalYyW3M_YdHZdFO29F0_X')",
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
+      {/* Profile Section */}
+      <div className="px-5">
+        <ProfileHeader
+          name={profileName}
+          title="Exploradora en León, Nicaragua"
+          avatarUrl="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200"
+          onEdit={() => {
+            setEditVal(profileName);
+            setIsEditing(!isEditing);
           }}
-        >
-          {/* Avatar frame */}
-          <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-brand-primary shadow-md">
-            <img 
-              src={user?.photoURL || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200"} 
-              alt={user?.displayName || "Elena Santos Avatar"} 
-              className="w-full h-full object-cover grayscale contrast-110 sepia-[40%]" 
-            />
-          </div>
-
-          <div className="flex flex-col gap-1 items-center">
-            {isEditing ? (
-              <div className="flex items-center gap-1.5">
-                <input 
-                  type="text" 
-                  value={editVal}
-                  onChange={(e) => setEditVal(e.target.value)}
-                  className="bg-surface border border-black/10 rounded-lg px-2.5 py-1 text-sm font-semibold text-brand-text-dark"
-                />
-                <button 
-                  onClick={handleSaveProfile}
-                  className="bg-brand-primary text-white text-xs font-bold px-2.5 py-1.5 rounded-lg active:scale-95"
-                >
-                  Ok
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center">
-                <h3 className="font-serif text-lg font-semibold text-brand-text-dark leading-tight">{user ? user.displayName : profileName}</h3>
-                <p className="text-[11px] text-brand-text-muted font-bold mt-0.5 uppercase tracking-wide">
-                  {user ? 'Explorador Conectado' : 'Exploradora en León, Nicaragua'}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-2.5 mt-1.5">
-            <button 
-              onClick={() => {
-                setEditVal(profileName);
-                setIsEditing(!isEditing);
-              }}
-              className="bg-brand-primary text-white hover:bg-brand-primary/95 font-semibold py-2 px-5 rounded-full text-[11px] tracking-wide transition-all active:scale-95 shadow-ios leading-none"
-            >
-              {isEditing ? 'Cancelar' : 'Editar Perfil'}
-            </button>
-            <button className="glass-chrome text-brand-text-dark font-semibold py-2 px-5 rounded-full text-[11px] tracking-wide transition-all active:scale-95 leading-none">
-              Compártelo
-            </button>
-          </div>
-        </div>
+        />
       </div>
 
       {/* Community Impact highlights board */}
@@ -421,42 +368,29 @@ export default function ProfileScreen({
         )}
       </section>
 
-      {/* Recet Passport Stamps list */}
-      <section className="px-5 flex flex-col gap-3 font-sans">
-        <div className="flex justify-between items-baseline">
-          <h4 className="font-serif text-sm font-semibold text-brand-text-dark">Sellos Recientes de Pasaporte</h4>
-        </div>
-
-        <div className="flex gap-3 overflow-x-auto hide-scrollbar py-2 -mx-5 px-5">
-          {RECENT_PASSPORT_STAMPS.map(stamp => (
-            <div 
-              key={stamp.id}
-              className="flex-shrink-0 w-28 surface-card p-3 flex flex-col items-center justify-center text-center relative overflow-hidden"
-            >
-              <div 
-                className="w-12 h-12 rounded-full border-2 border-dashed flex items-center justify-center text-base mb-1.5"
-                style={{ borderColor: stamp.color, color: stamp.color }}
-              >
-                {stamp.iconType === 'mountain' ? <Mountain className="w-5 h-5 text-current" strokeWidth={2}/> : stamp.iconType === 'utensils' ? <Utensils className="w-5 h-5 text-current" strokeWidth={2}/> : <Palette className="w-5 h-5 text-current" strokeWidth={2}/>}
-              </div>
-              <h5 className="text-[11px] font-bold text-brand-text-dark truncate w-full leading-tight">{stamp.title}</h5>
-              <span className="text-[9px] text-[#8a726c] font-bold mt-0.5 uppercase tracking-wide">{stamp.date}</span>
-            </div>
-          ))}
-
-          {bookings.map((b) => (
-            <div 
-              key={`dynamic-${b.id}`}
-              className="flex-shrink-0 w-28 surface-card p-3 flex flex-col items-center justify-center text-center relative overflow-hidden"
-            >
-              <div className="w-12 h-12 rounded-full border-2 border-dashed flex items-center justify-center text-base mb-1.5 border-brand-primary text-brand-primary">
-                <Coffee className="w-5 h-5 text-current" strokeWidth={2} />
-              </div>
-              <h5 className="text-[11px] font-bold text-brand-text-dark truncate w-full leading-tight">{b.experienceTitle}</h5>
-              <span className="text-[9px] text-brand-secondary font-bold mt-0.5 uppercase tracking-wide">Oct 2023</span>
-            </div>
-          ))}
-        </div>
+      {/* Recent Passport Stamps list - using reusable component */}
+      <section className="px-5 flex flex-col gap-3 font-body">
+        <PassportStampList
+          title="Sellos recientes"
+          stamps={[
+            ...RECENT_PASSPORT_STAMPS.map(s => ({
+              id: s.id,
+              title: s.title,
+              date: s.date,
+              color: s.color,
+              icon: s.iconType === 'mountain' ? <Mountain className="w-5 h-5" strokeWidth={2} /> :
+                    s.iconType === 'utensils' ? <Utensils className="w-5 h-5" strokeWidth={2} /> :
+                    <Coffee className="w-5 h-5" strokeWidth={2} />,
+            })),
+            ...bookings.map(b => ({
+              id: `dynamic-${b.id}`,
+              title: b.experienceTitle,
+              date: 'Oct 2023',
+              color: '#a8472f',
+              icon: <Coffee className="w-5 h-5" strokeWidth={2} />,
+            })),
+          ]}
+        />
       </section>
 
       {/* ========================================================================= */}

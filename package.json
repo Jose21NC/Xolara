@@ -7,17 +7,11 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
+    "clean": "rm -rf dist node_modules/.cache",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
-    "@vis.gl/react-google-maps": "^1.8.3",
-    "@vitejs/plugin-react": "^5.0.4",
-    "dotenv": "^17.2.3",
-    "express": "^4.21.2",
-    "firebase": "^12.14.0",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
     "react": "^19.0.1",
@@ -25,16 +19,10 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
-    "@firebase/eslint-plugin-security-rules": "^0.0.2",
-    "@types/express": "^4.17.21",
-    "@types/google.maps": "^3.65.1",
-    "@types/node": "^22.14.0",
-    "autoprefixer": "^10.4.21",
-    "esbuild": "^0.25.0",
-    "eslint": "^10.5.0",
+    "@types/node": "^26.1.2",
+    "@vitejs/plugin-react": "^5.0.4",
     "tailwindcss": "^4.1.14",
-    "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.3"
-  }
+    "typescript": "~5.8.2"
+  },
+  "packageManager": "pnpm@11.17.0+sha512.cca3cea332ad254bb84145f966d19f4879615210346fc92c79a047f23a0d7b3cca3c3792f0076ba1f1831d277efbcf0a9119b31a9a60eca7fb3d6231f331ef72"
 }

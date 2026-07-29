@@ -1,14 +1,24 @@
 # Contexto de Desarrollo - Xolara
-**Estado**: Refactorización de UI/UX.
-**Foco Actual**: Pantalla de Pasaporte (Gamerificación).
+**Estado**: MVP Visual — entregable express.
+**Foco Actual**: UI mobile-first, sin backend.
 
-## Directivas Caveman
+## Directivas
 - No explicar código obvio.
 - Solo entregar bloques modificados.
 - Priorizar Framer Motion para animaciones.
 - Estética: Apple-like (minimalista, profundidad, sombras suaves).
+- Gestor de paquetes: **pnpm** (npm bloqueado).
 
-## Roadmap Corto
-1. Corregir visualización de hoja de pasaporte (Textura y bordes).
-2. Implementar animación de deslizamiento 3D (Page turn/Slide stack).
-3. Conectar con Firestore para stamps reales.
+## Stack
+- React 19 + TypeScript 5.8 + Vite 6
+- Tailwind CSS v4 (tema en index.css)
+- Motion (Framer Motion)
+- Lucide React (iconos)
+- Sin Firebase, sin Google Maps, sin backend
+
+## Roadmap
+1. ~~Eliminar dependencias Firebase/Google Maps~~ ✅
+2. ~~Configurar pnpm como gestor exclusivo~~ ✅
+3. ~~Verificar lint y build~~ ✅
+4. Pulir diseño responsive
+5. Agregar lazy loading / code splitting

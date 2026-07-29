@@ -6,16 +6,12 @@ import {defineConfig} from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
-    define: {
-      'process.env.GOOGLE_MAPS_PLATFORM_KEY': JSON.stringify(process.env.GOOGLE_MAPS_PLATFORM_KEY || '')
-    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
       },
     },
     server: {
-      // HMR can be disabled via DISABLE_HMR env var if needed.
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },

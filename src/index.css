@@ -1,9 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-serif: 'Literata', Georgia, serif;
   --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Syne', sans-serif;
+  --font-body: 'Outfit', sans-serif;
 
   /* Single accent: terracotta (very slightly desaturated) */
   --color-brand-primary: #a8472f;        /* Terracotta accent */
@@ -11,16 +13,25 @@
   --color-brand-tertiary: #8a6321;       /* Ochre - legacy, used sparingly */
 
   /* Cool-neutral Apple-style base (faint warmth so it isn't clinical) */
-  --color-brand-bg: #f4f4f2;             /* Off-white neutral canvas */
+  --color-brand-bg: #fff8f6;             /* Figma bg: warm bone */
   --color-surface: #ffffff;              /* Content card surface */
   --color-surface-2: #fbfbfa;            /* Slightly elevated / inset surface */
-  --color-hairline: #1c1c1810;           /* Neutral hairline (replaces brand-primary/5-10 borders) */
+  --color-hairline: #1c1c1810;           /* Neutral hairline */
 
-  --color-brand-text-dark: #1b1b1a;      /* Near-black neutral */
-  --color-brand-text-muted: #6b6862;     /* Cool warm-grey */
+  --color-brand-text-dark: #412c21;      /* Figma text-dark: deep brown */
+  --color-brand-text-muted: #4f4540;     /* Figma text-muted: warm grey */
+  --color-brand-gold: #e6be6d;           /* Figma gold accent */
+  --color-brand-gold-light: #ffdea1;     /* Figma light gold */
+  --color-brand-green: #47654f;          /* Figma green */
+  --color-brand-green-light: #c9ebce;    /* Figma light green */
+  --color-brand-warm-grey: #81746f;      /* Figma warm grey */
+  --color-brand-button-bg: #faf2f0;      /* Figma capsule bg */
+  --color-brand-brown: #594236;          /* Figma brown text */
+  --color-brand-red: #ba1a1a;            /* Figma red */
+  --color-brand-coffee-green: #4d6b54;   /* Figma coffee region tag */
 
-  /* Neutral-cool tinted shadow color (base is no longer warm paper) */
-  --shadow-warm: 24 24 27;
+  /* Neutral-cool tinted shadow color */
+  --shadow-warm: 89 66 54;
 
   /* Unified radius scale */
   --radius-card: 1.25rem;                /* 20px - content cards */
@@ -284,6 +295,65 @@ h1, h2, h3, h4 {
     box-shadow: 0 12px 36px rgba(var(--shadow-warm) / 0.12), 0 0 0 1px rgba(var(--shadow-warm) / 0.03);
   }
   
+  /* Figma-style typography utilities */
+  .figma-heading-xl {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 56px;
+    letter-spacing: -0.96px;
+  }
+  .figma-heading-lg {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 34px;
+  }
+  .figma-heading-md {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 32px;
+  }
+  .figma-heading-sm {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+  .figma-body-lg {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28px;
+  }
+  .figma-body-md {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+  .figma-body-sm {
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    letter-spacing: 0.7px;
+  }
+  .figma-body-xs {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+  .figma-tag {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 1.2px;
+  }
+
   /* Haptic feedback simulation */
   .tap-feedback:active {
     transform: scale(0.96);
