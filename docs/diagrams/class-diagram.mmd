@@ -1,0 +1,138 @@
+%% ⚠️ AVISO — Diagrama de CLASES de TypeScript (código frontend).
+%% No representa una base de datos ni un backend.
+%% Todas las clases son interfaces de TypeScript en src/types.ts
+%% y módulos de utilidad en src/lib/.
+%%
+%% WARNING — TypeScript CLASS diagram (frontend code only).
+%% Does NOT represent a database or backend.
+%% All classes are TypeScript interfaces in src/types.ts
+%% and utility modules in src/lib/.
+
+classDiagram
+    class Experience {
+        +string id
+        +string title
+        +string location
+        +string country
+        +enum category
+        +string duration
+        +number durationHours
+        +string groupSize
+        +number rating
+        +number reviewsCount
+        +number pricePerPerson
+        +string image
+        +string aboutCommunity
+        +object[] whatYouWillDo
+        +number authenticityScore
+        +string communityImpactText
+        +string[] communityImpactBullets
+        +object howToGetThere
+        +string[] tags
+        +string[] galleryImages
+        +number? lat
+        +number? lng
+        +string? createdBy
+        +string? hostName
+    }
+
+    class Booking {
+        +string id
+        +string? userId
+        +string experienceId
+        +string experienceTitle
+        +string experienceImage
+        +string date
+        +string time
+        +number adultsCount
+        +number childrenCount
+        +number totalPrice
+        +string bookingRef
+        +string confirmedAt
+        +enum status
+    }
+
+    class PassportStamp {
+        +string id
+        +string title
+        +string category
+        +string date
+        +enum iconType
+        +string color
+    }
+
+    class AppConfig {
+        +enum greetingTone
+        +enum language
+        +string[] tipFocus
+        +boolean enableNicaSound
+        +boolean showCo2InLbs
+    }
+
+    class bookingSchema {
+        <<Zod Schema>>
+        +experienceId: string min(1)
+        +date: string min(1)
+        +time: string min(1)
+        +adultsCount: int min(1) max(20)
+        +childrenCount: int min(0) max(15)
+        +totalPrice: number positive
+    }
+
+    class experienceSchema {
+        <<Zod Schema>>
+        +title: string min(3) max(100)
+        +category: enum
+        +location: string min(2) max(100)
+        +duration: string min(1)
+        +pricePerPerson: number min(1) max(1000)
+        +aboutCommunity: string min(10) max(500)
+        +image: string url
+    }
+
+    class configSchema {
+        <<Zod Schema>>
+        +greetingTone: enum
+        +language: enum
+        +tipFocus: string[] min(1)
+        +enableNicaSound: boolean
+        +showCo2InLbs: boolean
+    }
+
+    class Session {
+        <<interface>>
+        +string userId
+        +enum role
+        +string displayName
+        +number createdAt
+        +number lastActivity
+    }
+
+    class sanitize {
+        <<module>>
+        +sanitizeHTML(input: string): string
+        +sanitizeInput(input: string): string
+        +sanitizeURL(url: string): string
+    }
+
+    class roles {
+        <<module>>
+        +hasPermission(userRole, requiredRole): boolean
+        +canAccess(userRole, resource): boolean
+        +getRoleName(role): string
+    }
+
+    class session {
+        <<module>>
+        +createSession(role, displayName): Session
+        +getSession(): Session | null
+        +destroySession(): void
+        +isSessionValid(): boolean
+    }
+
+    Booking --> Experience : references via experienceId
+    bookingSchema ..> Booking : validates
+    experienceSchema ..> Experience : validates
+    configSchema ..> AppConfig : validates
+    Session --> roles : uses Role enum
+    session ..> Session : manages

@@ -1,0 +1,114 @@
+graph TB
+    subgraph External["External Dependencies"]
+        React["React 19"]
+        Motion["Framer Motion"]
+        Lucide["Lucide React"]
+        Zod["Zod"]
+        Tailwind["Tailwind CSS v4"]
+        Vite["Vite"]
+    end
+
+    subgraph Lib["Lib Modules"]
+        Validation["validation/schemas.ts<br/>bookingSchema, experienceSchema,<br/>configSchema, validate()"]
+        Roles["roles.ts<br/>hasPermission(), canAccess(),<br/>getRoleName()"]
+        Session["security/session.ts<br/>createSession(), getSession(),<br/>destroySession(), isSessionValid()"]
+        Sanitize["security/sanitize.ts<br/>sanitizeHTML(), sanitizeInput(),<br/>sanitizeURL()"]
+    end
+
+    subgraph App["App Root — src/App.tsx"]
+        StateMachine["State Machine<br/>activeTab + currentScreen"]
+        Handlers["Handlers<br/>handleConfirmBooking,<br/>handleLike, handleBook"]
+        Data["Data Layer<br/>EXPERIENCES_DATA,<br/>MAP_PINS, LOCAL_STATE"]
+    end
+
+    subgraph Screens["Screen Components (10)"]
+        ExploreScreen["ExploreScreen"]
+        DetailScreen["DetailScreen"]
+        ReservationScreen["ReservationScreen"]
+        ConfirmedScreen["ConfirmedScreen"]
+        ExperiencesFeedScreen["ExperiencesFeedScreen"]
+        ProfileScreen["ProfileScreen"]
+        PassportScreen["PassportScreen"]
+        ConfigurationScreen["ConfigurationScreen"]
+        CreateExperienceScreen["CreateExperienceScreen"]
+        MapScreen["MapScreen"]
+    end
+
+    subgraph Shared["Shared Components (19)"]
+        TopAppBar["TopAppBar"]
+        BottomNavBar["BottomNavBar"]
+        PhoneShell["PhoneShell"]
+        HeroSection["HeroSection"]
+        SearchBar["SearchBar"]
+        CategoryPills["CategoryPills"]
+        ExperienceCard["ExperienceCard"]
+        ExperienceCardRow["ExperienceCardRow"]
+        FilterModal["FilterModal"]
+        ProfileHeader["ProfileHeader"]
+        ImpactDashboard["ImpactDashboard"]
+        PassportStampList["PassportStampList"]
+        SectionHeader["SectionHeader"]
+        ActionList["ActionList"]
+        DetailHero["DetailHero"]
+        InfoStats["InfoStats"]
+        CTABar["CTABar"]
+        CulturalTipsPopup["CulturalTipsPopup"]
+        ErrorBoundary["ErrorBoundary"]
+    end
+
+    subgraph Types["Type System"]
+        TypesTS["types.ts<br/>Experience, Booking,<br/>PassportStamp, AppConfig"]
+    end
+
+    App --> StateMachine
+    App --> Handlers
+    App --> Data
+
+    StateMachine --> Screens
+
+    Handlers --> Validation
+    Handlers --> Roles
+    Handlers --> Session
+    Handlers --> Sanitize
+
+    ExploreScreen --> HeroSection
+    ExploreScreen --> SearchBar
+    ExploreScreen --> CategoryPills
+    ExploreScreen --> ExperienceCard
+    ExploreScreen --> ExperienceCardRow
+    ExploreScreen --> FilterModal
+    ExploreScreen --> SectionHeader
+    ExploreScreen --> CulturalTipsPopup
+
+    DetailScreen --> DetailHero
+    DetailScreen --> InfoStats
+    DetailScreen --> CTABar
+    DetailScreen --> ActionList
+
+    ReservationScreen --> CTABar
+
+    ProfileScreen --> ProfileHeader
+    ProfileScreen --> ImpactDashboard
+    ProfileScreen --> ActionList
+
+    PassportScreen --> PassportStampList
+    PassportScreen --> SectionHeader
+
+    CreateExperienceScreen --> CTABar
+
+    AllScreens["All Screens"] --> TopAppBar
+    App --> PhoneShell
+    App --> BottomNavBar
+    App --> ErrorBoundary
+
+    React --> App
+    Motion --> Screens
+    Lucide --> Shared
+    Zod --> Validation
+    Tailwind --> Shared
+    Tailwind --> Screens
+    Vite --> App
+
+    TypesTS --> Screens
+    TypesTS --> Shared
+    TypesTS --> Lib

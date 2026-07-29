@@ -1,0 +1,54 @@
+stateDiagram-v2
+    [*] --> Explore : Initial state
+
+    state "Tab States (Bottom Nav Visible)" as TabStates {
+        Explore --> Experiences : tap experiences tab
+        Explore --> Passport : tap passport tab
+        Explore --> Profile : tap profile tab
+
+        Experiences --> Explore : tap explore tab
+        Experiences --> Passport : tap passport tab
+        Experiences --> Profile : tap profile tab
+
+        Passport --> Explore : tap explore tab
+        Passport --> Experiences : tap experiences tab
+        Passport --> Profile : tap profile tab
+
+        Profile --> Explore : tap explore tab
+        Profile --> Experiences : tap experiences tab
+        Profile --> Passport : tap passport tab
+    }
+
+    state "Overlay States (Bottom Nav Hidden)" as OverlayStates {
+        Detail --> Reservation : tap "Reservar"
+        Reservation --> Confirmed : booking confirmed
+        Reservation --> Detail : go back
+    }
+
+    Explore --> Detail : tap experience card
+    Experiences --> Detail : tap experience card
+
+    Explore --> Configuration : tap config
+    Experiences --> Configuration : tap config
+    Passport --> Configuration : tap config
+    Profile --> Configuration : tap config
+
+    Explore --> CreateExperience : tap create
+    Experiences --> CreateExperience : tap create
+
+    Explore --> Map : tap map
+
+    Detail --> Explore : back / close
+    Reservation --> Detail : back
+    Confirmed --> Explore : done
+    Configuration --> Explore : back
+    CreateExperience --> Explore : back / cancel
+    Map --> Explore : back
+
+    note right of Explore : currentScreen = 'explore'<br/>Bottom nav: VISIBLE
+    note right of Detail : currentScreen = 'detail'<br/>Bottom nav: HIDDEN
+    note right of Reservation : currentScreen = 'reservation'<br/>Bottom nav: HIDDEN
+    note right of Confirmed : currentScreen = 'confirmed'<br/>Bottom nav: HIDDEN
+    note right of Configuration : currentScreen = 'configuration'<br/>Bottom nav: HIDDEN
+    note right of CreateExperience : currentScreen = 'create_exp'<br/>Bottom nav: HIDDEN
+    note right of Map : currentScreen = 'map'<br/>Bottom nav: HIDDEN

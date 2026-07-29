@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PhoneShell from './components/PhoneShell';
 import BottomNavBar from './components/BottomNavBar';
+import ErrorBoundary from './components/ErrorBoundary';
 import ExploreScreen from './screens/ExploreScreen';
 import DetailScreen from './screens/DetailScreen';
 import ReservationScreen from './screens/ReservationScreen';
@@ -12,10 +13,12 @@ import ConfigurationScreen from './screens/ConfigurationScreen';
 import CreateExperienceScreen from './screens/CreateExperienceScreen';
 import { EXPERIENCES_DATA } from './data';
 import { Booking, Experience, AppConfig } from './types';
+import { createSession, getSession, destroySession } from './lib/security/session';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'explore' | 'experiences' | 'passport' | 'profile'>('explore');
   const [currentScreen, setCurrentScreen] = useState<'explore' | 'detail' | 'reservation' | 'confirmed' | 'configuration' | 'create_exp'>('explore');
+  const [session] = useState(() => getSession() || createSession());
 
   const [config, setConfig] = useState<AppConfig>({
     greetingTone: 'traditional',
@@ -157,9 +160,11 @@ export default function App() {
   const showBottomNav = currentScreen === 'explore';
 
   return (
+    <ErrorBoundary>
     <PhoneShell activeTab={activeTab}>
       <main className="w-full h-full">{renderScreenContent()}</main>
       {showBottomNav && <BottomNavBar activeTab={activeTab} onTabClick={handleTabClick} />}
     </PhoneShell>
+    </ErrorBoundary>
   );
 }

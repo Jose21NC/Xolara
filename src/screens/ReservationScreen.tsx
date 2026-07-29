@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Clock, CalendarDays, Plus, Minus, Heart, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Clock, CalendarDays, Plus, Minus, Heart, ArrowRight, AlertCircle } from 'lucide-react';
 import { Experience } from '../types';
+import { bookingSchema } from '../lib/validation/schemas';
+import { sanitizeInput } from '../lib/security/sanitize';
 
 interface ReservationScreenProps {
   experience: Experience;
@@ -20,12 +22,11 @@ export default function ReservationScreen({
   onBack,
   onConfirmBooking
 }: ReservationScreenProps) {
-  
-  // Selection states
-  const [selectedDateIndex, setSelectedDateIndex] = useState(2); // Wednesday 14th default
+  const [selectedDateIndex, setSelectedDateIndex] = useState(2);
   const [selectedTime, setSelectedTime] = useState('11:30 AM');
   const [adultsCount, setAdultsCount] = useState(2);
   const [childrenCount, setChildrenCount] = useState(0);
+  const [errors, setErrors] = useState<string[]>([]);
 
   const dates = [
     { label: 'Lun', num: '12' },
@@ -38,26 +39,27 @@ export default function ReservationScreen({
 
   const times = ['09:00 AM', '11:30 AM', '02:00 PM', '04:00 PM'];
 
-  // Pricing calculation
   const totalQuantity = adultsCount + childrenCount;
   const totalPrice = totalQuantity * experience.pricePerPerson;
 
   const handleConfirm = () => {
-    if (totalQuantity <= 0) {
-      alert('Por favor selecciona al menos 1 participante.');
-      return;
-    }
-
     const selectedDateObj = dates[selectedDateIndex];
-    const fullDate = `Miércoles, Oct 14`; // styled exactly like mockup
-    onConfirmBooking({
+    const data = {
       experienceId: experience.id,
-      date: `Miércoles, Oct ${selectedDateObj.num}`,
-      time: selectedTime,
+      date: sanitizeInput(`Miércoles, Oct ${selectedDateObj.num}`),
+      time: sanitizeInput(selectedTime),
       adultsCount,
       childrenCount,
-      totalPrice
-    });
+      totalPrice,
+    };
+
+    const result = bookingSchema.safeParse(data);
+    if (!result.success) {
+      setErrors(result.error.issues.map(i => i.message));
+      return;
+    }
+    setErrors([]);
+    onConfirmBooking(result.data);
   };
 
   return (
@@ -202,6 +204,18 @@ export default function ReservationScreen({
           </div>
         </div>
       </section>
+
+      {/* Validation errors */}
+      {errors.length > 0 && (
+        <div className="mx-5 p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2" role="alert" aria-live="polite">
+          <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+          <div className="flex flex-col gap-0.5">
+            {errors.map((err, i) => (
+              <span key={i} className="text-[11px] text-red-600 font-medium">{err}</span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Community impact positive notes section */}
       <div className="px-5">

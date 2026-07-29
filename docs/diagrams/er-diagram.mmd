@@ -1,0 +1,77 @@
+%% ⚠️ AVISO — Este es un DIAGRAMA CONCEPTUAL del modelo de datos interno.
+%% Xolara NO tiene base de datos. Todas las entidades aquí representadas
+%% son tipos de TypeScript (src/types.ts) con datos semilla (src/data.ts).
+%% No existe persistencia externa, servidor, ni SQL.
+%% 
+%% WARNING — This is a CONCEPTUAL DIAGRAM of the internal data model.
+%% Xolara has NO database. All entities shown are TypeScript types
+%% (src/types.ts) with seed data (src/data.ts).
+%% There is no external persistence, server, or SQL.
+
+erDiagram
+    EXPERIENCE {
+        string id PK
+        string title
+        string location
+        string country
+        enum category "Crafts|Culinary|Music|Nature|Agriculture"
+        string duration
+        number durationHours
+        string groupSize
+        number rating
+        number reviewsCount
+        number pricePerPerson
+        string image
+        string aboutCommunity
+        json whatYouWillDo
+        number authenticityScore
+        string communityImpactText
+        string communityImpactBullets
+        json howToGetThere
+        string[] tags
+        string[] galleryImages
+        number lat "nullable"
+        number lng "nullable"
+        string createdBy "nullable"
+        string hostName "nullable"
+    }
+
+    BOOKING {
+        string id PK
+        string userId "nullable"
+        string experienceId FK
+        string experienceTitle
+        string experienceImage
+        string date
+        string time
+        number adultsCount
+        number childrenCount
+        number totalPrice
+        string bookingRef "unique"
+        string confirmedAt
+        enum status "Confirmed|Pending|Completed"
+    }
+
+    PASSPORT_STAMP {
+        string id PK
+        string title
+        string category
+        string date
+        enum iconType "mountain|utensils|palette|coffee"
+        string color
+    }
+
+    APP_CONFIG {
+        enum greetingTone "traditional|formal|slang"
+        enum language "es|en|bilingual"
+        string[] tipFocus
+        boolean enableNicaSound
+        boolean showCo2InLbs
+    }
+
+    BOOKING }o--|| EXPERIENCE : "references experienceId"
+
+    note for EXPERIENCE "Seeded from src/data.ts<br/>No database — all data<br/>is local/seed"
+    note for BOOKING "Created via handleConfirmBooking<br/>Stored in React state<br/>Not persisted to backend"
+    note for PASSPORT_STAMP "Generated from completed bookings<br/>RECENT_PASSPORT_STAMPS seed data"
+    note for APP_CONFIG "User preferences<br/>Managed in React state<br/>Validated by configSchema"
