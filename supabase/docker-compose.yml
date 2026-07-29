@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  supabase-db:
+    image: supabase/postgres:16.3.0.0
+    container_name: xolara-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-change-in-production}
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  supabase-auth:
+    image: supabase/gotrue:v2.165.0
+    container_name: xolara-auth
+    ports:
+      - "9999:9999"
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD:-postgres}@supabase-db:5432/supabase
+      GOTRUE_SITE_URL: ${GOTRUE_SITE_URL:-http://localhost:3000}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-change-in-production}
+      GOTRUE_JWT_EXP: ${GOTRUE_JWT_EXP:-3600}
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_MAILER_AUTOCONFIRM: ${GOTRUE_MAILER_AUTOCONFIRM:-true}
+      GOTRUE_LOG_LEVEL: info
+
+  supabase-studio:
+    image: supabase/studio:20250101-6b6c1c6
+    container_name: xolara-studio
+    ports:
+      - "3001:3001"
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    environment:
+      STUDIO_PG_META_URL: http://supabase-db:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SUPABASE_URL: http://localhost:9999
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}

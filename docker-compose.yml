@@ -1,0 +1,107 @@
+version: "3.8"
+
+services:
+  # ────────────────────────────────────────────
+  # Supabase — PostgreSQL Database
+  # ────────────────────────────────────────────
+  db:
+    image: supabase/postgres:16.3.0.0
+    container_name: xolara-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-change-in-production}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./supabase/seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ────────────────────────────────────────────
+  # Supabase — GoTrue (Authentication)
+  # ────────────────────────────────────────────
+  auth:
+    image: supabase/gotrue:v2.165.0
+    container_name: xolara-auth
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD:-postgres}@db:5432/supabase
+      GOTRUE_SITE_URL: ${GOTRUE_SITE_URL:-http://localhost:3000}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-change-in-production}
+      GOTRUE_JWT_EXP: ${GOTRUE_JWT_EXP:-3600}
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_MAILER_AUTOCONFIRM: ${GOTRUE_MAILER_AUTOCONFIRM:-true}
+      GOTRUE_LOG_LEVEL: info
+
+  # ────────────────────────────────────────────
+  # Supabase — Studio (Admin UI)
+  # ────────────────────────────────────────────
+  studio:
+    image: supabase/studio:20250101-6b6c1c6
+    container_name: xolara-studio
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      STUDIO_PG_META_URL: http://db:8080
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      SUPABASE_URL: http://auth:9999
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+
+  # ────────────────────────────────────────────
+  # Backend — Express API
+  # ────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: xolara-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      BACKEND_PORT: "4000"
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-postgres}@db:5432/postgres
+      JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-change-in-production}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      CORS_ORIGIN: http://localhost:3000
+    volumes:
+      - uploads-data:/app/uploads
+
+  # ────────────────────────────────────────────
+  # Frontend — React + Vite (via Nginx)
+  # ────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: xolara-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
+  uploads-data:
