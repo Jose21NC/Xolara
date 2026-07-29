@@ -13,7 +13,7 @@ export const signInSchema = z.object({
 });
 
 export const bookingSchema = z.object({
-  experienceId: z.string().uuid('Experiencia inválida'),
+  experienceId: z.string().min(1, 'Experiencia inválida'),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida (YYYY-MM-DD)'),
   time: z.string().regex(/^\d{2}:\d{2}$/, 'Hora inválida (HH:MM)'),
   adultsCount: z.number().int().min(1, 'Al menos 1 adulto').max(20),

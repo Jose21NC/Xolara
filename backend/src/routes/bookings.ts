@@ -31,7 +31,7 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 
   const { experienceId, date, time, adultsCount, childrenCount } = parsed.data;
 
-  const exp = await query('SELECT id, title, image, price_per_person FROM public.experiences WHERE id = $1', [experienceId]);
+  const exp = await query('SELECT id, title, image, price_per_person, category FROM public.experiences WHERE id = $1', [experienceId]);
   if (exp.rows.length === 0) throw new AppError(404, 'Experiencia no encontrada');
 
   const experience = exp.rows[0];

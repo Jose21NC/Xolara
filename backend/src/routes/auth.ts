@@ -43,7 +43,7 @@ router.post('/signup', async (req: Request, res: Response) => {
 
   try {
     await query(
-      `INSERT INTO auth.users (id, instance_id, email, encrypted_password, email_confirmed_at, role, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
+      `INSERT INTO auth.users (id, instance_id, email, encrypted_password, confirmed_at, role, raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
        VALUES ($1, '00000000-0000-0000-0000-000000000000', $2, $3, now(), 'authenticated', '{"provider":"email"}', $4::jsonb, now(), now())`,
       [userId, email, hashed, JSON.stringify({ display_name: displayName, role })]
     );

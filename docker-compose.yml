@@ -1,15 +1,13 @@
-version: "3.8"
-
 services:
   # ────────────────────────────────────────────
   # Supabase — PostgreSQL Database
   # ────────────────────────────────────────────
   db:
-    image: supabase/postgres:16.3.0.0
+    image: supabase/postgres:15.14.1.157
     container_name: xolara-db
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-key-change-in-production}
@@ -26,7 +24,7 @@ services:
   # Supabase — GoTrue (Authentication)
   # ────────────────────────────────────────────
   auth:
-    image: supabase/gotrue:v2.165.0
+    image: supabase/gotrue:v2.194.0
     container_name: xolara-auth
     restart: unless-stopped
     ports:
@@ -36,6 +34,8 @@ services:
         condition: service_healthy
     environment:
       GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: "9999"
+      API_EXTERNAL_URL: http://localhost:9999
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD:-postgres}@db:5432/supabase
       GOTRUE_SITE_URL: ${GOTRUE_SITE_URL:-http://localhost:3000}
@@ -49,7 +49,7 @@ services:
   # Supabase — Studio (Admin UI)
   # ────────────────────────────────────────────
   studio:
-    image: supabase/studio:20250101-6b6c1c6
+    image: supabase/studio:latest
     container_name: xolara-studio
     restart: unless-stopped
     ports:
