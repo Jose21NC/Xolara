@@ -7,7 +7,7 @@
 | Capa | Stack |
 |------|-------|
 | **Frontend** | React 19 + TypeScript 5.8 + Vite 6 + Tailwind v4 + Motion + Lucide + Zod 4 |
-| **Backend** | Express 4 + TypeScript ESM + PostgreSQL 16 |
+| **Backend** | Express 4 + TypeScript ESM + PostgreSQL 15 |
 | **Auth** | Supabase GoTrue (JWT HS256) |
 | **Infra** | Docker Compose (5 servicios) |
 | **Paquetería** | pnpm (frontend), npm (backend) |

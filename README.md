@@ -18,7 +18,7 @@ Descubre y reserva experiencias turísticas artesanales y comunitarias en Nicara
 | **Estilos** | Tailwind CSS v4 + Motion (Framer Motion) + Lucide React |
 | **Validación** | Zod 4 (compartido entre frontend y backend) |
 | **Backend** | Express 4.21 + TypeScript (ESM) |
-| **Base de datos** | PostgreSQL 16 (vía Supabase) |
+| **Base de datos** | PostgreSQL 15 (vía Supabase) |
 | **Autenticación** | Supabase GoTrue (JWT HS256, email/password) |
 | **Infraestructura** | Docker Compose (5 servicios) |
 | **Admin DB** | Supabase Studio (puerto 3001) |
@@ -49,7 +49,7 @@ Descubre y reserva experiencias turísticas artesanales y comunitarias en Nicara
          │
    ┌─────▼─────┐
    │ PostgreSQL │
-   │     :5432  │
+    │   :5433  │
    └───────────┘
 ```
 
@@ -84,47 +84,40 @@ pnpm install
 cd backend && npm install && cd ..
 ```
 
-### 2. Variables de entorno
+### 2. Variables de entorno (primera vez)
 
 ```bash
 cp .env.example backend/.env
 ```
 
-Ajusta `JWT_SECRET` en producción.
+Ajusta `JWT_SECRET` en producción. El script `scripts/dev.sh` genera claves JWT automáticamente si no existe `.env`.
 
-### 3. Levantar base de datos + autenticación
-
-```bash
-docker compose up db auth studio
-```
-
-Esto inicia PostgreSQL (puerto 5432), GoTrue Auth (puerto 9999), y Studio (puerto 3001). La primera vez ejecuta `supabase/seed.sql` que crea las tablas y siembra 4 experiencias.
-
-### 4. Iniciar backend (dev)
+### 3. Iniciar todo (dev)
 
 ```bash
-cd backend
-npx tsx watch src/index.ts
+pnpm dev:stack
 ```
 
-API en `http://localhost:4000`. Health check: `GET /api/health`.
+Esto arranca en un solo comando:
+1. **PostgreSQL** + **GoTrue Auth** via Docker (puertos 5433 y 9999)
+2. **Backend Express** con tsx watch (hot-reload en :4000)
+3. **Frontend Vite** con HMR (en :3000)
 
-### 5. Iniciar frontend (dev)
-
-```bash
-# En otra terminal, desde la raíz
-pnpm dev
-```
-
-Frontend en `http://localhost:3000`.
+La primera vez ejecuta `supabase/seed.sql` que crea las tablas y siembra 4 experiencias.
 
 ---
 
 ## Scripts
 
+### Stack completo
+
+| Comando | Descripción |
+|---------|-------------|
+| `pnpm dev:stack` | Arranca Docker + Backend + Frontend (un solo comando) |
+
 ### Frontend
 
-| Comando | Description |
+| Comando | Descripción |
 |---------|-------------|
 | `pnpm dev` | Vite dev server en :3000 |
 | `pnpm build` | Build producción a `dist/` |
@@ -133,7 +126,7 @@ Frontend en `http://localhost:3000`.
 
 ### Backend
 
-| Comando | Description |
+| Comando | Descripción |
 |---------|-------------|
 | `npm run dev` | `tsx watch` con hot-reload |
 | `npm run build` | `tsc` a `dist/` |
@@ -141,7 +134,7 @@ Frontend en `http://localhost:3000`.
 
 ### Docker
 
-| Comando | Description |
+| Comando | Descripción |
 |---------|-------------|
 | `docker compose up db auth` | Solo base de datos + auth (dev) |
 | `docker compose up` | Stack completo (producción) |
@@ -180,6 +173,7 @@ Xolara/
 │   ├── Dockerfile              # Vite build → Nginx
 │   └── nginx.conf              # SPA + API proxy
 ├── scripts/
+│   ├── dev.sh                  # Lanzador: Docker + Backend + Frontend (1 comando)
 │   ├── generate-keys.sh        # Genera ANON_KEY + SERVICE_ROLE_KEY
 │   └── copy-env.sh             # Setup rápido de .env
 ├── docker-compose.yml          # Orquesta todo (5 servicios)

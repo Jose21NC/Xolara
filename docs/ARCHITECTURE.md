@@ -26,8 +26,8 @@
 | | jsonwebtoken | 9.0 | Verificación JWT |
 | | Zod | 4.4 | Validación de esquemas (backend) |
 | | multer | 1.4 | Upload de archivos |
-| **Database** | PostgreSQL | 16 | Base de datos relacional |
-| | Supabase GoTrue | 2.165 | Autenticación + JWT |
+| **Database** | PostgreSQL | 15 | Base de datos relacional |
+| | Supabase GoTrue | 2.194 | Autenticación + JWT |
 | **Infra** | Docker Compose | 3.8 | Orquestación de servicios |
 | | Nginx | latest | Servir SPA + proxy inverso |
 
@@ -47,7 +47,7 @@
 │        ▲                   │                      │              │
 │        │                   │                ┌─────▼──────────┐   │
 │        │                   └────────────────▶│  PostgreSQL     │   │
-│        │                      (SQL directo)  │  :5432          │   │
+│        │                      (SQL directo)  │  :5433          │   │
 │        │                                     └─────────────────┘   │
 │        │                                     ┌──────────────┐    │
 │        └─────────────────────────────────────│  Supabase     │    │
@@ -232,7 +232,7 @@ Cliente `@supabase/supabase-js` configurado con `VITE_SUPABASE_URL` y `VITE_SUPA
 
 | Servicio | Imagen | Puerto expuesto | Depende de |
 |----------|--------|-----------------|------------|
-| `db` | supabase/postgres:16.3.0.0 | 5432 | — |
+| `db` | supabase/postgres:15.14.1.157 | 5433 | — |
 | `auth` | supabase/gotrue:v2.165.0 | 9999 | db (healthy) |
 | `studio` | supabase/studio:20250101-6b6c1c6 | 3001 | db (healthy) |
 | `backend` | ./backend/Dockerfile | 4000 | db (healthy) |

@@ -8,7 +8,7 @@ Xolara requiere **tres entornos** ejecutándose simultáneamente:
 |---------|-----------|----------------|
 | Frontend (dev) | Vite dev server | 3000 |
 | Backend (dev) | Express + tsx watch | 4000 |
-| Base de datos | Docker (PostgreSQL + GoTrue) | 5432, 9999 |
+| Base de datos | Docker (PostgreSQL + GoTrue) | 5433, 9999 |
 
 ---
 
@@ -65,7 +65,17 @@ scripts/generate-keys.sh "tu-jwt-secret"
 
 ## Entorno de desarrollo
 
-### Opción 1: Híbrido (recomendado)
+### Opción 1: Un solo comando (recomendado)
+
+```bash
+pnpm dev:stack
+```
+
+Arranca Docker (PostgreSQL + GoTrue Auth), backend (tsx watch :4000) y frontend (Vite :3000) en paralelo. Ctrl+C detiene todo.
+
+El script `scripts/dev.sh` genera automáticamente las claves JWT si no existe `.env`.
+
+### Opción 2: Híbrido (3 terminales)
 
 ```bash
 # Terminal 1 — Base de datos + Auth
@@ -78,13 +88,13 @@ cd backend && cp ../.env.example .env && npx tsx watch src/index.ts
 pnpm dev
 ```
 
-### Opción 2: Todo Docker
+### Opción 3: Todo Docker
 
 ```bash
 docker compose up --build
 ```
 
-### Opción 3: Solo Supabase
+### Opción 4: Solo Supabase
 
 ```bash
 cd supabase && docker compose up
@@ -98,13 +108,19 @@ cd supabase && docker compose up
 |----------|---------------|------------------------|
 | Frontend | http://localhost:3000 | http://localhost:3000 |
 | Backend API | http://localhost:4000/api | http://localhost:3000/api (proxy) |
-| PostgreSQL | `postgres://postgres:postgres@localhost:5432/postgres` | `postgres://postgres:...@db:5432/postgres` |
+| PostgreSQL | `postgres://postgres:postgres@localhost:5433/postgres` | `postgres://postgres:...@db:5432/postgres` |
 | Supabase Auth | http://localhost:9999 | http://auth:9999 (interno) |
 | Supabase Studio | http://localhost:3001 | http://localhost:3001 |
 
 ---
 
 ## Comandos comunes
+
+### Stack completo
+
+```bash
+pnpm dev:stack    # Arranca Docker + Backend + Frontend (1 comando)
+```
 
 ### Frontend
 

@@ -45,7 +45,7 @@ curl http://localhost:3000/api/health
 | Frontend | 80 (mapeado a :3000) | http://tu-dominio.com |
 | Backend API | 4000 (interno) | Solo vía proxy Nginx |
 | Supabase Studio | 3001 | http://tu-dominio.com:3001 |
-| PostgreSQL | 5432 (interno) | Solo vía backend |
+| PostgreSQL | 5433 (host) / 5432 (interno) | Solo vía backend |
 
 ### Actualizar
 
