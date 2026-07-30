@@ -83,7 +83,10 @@ public.profiles
   ├── id UUID PK → auth.users(id)
   ├── display_name TEXT
   ├── role ENUM(visitor|traveler|guide|admin)
-  └── avatar_url TEXT
+  ├── avatar_url TEXT
+  ├── subtitle TEXT
+  ├── location TEXT
+  └── is_approved_guide BOOLEAN DEFAULT false
 
 public.experiences
   ├── id UUID PK
@@ -212,13 +215,25 @@ Reemplaza el session simulado de `localStorage` (`src/lib/security/session.ts`).
 - `signUp(email, password, displayName, role)` → llama a `POST /auth/signup`
 - `signOut()` → limpia localStorage + estado
 
-### 5.2 API Client (`src/lib/api.ts`)
+### 5.2 OverlayContext
+
+`OverlayContext` resuelve el conflicto entre modales/drawers y el BottomNavBar. Cuando un modal está abierto, registra un overlay vía `pushOverlay()` y el BottomNavBar se oculta automáticamente (vía `hasOverlay`). El hook `useOverlayModal(id, isOpen)` lo integra en cualquier componente sin boilerplate.
+
+### 5.3 i18n (`src/lib/i18n.ts` + `I18nContext`)
+
+Sistema de internacionalización manual (sin biblioteca externa):
+- Diccionario `translations` con clave → valor para ES y EN (~200 keys)
+- `useT()` hook expone `t(key, params?)` con interpolación `{n}`
+- `setLanguage()` soporta `'es'`, `'en'`, `'bilingual'` (muestra ES con opción EN)
+- Suscripción a cambios de idioma via `subscribeToLanguageChange()`
+
+### 5.4 API Client (`src/lib/api.ts`)
 
 Wrapper tipado sobre `fetch` con:
 - Inyección automática de JWT desde localStorage
 - Header `Content-Type: application/json`
 - Manejo de errores unificado (`ApiError`)
-- Módulos por recurso: `authApi`, `experiencesApi`, `bookingsApi`, `likesApi`, `passportApi`, `guidesApi`, `configApi`
+- Módulos por recurso: `authApi`, `experiencesApi`, `bookingsApi`, `likesApi`, `passportApi`, `guidesApi`, `configApi`, `adminApi`
 
 ### 5.3 Supabase Client (`src/lib/supabase.ts`)
 
@@ -307,7 +322,16 @@ El `AdminPanelScreen` es accesible desde `ProfileScreen` para usuarios con rol `
 
 La gestión se implementa vía el mismo state machine que el resto de la app: `currentScreen = 'admin_panel'`.
 
-### 8.5 ¿Por qué hash con PBKDF2 y no bcrypt?
+### 8.5 Guide Approval Flow
+
+Los guías requieren aprobación administrativa antes de poder crear experiencias. El flujo:
+1. Usuario se registra con role `guide` → `is_approved_guide = false`
+2. Admin ve guías pendientes en `AdminPanelScreen` → `GET /api/admin/pending-guides`
+3. Admin aprueba/rechaza → `POST /api/admin/approve-guide`
+4. Al aprobar, `is_approved_guide = true` en `profiles`
+5. `POST/PUT /api/experiences` verifica `is_approved_guide` antes de permitir crear/editar
+
+### 8.6 ¿Por qué hash con PBKDF2 y no bcrypt?
 
 `crypto.pbkdf2Sync` es nativo de Node.js — no requiere dependencias adicionales, lo que simplifica el Dockerfile (no necesita `bcrypt` ni `bcryptjs`). SHA-512 con 1000 iteraciones es seguro para este contexto.
 

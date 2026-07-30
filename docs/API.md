@@ -285,6 +285,60 @@ Actualizar configuración. Solo campos enviados.
 
 ---
 
+## Admin (🔒 role: admin)
+
+### `GET /api/admin/stats`
+
+Estadísticas del panel de gestión.
+
+**Response:**
+```json
+{
+  "experiences": 12,
+  "bookings": 45,
+  "travelers": 30,
+  "revenue": 1200
+}
+```
+
+### `GET /api/admin/pending-guides`
+
+Lista de guías pendientes de aprobación (usuarios con role `guide` e `is_approved_guide = false`).
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "display_name": "Néstor Guerrero",
+    "email": "nestor@example.com",
+    "subtitle": "Guía certificado",
+    "location": "Granada, Nicaragua",
+    "created_at": "2026-07-28T..."
+  }
+]
+```
+
+### `POST /api/admin/approve-guide` 🔒 (role: admin)
+
+Aprueba o rechaza a un guía.
+
+**Body:**
+```json
+{
+  "userId": "uuid-del-guía",
+  "approve": true
+}
+```
+`approve: false` rechaza al guía (borra su registro de `profiles` si el rol es `guide`).
+
+**Response:**
+```json
+{ "success": true }
+```
+
+---
+
 ## Salud
 
 ### `GET /api/health`

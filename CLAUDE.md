@@ -4,7 +4,7 @@ This file provides guidance when working with code in this repository.
 
 ## Project
 
-Xolara — mobile-first React app for discovering and booking artisanal travel experiences in Nicaragua. UI copy is in **Spanish**; code identifiers are in English.
+Xolara — mobile-first React app for discovering and booking artisanal travel experiences in Nicaragua. UI copy is bilingual **Spanish/English** via i18n; code identifiers are in English.
 
 **Full stack**: Express API + PostgreSQL (via Supabase) + Docker Compose. Auth via JWT (PBKDF2).
 
@@ -68,10 +68,10 @@ Frontend (React SPA) ──HTTP──▶ Express API ──SQL──▶ PostgreS
 ### Stack components
 
 - **Frontend**: React 19 state machine (`activeTab` + `currentScreen`), no router
-- **Backend**: Express 4, TypeScript ESM, 8 route modules (auth, experiences, bookings, likes, passport, guides, config, auth/profile PATCH)
+- **Backend**: Express 4, TypeScript ESM, 9 route modules (auth, experiences, bookings, likes, passport, guides, config, admin, auth/profile PATCH)
 - **Auth**: JWT HS256 via Supabase GoTrue, RBAC (visitor/traveler/guide/admin)
 - **Auth flow**: `AuthProvider` wraps the app, `AuthScreen` gates until signed in
-- **Database**: PostgreSQL 15 via Supabase, 7 tables, seed data in `supabase/seed.sql`
+- **Database**: PostgreSQL 15 via Supabase, 7 tables + `is_approved_guide` in profiles, seed data in `supabase/seed.sql`
 - **Storage**: Supabase Storage (para subida de imágenes de experiencias)
 - **Validation**: Zod 4 en frontend y backend (validación duplicada por seguridad)
 
@@ -95,7 +95,6 @@ pnpm dev
 ### Data flow
 - `App.tsx` loads experiences (public), bookings, likes, config on mount (when authenticated)
 - Snake_case DB responses → camelCase frontend types via `mapExperience()` / `mapBooking()`
-- Static `EXPERIENCES_DATA` used as fallback if API unavailable
 - Optimistic UI updates followed by API confirmation; rollback on failure
 - `useAuth()` provides user identity to all screens; `updateUser(partial)` propagates changes globally
 
@@ -109,7 +108,10 @@ pnpm dev
 - `src/App.tsx` — Root state machine + API data loading + auth gating
 - `src/screens/AuthScreen.tsx` — Login/signup with role selection (traveler/guide)
 - `src/contexts/AuthContext.tsx` — Auth provider with session persistence + `updateUser()`
+- `src/contexts/I18nContext.tsx` — i18n provider with useT() hook for bilingual UI (ES/EN)
+- `src/contexts/OverlayContext.tsx` — Prevents BottomNav overlap when modals/drawers open
 - `src/lib/api.ts` — Typed API client with JWT injection, 7 API modules
+- `src/lib/i18n.ts` — Translation dictionary (ES + EN) with t() interpolation
 - `src/lib/supabase.ts` — Supabase client config (auth + storage)
 - `src/components/ComingSoon.tsx` — Reusable "en desarrollo" modal
 - `backend/src/routes/` — All Express route handlers
