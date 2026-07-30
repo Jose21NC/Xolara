@@ -50,17 +50,21 @@ Frontend (React SPA) ──HTTP──▶ Express API ──SQL──▶ PostgreS
 - **Frontend**: React 19 state machine (`activeTab` + `currentScreen`), no router
 - **Backend**: Express 4, TypeScript ESM, 7 route modules (auth, experiences, bookings, likes, passport, guides, config)
 - **Auth**: JWT HS256, PBKDF2 password hashing, RBAC (visitor/traveler/guide/admin)
-- **Database**: PostgreSQL 16 via Supabase, 7 tables, seed data in `supabase/seed.sql`
+- **Database**: PostgreSQL 15 via Supabase, 7 tables, seed data in `supabase/seed.sql`
 
-### Dev workflow (hybrid)
+### Dev workflow
 ```bash
-# Terminal 1
+# Single command (starts everything)
+pnpm dev:stack
+
+# Or hybrid (3 terminals)
+# Terminal 1 — DB + Auth
 docker compose up db auth
 
-# Terminal 2
+# Terminal 2 — Backend (hot-reload)
 cd backend && cp ../.env.example .env && npm run dev
 
-# Terminal 3
+# Terminal 3 — Frontend (hot-reload)
 pnpm dev
 ```
 
