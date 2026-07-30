@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { useT } from '../contexts/I18nContext';
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -8,27 +9,30 @@ interface FilterModalProps {
 }
 
 export default function FilterModal({ isOpen, onClose, onApply }: FilterModalProps) {
+  const { t } = useT();
   const [selectedDurations, setSelectedDurations] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState(200);
   const [maxDistance, setMaxDistance] = useState(50);
 
   if (!isOpen) return null;
 
+  const durations = [t('filter.dur_1_2'), t('filter.dur_3_4'), t('filter.half_day'), t('filter.full_day')];
+
   return (
-    <div className="fixed inset-0 bg-black/40 z-[60] flex items-end justify-center" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-end justify-center" onClick={onClose} style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="bg-[#fcf9f3] w-full max-w-md rounded-t-[var(--radius-sheet)] flex flex-col max-h-[70vh] animate-slide-up" onClick={(e) => e.stopPropagation()}>
         <div className="w-12 h-1 bg-brand-text-muted/20 rounded-full mx-auto my-3 flex-shrink-0" />
         <div className="px-5 pb-3 border-b border-brand-primary/10 flex items-center justify-between flex-shrink-0">
-          <h3 className="font-heading text-lg font-bold text-[#412c21]">Filtros</h3>
+          <h3 className="font-heading text-lg font-bold text-[#412c21]">{t('filter.title')}</h3>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-neutral-200 transition-colors">
             <X className="w-5 h-5 text-brand-text-muted" />
           </button>
         </div>
         <div className="overflow-y-auto flex-grow p-5 flex flex-col gap-5">
           <div className="flex flex-col gap-2">
-            <h4 className="text-sm font-bold text-[#412c21]">Duración</h4>
+            <h4 className="text-sm font-bold text-[#412c21]">{t('filter.duration')}</h4>
             <div className="flex flex-wrap gap-2">
-              {['1-2 horas', '3-4 horas', 'Medio día', 'Día completo'].map((duration) => {
+              {durations.map((duration) => {
                 const isSelected = selectedDurations.includes(duration);
                 return (
                   <button
@@ -51,8 +55,8 @@ export default function FilterModal({ isOpen, onClose, onApply }: FilterModalPro
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <h4 className="text-sm font-bold text-[#412c21]">Distancia</h4>
-            <p className="text-xs text-brand-text-muted">Distancia máxima: {maxDistance} km</p>
+            <h4 className="text-sm font-bold text-[#412c21]">{t('filter.distance')}</h4>
+            <p className="text-xs text-brand-text-muted">{t('filter.distance_label', { n: maxDistance })}</p>
             <input
               type="range"
               min={5}
@@ -64,8 +68,8 @@ export default function FilterModal({ isOpen, onClose, onApply }: FilterModalPro
             />
           </div>
           <div className="flex flex-col gap-2">
-            <h4 className="text-sm font-bold text-[#412c21]">Precio</h4>
-            <p className="text-xs text-brand-text-muted">Precio máximo: ${maxPrice}</p>
+            <h4 className="text-sm font-bold text-[#412c21]">{t('filter.price')}</h4>
+            <p className="text-xs text-brand-text-muted">{t('filter.price_label', { n: maxPrice })}</p>
             <input
               type="range"
               min={10}
@@ -87,7 +91,7 @@ export default function FilterModal({ isOpen, onClose, onApply }: FilterModalPro
             }}
             className="flex-1 bg-surface text-brand-text-dark text-sm font-semibold py-3 rounded-xl transition-all border border-black/5"
           >
-            Limpiar
+            {t('filter.clear')}
           </button>
           <button
             onClick={() => {
@@ -96,7 +100,7 @@ export default function FilterModal({ isOpen, onClose, onApply }: FilterModalPro
             }}
             className="flex-1 bg-brand-primary text-white text-sm font-semibold py-3 rounded-xl transition-all shadow-ios"
           >
-            Aplicar Filtros
+            {t('filter.apply')}
           </button>
         </div>
       </div>

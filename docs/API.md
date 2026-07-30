@@ -69,6 +69,25 @@ Perfil del usuario autenticado.
 }
 ```
 
+### `PATCH /api/auth/profile` 🔒
+
+Actualiza el nombre público del perfil.
+
+**Body:**
+```json
+{
+  "displayName": "Nuevo Nombre"
+}
+```
+
+**Response** `200`:
+```json
+{
+  "success": true,
+  "displayName": "Nuevo Nombre"
+}
+```
+
 ---
 
 ## Experiencias

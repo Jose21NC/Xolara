@@ -1,4 +1,5 @@
 import React from 'react';
+import { useT } from '../contexts/I18nContext';
 
 interface Stamp {
   id: string;
@@ -25,12 +26,13 @@ function StampCircle({ color, icon }: { color: string; icon: React.ReactNode }) 
 }
 
 export default function PassportStampList({
-  title = 'Sellos recientes',
+  title,
   stamps,
 }: PassportStampListProps) {
+  const { t } = useT();
   return (
     <section className="flex flex-col gap-4 w-full">
-      <h2 className="figma-heading-md text-[#412c21]">{title}</h2>
+      <h2 className="figma-heading-md text-[#412c21]">{title || t('profile.stamps_recent')}</h2>
       <div className="flex gap-3 overflow-x-auto hide-scrollbar py-1 -mx-5 px-5">
         {stamps.map((stamp) => (
           <div

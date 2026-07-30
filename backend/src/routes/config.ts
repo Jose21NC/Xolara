@@ -23,7 +23,14 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
     return;
   }
 
-  res.json(result.rows[0]);
+  const row = result.rows[0];
+  res.json({
+    greetingTone: row.greeting_tone ?? 'traditional',
+    language: row.language ?? 'bilingual',
+    tipFocus: row.tip_focus ?? ['gastronomy', 'nature', 'crafts'],
+    enableNicaSound: row.enable_nica_sound ?? true,
+    showCo2InLbs: row.show_co2_in_lbs ?? false,
+  });
 });
 
 router.put('/', authMiddleware, async (req: Request, res: Response) => {
@@ -68,7 +75,14 @@ router.put('/', authMiddleware, async (req: Request, res: Response) => {
   }
 
   const updated = await query('SELECT * FROM public.app_configs WHERE user_id = $1', [req.user!.userId]);
-  res.json(updated.rows[0]);
+  const u = updated.rows[0];
+  res.json({
+    greetingTone: u.greeting_tone ?? 'traditional',
+    language: u.language ?? 'bilingual',
+    tipFocus: u.tip_focus ?? ['gastronomy', 'nature', 'crafts'],
+    enableNicaSound: u.enable_nica_sound ?? true,
+    showCo2InLbs: u.show_co2_in_lbs ?? false,
+  });
 });
 
 export default router;

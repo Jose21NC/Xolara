@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { 
-  Award, Fingerprint, ArrowRight, CheckCircle2,
+  Award, Fingerprint, ArrowRight, CheckCircle2, X,
   Mountain, Utensils, Palette, Coffee, Flame, Lock,
   User, Settings, CreditCard, HelpCircle, LogOut
 } from 'lucide-react';
-import { Booking, AppConfig } from '../types';
+import { Booking, AppConfig, PassportStamp } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { useOverlayModal } from '../contexts/OverlayContext';
+import { guidesApi } from '../lib/api';
 import CulturalTipsPopup from '../components/CulturalTipsPopup';
+import ComingSoon from '../components/ComingSoon';
 import ProfileHeader from '../components/ProfileHeader';
 import ImpactDashboard from '../components/ImpactDashboard';
 import PassportStampList from '../components/PassportStampList';
@@ -14,8 +18,10 @@ import ActionList from '../components/ActionList';
 
 interface PassportScreenProps {
   bookings: Booking[];
+  passportStamps: PassportStamp[];
   config: AppConfig;
   onOpenConfig: () => void;
+  onSignOut?: () => void;
 }
 
 const StampFilter = () => (
@@ -67,11 +73,6 @@ const RealisticStamp = ({
   onClick: () => void;
   key?: string;
 }) => {
-  const isMombacho = id === 'p1';
-  const isGranada = id === 'p2';
-  const isCeramica = id === 'p3';
-  const isMasaya = id === 'p4';
-
   return (
     <div 
       onClick={onClick}
@@ -82,115 +83,48 @@ const RealisticStamp = ({
         className="flex flex-col items-center justify-center font-mono relative group"
         style={{ color, filter: 'url(#distressed-ink)' }}
       >
-        {isMombacho && (
-          <div className="w-20 h-20 relative flex flex-col items-center justify-center">
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-              <circle cx="50" cy="50" r="46" strokeWidth="2.5" />
-              <circle cx="50" cy="50" r="41" strokeWidth="0.7" strokeDasharray="3 2" />
-              <circle cx="50" cy="50" r="28" strokeWidth="1" />
-              <path id="mombacho-text-top" d="m 16 50 a 34 34 0 0 1 68 0" fill="none" stroke="none" />
-              <path id="mombacho-text-bot" d="m 84 50 a 34 34 0 0 1 -68 0" fill="none" stroke="none" />
-              <text fontSize="7.5" fontWeight="950" fill="currentColor" letterSpacing="0.08em" className="uppercase font-mono">
-                <textPath href="#mombacho-text-top" startOffset="50%" textAnchor="middle">Nicaragua</textPath>
-              </text>
-              <text fontSize="5.5" fontWeight="950" fill="currentColor" letterSpacing="0.05em" className="uppercase font-mono">
-                <textPath href="#mombacho-text-bot" startOffset="50%" textAnchor="middle">★ ECO-RESERVA ★</textPath>
-              </text>
-            </svg>
-            <div className="z-10 flex flex-col items-center mt-1">
-              <Mountain className="w-5 h-5 text-current" strokeWidth={2.5} />
-              <span className="text-[5.5px] font-black tracking-widest mt-0.5 leading-none">MOMBACHO</span>
-              <span className="text-[7.5px] font-black mt-1 bg-white/40 px-1 leading-none">{date}</span>
-            </div>
+        <div className="w-20 h-20 relative flex flex-col items-center justify-center">
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+            <ellipse cx="50" cy="50" rx="47" ry="35" strokeWidth="2.4" />
+            <ellipse cx="50" cy="50" rx="42" ry="30" strokeWidth="0.8" strokeDasharray="3 2" />
+            <path id="live-text-top" d="m 10 50 a 40 24 0 0 1 80 0" fill="none" stroke="none" />
+            <path id="live-text-bot" d="m 90 50 a 40 24 0 0 1 -80 0" fill="none" stroke="none" />
+            <text fontSize="5.5" fontWeight="950" fill="currentColor" letterSpacing="0.12em" className="uppercase font-mono">
+              <textPath href="#live-text-top" startOffset="50%" textAnchor="middle">TURISMO ECO</textPath>
+            </text>
+            <text fontSize="5" fontWeight="950" fill="currentColor" letterSpacing="0.08em" className="uppercase font-mono">
+              <textPath href="#live-text-bot" startOffset="50%" textAnchor="middle">★ SOBERANO NICA ★</textPath>
+            </text>
+          </svg>
+          <div className="z-10 flex flex-col items-center justify-center px-1">
+            <Coffee className="w-5 h-5 text-current mb-0.5 mt-1" strokeWidth={2.5} />
+            <span className="text-[5.5px] font-black uppercase text-center tracking-tight leading-none max-w-[55px] truncate mt-0.5 bg-white/30 px-0.5">
+              {title.split(' en ')[0].split(' de ')[0]}
+            </span>
+            <span className="text-[7.5px] font-black uppercase bg-white/60 px-1.5 py-0.5 rounded border border-dashed border-current mt-1 leading-none">{date}</span>
           </div>
-        )}
-
-        {isGranada && (
-          <div className="w-20 h-20 relative flex flex-col items-center justify-center">
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-              <path d="M 10 12 Q 50 20 90 12 L 90 88 Q 50 80 10 88 Z" strokeWidth="2.2" />
-              <path d="M 14 16 L 14 84 M 86 16 L 86 84" strokeWidth="0.8" strokeDasharray="2.5 2.5" />
-              <line x1="14" y1="31" x2="86" y2="31" strokeWidth="1" />
-              <line x1="14" y1="69" x2="86" y2="69" strokeWidth="1" />
-            </svg>
-            <div className="z-10 flex flex-col items-center px-1 justify-center mt-0.5">
-              <span className="text-[6px] font-extrabold uppercase tracking-widest leading-none">GRANADA</span>
-              <Utensils className="w-5 h-5 text-current my-1" strokeWidth={2.5} />
-              <span className="text-[8px] font-black uppercase tracking-widest leading-none bg-white/50 px-1">{date}</span>
-              <span className="text-[5px] font-bold mt-1 text-center truncate leading-none uppercase">SABORES REGIONALES</span>
-            </div>
-          </div>
-        )}
-
-        {isCeramica && (
-          <div className="w-20 h-20 relative flex flex-col items-center justify-center">
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-              <polygon points="30,8 70,8 92,30 92,70 70,92 30,92 8,70 8,30" strokeWidth="2.2" />
-              <polygon points="32,12 68,12 88,32 88,68 68,88 32,88 12,68 12,32" strokeWidth="0.8" strokeDasharray="2 2" />
-            </svg>
-            <div className="z-10 flex flex-col items-center justify-center text-center px-1">
-              <span className="text-[5px] font-extrabold uppercase tracking-widest leading-none">ALFARERO</span>
-              <Palette className="w-5 h-5 text-current my-0.5" strokeWidth={2.5} />
-              <span className="text-[8.5px] font-black tracking-tight leading-none px-1 bg-white/60 mb-0.5">{date}</span>
-              <span className="text-[4.5px] font-bold uppercase leading-none">CHOROTEGA</span>
-            </div>
-          </div>
-        )}
-
-        {isMasaya && (
-          <div className="w-20 h-20 relative flex flex-col items-center justify-center">
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-              <rect x="8" y="10" width="84" height="80" rx="14" strokeWidth="2.2" />
-              <rect x="12" y="14" width="76" height="72" rx="10" strokeWidth="0.8" strokeDasharray="4 2" />
-              <text x="18" y="24" fontSize="6">★</text>
-              <text x="82" y="24" fontSize="6" textAnchor="end">★</text>
-              <text x="18" y="82" fontSize="6">★</text>
-              <text x="82" y="82" fontSize="6" textAnchor="end">★</text>
-            </svg>
-            <div className="z-10 flex flex-col items-center justify-center px-2">
-              <span className="text-[5.5px] font-black uppercase tracking-widest leading-none">PARQUE NACIONAL</span>
-              <Flame className="w-5 h-5 text-current my-0.5" strokeWidth={2.5} />
-              <span className="text-[8px] font-black uppercase tracking-widest leading-none bg-white/60 px-1 py-0.5 my-0.5">MASAYA</span>
-              <span className="text-[6.5px] font-bold uppercase leading-none">{date}</span>
-            </div>
-          </div>
-        )}
-
-        {!isMombacho && !isGranada && !isCeramica && !isMasaya && (
-          <div className="w-20 h-20 relative flex flex-col items-center justify-center">
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-              <ellipse cx="50" cy="50" rx="47" ry="35" strokeWidth="2.4" />
-              <ellipse cx="50" cy="50" rx="42" ry="30" strokeWidth="0.8" strokeDasharray="3 2" />
-              <path id="live-text-top" d="m 10 50 a 40 24 0 0 1 80 0" fill="none" stroke="none" />
-              <path id="live-text-bot" d="m 90 50 a 40 24 0 0 1 -80 0" fill="none" stroke="none" />
-              <text fontSize="5.5" fontWeight="950" fill="currentColor" letterSpacing="0.12em" className="uppercase font-mono">
-                <textPath href="#live-text-top" startOffset="50%" textAnchor="middle">TURISMO ECO</textPath>
-              </text>
-              <text fontSize="5" fontWeight="950" fill="currentColor" letterSpacing="0.08em" className="uppercase font-mono">
-                <textPath href="#live-text-bot" startOffset="50%" textAnchor="middle">★ SOBERANO NICA ★</textPath>
-              </text>
-            </svg>
-            <div className="z-10 flex flex-col items-center justify-center px-1">
-              <Coffee className="w-5 h-5 text-current mb-0.5 mt-1" strokeWidth={2.5} />
-              <span className="text-[5.5px] font-black uppercase text-center tracking-tight leading-none max-w-[55px] truncate mt-0.5 bg-white/30 px-0.5">
-                {title.split(' en ')[0].split(' de ')[0]}
-              </span>
-              <span className="text-[7.5px] font-black uppercase bg-white/60 px-1.5 py-0.5 rounded border border-dashed border-current mt-1 leading-none">{date}</span>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
       <span className="text-[8.5px] font-black text-brand-text-dark mt-3 leading-tight truncate w-full group-hover:text-brand-primary">{title}</span>
     </div>
   );
 };
 
-export default function PassportScreen({ bookings, config, onOpenConfig }: PassportScreenProps) {
+export default function PassportScreen({ bookings, passportStamps, config, onOpenConfig, onSignOut }: PassportScreenProps) {
+  const { user } = useAuth();
   const prefersReducedMotion = useReducedMotion();
   const [selectedStamp, setSelectedStamp] = useState<any | null>(null);
   const [isTipsOpen, setIsTipsOpen] = useState(false);
   const [bookPage, setBookPage] = useState<number>(0);
   const [[page, direction], setPage] = useState([0, 0]);
+  const [comingSoon, setComingSoon] = useState<string | null>(null);
+  const [showFaq, setShowFaq] = useState(false);
+  const [faqGuide, setFaqGuide] = useState<{ name: string; faq: Record<string, string> } | null>(null);
+
+  useOverlayModal('passport-selected-stamp', !!selectedStamp);
+  useOverlayModal('passport-cultural-tips', isTipsOpen);
+  useOverlayModal('passport-coming-soon', !!comingSoon);
+  useOverlayModal('passport-faq', showFaq);
 
   const dynamicStamps = bookings.map(b => ({
     id: `dynamic-${b.id}`,
@@ -203,42 +137,10 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
     desc: `Este sello oficial nicaragüense certifica tu participación directa en "${b.experienceTitle}". Tu inversión de $${b.totalPrice} USD financió directamente salarios de artesanos locales y microproyectos de mitigación ambiental en la comunidad.`
   }));
 
-  const allStamps = [
-    {
-      id: 'p1',
-      title: 'Volcán Mombacho',
-      category: 'Conservación',
-      date: 'Mayo 2026',
-      iconType: 'mountain',
-      color: '#214e34',
-      isDynamic: false,
-      desc: 'Sello ecológico de senderismo certificado de la reserva biológica nebliselva del Volcán Mombacho.'
-    },
-    {
-      id: 'p2',
-      title: 'Plato Tradicional Granada',
-      category: 'Gastronómico',
-      date: 'Abril 2026',
-      iconType: 'utensils',
-      color: '#7b4c06',
-      isDynamic: false,
-      desc: 'Sello del rescate culinario nicaragüense.'
-    },
-    {
-      id: 'p3',
-      title: 'Cerámica Ancestral',
-      category: 'Patrimonial',
-      date: 'Marzo 2026',
-      iconType: 'palette',
-      color: '#922718',
-      isDynamic: false,
-      desc: 'Sello de preservación indígena chorotega.'
-    },
-    ...dynamicStamps
-  ];
+  const allStamps = dynamicStamps;
 
   const totalStamps = allStamps.length;
-  const milestonePercent = Math.min(100, Math.round((totalStamps / 8) * 100));
+  const milestonePercent = Math.min(100, Math.round((totalStamps / Math.max(8, totalStamps)) * 100));
 
   const variants = prefersReducedMotion
     ? {
@@ -272,7 +174,8 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
     }
   };
 
-  const stampItems = allStamps.map(s => ({
+  const stampSource = passportStamps.length > 0 ? passportStamps : dynamicStamps;
+  const stampItems = stampSource.map(s => ({
     id: s.id,
     title: s.title,
     date: s.date,
@@ -288,26 +191,41 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
       id: 'account',
       label: 'Detalles de la cuenta',
       icon: <User className="w-5 h-5" />,
-      onClick: () => {},
+      onClick: onOpenConfig,
     },
     {
       id: 'payment',
       label: 'Métodos de pago',
       icon: <CreditCard className="w-5 h-5" />,
-      onClick: () => {},
+      onClick: () => setComingSoon('payment'),
     },
     {
       id: 'faq',
       label: 'FAQ & Support',
       icon: <HelpCircle className="w-5 h-5" />,
-      onClick: () => {},
+      onClick: async () => {
+        if (bookings.length > 0) {
+          try {
+            const data = await guidesApi.getByExperience(bookings[0].experienceId);
+            if (data) {
+              setFaqGuide({ name: data.name, faq: data.faq });
+              setShowFaq(true);
+              return;
+            }
+          } catch (err) {
+            console.warn('[PassportScreen] Failed to load guide FAQ:', err);
+          }
+        }
+        setFaqGuide({ name: 'Guía Local', faq: { '¿Cómo prepararme?': 'Usa ropa cómoda y lleva agua.', '¿Cuánto dura?': 'La experiencia dura aproximadamente 3-4 horas.' } });
+        setShowFaq(true);
+      },
     },
     {
       id: 'logout',
       label: 'Cerrar sesión',
       icon: <LogOut className="w-5 h-5" />,
       color: '#ba1a1a',
-      onClick: () => {},
+      onClick: () => { onSignOut?.(); },
     },
   ];
 
@@ -369,29 +287,29 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
         <div className="col-span-2 flex flex-col items-center">
           <div className="w-full aspect-[4/5] bg-[#efebe1] rounded border border-brand-primary/20 overflow-hidden relative shadow-md flex items-center justify-center">
               <img 
-                src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200" 
-                alt="Elena Santos" 
+                src={user?.avatarUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200'} 
+                alt={user?.displayName || 'Viajero'} 
                 className="w-full h-full object-cover grayscale contrast-115 sepia-[40%]" 
               />
             <div className="absolute -bottom-3 -right-3 w-10 h-10 rounded-full border border-dashed border-[#922718]/40 bg-transparent flex items-center justify-center text-[#922718]/30 font-serif text-[4px] font-black scale-120 rotate-12">
               SELLO OFICIAL
             </div>
           </div>
-            <span className="text-[7.5px] font-black text-[#8c7457] mt-1.5 uppercase tracking-wide">Elena Santos</span>
+            <span className="text-[7.5px] font-black text-[#8c7457] mt-1.5 uppercase tracking-wide">{user?.displayName || 'Viajero'}</span>
         </div>
         <div className="col-span-3 flex flex-col gap-2.5 text-[8px] text-[#6b563f] pt-1">
           <div>
             <span className="block text-[6px] text-brand-text-muted font-black uppercase leading-none">Viajero / Nombres:</span>
-            <span className="font-black text-[9.5px] text-brand-text-dark font-mono mt-0.5 block">Elena Santos</span>
+            <span className="font-black text-[9.5px] text-brand-text-dark font-mono mt-0.5 block">{user?.displayName || 'Viajero'}</span>
           </div>
           <div>
             <span className="block text-[6px] text-brand-text-muted font-black uppercase leading-none">País de Procedencia:</span>
-            <span className="font-bold text-[9px] text-brand-text-dark font-mono mt-0.5 block">España (Madrid)</span>
+            <span className="font-bold text-[9px] text-brand-text-dark font-mono mt-0.5 block">{user?.location || 'No especificado'}</span>
           </div>
           <div>
             <span className="block text-[6px] text-brand-text-muted font-black uppercase leading-none">Estado de Rol:</span>
             <span className="font-black text-[8px] text-brand-secondary uppercase font-mono mt-0.5 block tracking-tighter bg-brand-secondary/15 px-1.5 py-0.5 rounded w-max">
-              Exploradora Activa nica
+              {user?.role === 'guide' ? 'Guía Local Certificado' : 'Viajero Sostenible'}
             </span>
           </div>
           <div>
@@ -406,7 +324,7 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
       <div className="border-t border-dashed border-[#8c7457]/30 pt-2 pb-1 z-10">
         <span className="block text-[6px] text-[#9c8468] uppercase font-bold leading-none mb-1">Presentación:</span>
         <span className="font-serif italic font-extrabold text-sm text-brand-primary block tracking-wider leading-none select-none pl-1 py-1 transform -rotate-1">
-          Texto de presentacion de prueba.
+          {user?.bio || 'Viajero comprometido con el turismo sostenible en Nicaragua.'}
         </span>
       </div>
       <div className="flex justify-between text-[7px] text-brand-text-muted font-mono pt-1 pointer-events-none border-t border-brand-primary/5">
@@ -435,35 +353,19 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
           Registros oficiales de preservación ecológica nicaragüense.
         </p>
         <div className="grid grid-cols-2 gap-4 mt-2">
-          {allStamps[0] && (
+          {allStamps.slice(0, 2).map((s, i) => (
             <RealisticStamp
-              id={allStamps[0].id}
-              title={allStamps[0].title}
-              category={allStamps[0].category}
-              date={allStamps[0].date}
-              color={allStamps[0].color}
-              isDynamic={allStamps[0].isDynamic}
-              rotate={-4.5}
-              onClick={() => setSelectedStamp(allStamps[0])}
+              key={s.id}
+              id={s.id}
+              title={s.title}
+              category={s.category}
+              date={s.date}
+              color={s.color}
+              isDynamic={s.isDynamic}
+              rotate={i === 0 ? -4.5 : 5.2}
+              onClick={() => setSelectedStamp(s)}
             />
-          )}
-          <RealisticStamp
-            id="p4"
-            title="Volcán Masaya Trek"
-            category="Naturaleza"
-            date="OCT 2023"
-            color="#1b4570"
-            rotate={5.2}
-            onClick={() => setSelectedStamp({
-              id: 'p4',
-              title: 'Volcán Masaya Trek',
-              category: 'Naturaleza',
-              date: 'Octubre 2023',
-              iconType: 'mountain',
-              color: '#1b4570',
-              desc: 'Sello de participación activa en el ecotrekking del Volcán Masaya.'
-            })}
-          />
+          ))}
         </div>
       </div>
       <div className="flex justify-between text-[7px] text-[#9c8468] font-semibold border-t border-[#a89c7d]/15 pt-2 z-10">
@@ -595,15 +497,15 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
       <div className="w-[180px] py-3.5 px-4 bg-[#4e140b]/90 rounded-2xl border border-amber-300/10 flex flex-col gap-2 z-10 shadow-inner">
         <div className="flex items-center justify-between text-[9px] text-amber-200/80">
           <span className="font-mono">Mitigación CO2:</span>
-          <span className="font-black text-amber-300">{45 + bookings.length * 15}kg CO2</span>
+          <span className="font-black text-amber-300">{bookings.length > 0 ? `${bookings.length * 10}kg` : '—'}</span>
         </div>
         <div className="flex items-center justify-between text-[9px] text-amber-200/80">
           <span className="font-mono">Familias impactadas:</span>
-          <span className="font-black text-amber-300">{12 + bookings.length * 4} F.</span>
+          <span className="font-black text-amber-300">{bookings.length > 0 ? `${Math.ceil(bookings.length * 1.5)} F.` : '—'}</span>
         </div>
         <div className="flex items-center justify-between text-[9px] text-amber-200/80">
-          <span className="font-mono">Sueldos Directos:</span>
-          <span className="font-black text-amber-300">${320 + bookings.reduce((s, b) => s + b.totalPrice, 0)} USD</span>
+          <span className="font-mono">Inversión Directa:</span>
+          <span className="font-black text-amber-300">{bookings.length > 0 ? `$${bookings.reduce((s, b) => s + b.totalPrice, 0)}` : '—'}</span>
         </div>
       </div>
       <div className="flex flex-col items-center gap-1 pb-2 z-10 pointer-events-none">
@@ -624,10 +526,10 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
       {/* Profile Header - Figma Section */}
       <div className="px-5 pt-6">
         <ProfileHeader
-          name={'Elena Santos'}
-          title="Explorer & Impact Maker"
-          badge="Guardian"
-          avatarUrl="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200"
+          name={user?.displayName || 'Viajero'}
+          title={user?.subtitle || 'Explorador en Nicaragua'}
+          badge={user?.role === 'guide' ? 'Guía' : 'Viajero'}
+          avatarUrl={user?.avatarUrl || undefined}
           onEdit={() => {}}
         />
       </div>
@@ -639,20 +541,20 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
           metrics={[
             {
               label: 'CO2 Mitigado',
-              value: `${45 + bookings.length * 15}`,
+              value: bookings.length > 0 ? `${bookings.length * 10}` : '—',
               unit: 'kg',
               icon: <Flame className="w-5 h-5" />,
               color: 'text-[#47654f]',
             },
             {
               label: 'Familias',
-              value: `${12 + bookings.length * 4}`,
+              value: bookings.length > 0 ? `${Math.ceil(bookings.length * 1.5)}` : '—',
               icon: <User className="w-5 h-5" />,
               color: 'text-[#47654f]',
             },
             {
               label: 'Inversión',
-              value: `$${320 + bookings.reduce((s, b) => s + b.totalPrice, 0)}`,
+              value: bookings.length > 0 ? `$${bookings.reduce((s, b) => s + b.totalPrice, 0)}` : '—',
               icon: <Award className="w-5 h-5" />,
               color: 'text-[#47654f]',
             },
@@ -763,7 +665,7 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
               />
             </div>
             <p className="text-[10px] text-brand-text-muted leading-tight font-bold mt-0.5">
-              ¡Tienes {totalStamps} de 8 sellos recomendados! Completa {Math.max(1, 8 - totalStamps)} experiencias más para desbloquear la insignia de <span className="text-brand-secondary font-black">"Guardián de Tradiciones Chorotegas"</span>.
+              ¡Tienes {totalStamps} sello{totalStamps !== 1 ? 's' : ''}! Sigue explorando para descubrir más experiencias.
             </p>
           </div>
         </div>
@@ -798,7 +700,7 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
 
       {selectedStamp && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
           onClick={() => setSelectedStamp(null)}
         >
           <div
@@ -814,6 +716,33 @@ export default function PassportScreen({ bookings, config, onOpenConfig }: Passp
               <span className="text-xs font-semibold text-brand-text-muted uppercase tracking-wide">
                 {selectedStamp.category} • {selectedStamp.date}
               </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ComingSoon
+        isOpen={comingSoon === 'payment'}
+        onClose={() => setComingSoon(null)}
+        message="Métodos de pago es un tema delicado que requiere integración con pasarelas de pago seguras. Estará disponible en futuras versiones de Xolara."
+      />
+
+      {showFaq && faqGuide && (
+        <div className="fixed inset-0 bg-black/40 z-[60] flex items-end justify-center backdrop-blur-sm" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div className="glass-chrome w-full max-w-md rounded-t-[var(--radius-sheet)] max-h-[70dvh] flex flex-col animate-slide-up">
+            <div className="flex items-center justify-between p-5 border-b border-black/5 flex-shrink-0">
+              <h3 className="font-serif text-sm font-semibold text-brand-text-dark">FAQ — {faqGuide.name}</h3>
+              <button onClick={() => setShowFaq(false)} className="p-1 rounded-full hover:bg-black/5 transition-colors">
+                <X className="w-5 h-5 text-brand-text-muted" />
+              </button>
+            </div>
+            <div className="overflow-y-auto p-5 flex flex-col gap-3">
+              {Object.entries(faqGuide.faq).map(([q, a]) => (
+                <div key={q} className="p-3 surface-card">
+                  <p className="text-[11px] font-black text-brand-text-dark mb-1">{q}</p>
+                  <p className="text-[10px] text-brand-text-muted font-semibold leading-relaxed">{a}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>

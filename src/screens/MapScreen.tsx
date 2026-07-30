@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { MapPin, Star, Clock, Crosshair, ArrowLeft, X, Sparkles } from 'lucide-react';
-import { MAP_PINS } from '../data';
+
 import { Experience } from '../types';
+import { useT } from '../contexts/I18nContext';
 
 interface MapScreenProps {
   onBack: () => void;
   onSelectExperience: (id: string) => void;
   activeCategory: string;
   setActiveCategory: (category: string) => void;
-  likedExperiences: string[];
-  onToggleLike: (id: string, e: React.MouseEvent) => void;
   experiences: Experience[];
 }
 
@@ -20,9 +19,10 @@ export default function MapScreen({
   setActiveCategory,
   experiences
 }: MapScreenProps) {
-  const [selectedPinId, setSelectedPinId] = useState<string | null>('coffee-journey');
+  const { t } = useT();
+  const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
 
-  const categories = ['All', 'Crafts', 'Culinary', 'Agriculture', 'Nature'];
+  const categories = ['All', 'Crafts', 'Culinary', 'Agriculture', 'Nature', 'Music'];
   const selectedExperience = experiences.find(exp => exp.id === selectedPinId);
 
   const filteredExperiences = experiences.filter(exp => {
@@ -34,7 +34,7 @@ export default function MapScreen({
     <div className="relative w-full h-screen font-sans flex flex-col bg-brand-bg">
       <div className="absolute top-0 left-0 w-full z-30 pt-4 px-4 pb-12 pointer-events-none bg-gradient-to-b from-white via-white to-transparent">
         <div className="flex items-center gap-2 mb-3 pointer-events-auto">
-          <button onClick={onBack} className="glass-chrome text-brand-text-dark rounded-full p-2.5 active:scale-95 transition-all" title="Volver">
+          <button onClick={onBack} className="glass-chrome text-brand-text-dark rounded-full p-2.5 active:scale-95 transition-all" title={t('map.back')}>
             <ArrowLeft className="w-4 h-4 text-brand-text-dark" strokeWidth={2.5} />
           </button>
           <div className="flex gap-1.5 overflow-x-auto hide-scrollbar flex-1">
@@ -63,13 +63,12 @@ export default function MapScreen({
 
           {filteredExperiences.map((exp, idx) => {
             const isSelected = selectedPinId === exp.id;
-            const placements = [
-              { top: '35%', left: '50%' },
-              { top: '64%', left: '38%' },
-              { top: '55%', left: '60%' },
-              { top: '48%', left: '25%' }
-            ];
-            const placement = placements[idx % placements.length];
+            const rows = Math.ceil(filteredExperiences.length / 2);
+            const col = idx % 2;
+            const row = Math.floor(idx / 2);
+            const top = `${25 + (row * 25)}%`;
+            const left = col === 0 ? '25%' : '55%';
+            const placement = { top, left };
             return (
               <button key={exp.id} onClick={() => setSelectedPinId(exp.id)}
                 className="absolute group transition-all duration-300 active:scale-95 z-10"
@@ -92,17 +91,26 @@ export default function MapScreen({
           <div className="absolute top-28 mx-5 p-3.5 bg-amber-50/95 border border-amber-500/20 rounded-xl shadow-md z-20 max-w-[280px] text-center">
             <div className="flex items-center justify-center gap-1.5 text-amber-800 text-[11px] font-bold mb-0.5">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Mapa Interactivo</span>
+              <span>{t('map.title')}</span>
             </div>
             <p className="text-[10px] text-amber-900/80 leading-snug">
-              Explora las experiencias disponibles en Nicaragua tocando los pins del mapa.
+              {t('map.description')}
             </p>
           </div>
         </div>
       </div>
 
-      <button onClick={() => setSelectedPinId('coffee-journey')}
-        className="absolute bottom-60 right-4 z-20 glass-chrome text-brand-text-dark rounded-full p-3 active:scale-95 transition-all" title="Centrar ubicación">
+      <button onClick={() => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            () => alert(t('map.geo_detected')),
+            () => setSelectedPinId(filteredExperiences[0]?.id || null)
+          );
+        } else if (filteredExperiences.length > 0) {
+          setSelectedPinId(filteredExperiences[0].id);
+        }
+      }}
+        className="absolute bottom-60 right-4 z-20 glass-chrome text-brand-text-dark rounded-full p-3 active:scale-95 transition-all" title={t('map.center')}>
         <Crosshair className="w-5 h-5 text-brand-secondary" strokeWidth={2.5} />
       </button>
 
@@ -131,10 +139,10 @@ export default function MapScreen({
                 </div>
               </div>
               <div className="flex items-baseline justify-between mt-1 pt-1 border-t border-dashed border-brand-primary/5">
-                <p className="text-[11px] text-brand-text-muted font-semibold">Desde <span className="text-xs font-black text-brand-primary">${selectedExperience.pricePerPerson} USD</span></p>
+                <p className="text-[11px] text-brand-text-muted font-semibold">{t('card.from')} <span className="text-xs font-black text-brand-primary">${selectedExperience.pricePerPerson} USD</span></p>
                 <button onClick={() => onSelectExperience(selectedExperience.id)}
                   className="bg-brand-primary text-white text-[10px] font-semibold py-1.5 px-3.5 rounded-full shadow-ios active:scale-95 hover:opacity-90 transition-all leading-none">
-                  Ver Detalles
+                  {t('map.view_details')}
                 </button>
               </div>
             </div>

@@ -66,17 +66,25 @@ classDiagram
 
     class ExpressAPI {
         <<Backend>>
-        +GET /api/experiences
-        +GET /api/experiences/:id
+        +POST /api/auth/signup
+        +POST /api/auth/signin
+        +GET  /api/auth/me
+        +PATCH /api/auth/profile
+        +GET  /api/experiences
+        +GET  /api/experiences/:id
         +POST /api/experiences
-        +GET /api/bookings
+        +PUT  /api/experiences/:id
+        +DELETE /api/experiences/:id
+        +GET  /api/bookings
         +POST /api/bookings
-        +GET /api/likes
+        +PUT  /api/bookings/:id
+        +DELETE /api/bookings/:id
+        +GET  /api/likes
         +POST /api/likes/:id
-        +GET /api/passport
-        +GET /api/guides/:id
-        +GET /api/config
-        +PUT /api/config
+        +GET  /api/passport
+        +GET  /api/guides/:id
+        +GET  /api/config
+        +PUT  /api/config
     }
 
     class AuthMiddleware {
@@ -108,7 +116,22 @@ classDiagram
         <<Frontend>>
         +apiFetch<T>(path, options)
         +auto JWT injection
-        +typed endpoints
+        +authApi, experiencesApi, bookingsApi
+        +likesApi, passportApi, guidesApi, configApi
+    }
+
+    class AdminPanelScreen {
+        <<Frontend>>
+        +list/grid of experiences (guide/admin)
+        +edit, delete, create actions
+        +role-gated (guide/admin)
+    }
+
+    class CreateExperienceScreen {
+        <<Frontend>>
+        +create mode / edit mode
+        +Zod validation
+        +POST or PUT depending on editExperience prop
     }
 
     Booking_DB --> Experience_DB : FK experience_id

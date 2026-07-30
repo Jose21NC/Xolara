@@ -6,7 +6,6 @@ export const bookingSchema = z.object({
   time: z.string().min(1, 'Selecciona un horario'),
   adultsCount: z.number().int().min(1, 'Al menos 1 adulto requerido').max(20, 'Máximo 20 adultos'),
   childrenCount: z.number().int().min(0).max(15, 'Máximo 15 niños'),
-  totalPrice: z.number().positive('El precio debe ser mayor a 0'),
 });
 
 export type BookingInput = z.infer<typeof bookingSchema>;

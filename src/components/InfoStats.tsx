@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, Users, Star } from 'lucide-react';
+import { useT } from '../contexts/I18nContext';
 
 interface StatItem {
   label: string;
@@ -14,19 +15,20 @@ interface InfoStatsProps {
 }
 
 export default function InfoStats({ duration, groupSize, rating }: InfoStatsProps) {
+  const { t } = useT();
   const stats: StatItem[] = [
     {
-      label: 'Duración',
+      label: t('detail.duration'),
       value: duration,
       icon: <Clock className="w-4 h-4" />,
     },
     {
-      label: 'Grupo',
+      label: t('detail.group'),
       value: groupSize,
       icon: <Users className="w-4 h-4" />,
     },
     {
-      label: 'Calificación',
+      label: t('detail.rating'),
       value: rating,
       icon: <Star className="w-4 h-4 fill-brand-primary stroke-none" />,
     },

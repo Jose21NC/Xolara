@@ -13,10 +13,10 @@ export class ApiError extends Error {
 
 function getToken(): string | null {
   try {
-    const raw = localStorage.getItem('supabase.auth.token');
+    const raw = localStorage.getItem('xolara_session_v2');
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    return parsed?.currentSession?.access_token || null;
+    return parsed?.token || null;
   } catch {
     return null;
   }
@@ -66,9 +66,31 @@ export const authApi = {
     ),
 
   me: () =>
-    apiFetch<{ id: string; display_name: string; role: string; avatar_url: string | null }>(
+    apiFetch<{ id: string; display_name: string; role: string; avatar_url: string | null; subtitle: string | null; location: string | null; bio: string | null }>(
       '/api/auth/me'
     ),
+
+  updateProfile: (data: { displayName?: string; subtitle?: string; location?: string; bio?: string }) =>
+    apiFetch<{ success: boolean }>('/api/auth/profile', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  uploadAvatar: async (file: File): Promise<{ success: boolean; avatarUrl: string }> => {
+    const token = getToken();
+    const form = new FormData();
+    form.append('avatar', file);
+    const res = await fetch(`${API_BASE}/api/auth/avatar`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({ error: 'Error al subir avatar' }));
+      throw new ApiError(res.status, body.error || 'Error al subir avatar');
+    }
+    return res.json();
+  },
 };
 
 // ─── Experiences ─────────────────────────────
@@ -128,6 +150,33 @@ export const passportApi = {
 export const guidesApi = {
   getByExperience: (experienceId: string) =>
     apiFetch<any | null>(`/api/guides/${experienceId}`),
+};
+
+// ─── Admin ───────────────────────────────────
+
+export interface PendingGuide {
+  id: string;
+  display_name: string;
+  email: string;
+  subtitle: string | null;
+  location: string | null;
+  created_at: string;
+}
+
+export const adminApi = {
+  getStats: () =>
+    apiFetch<{ experiences: number; bookings: number; travelers: number; revenue: number }>(
+      '/api/admin/stats'
+    ),
+
+  listPendingGuides: () =>
+    apiFetch<PendingGuide[]>('/api/admin/pending-guides'),
+
+  approveGuide: (userId: string, approve: boolean) =>
+    apiFetch<{ success: boolean }>('/api/admin/approve-guide', {
+      method: 'POST',
+      body: JSON.stringify({ userId, approve }),
+    }),
 };
 
 // ─── Config ──────────────────────────────────

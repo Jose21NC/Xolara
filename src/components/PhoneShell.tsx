@@ -2,7 +2,6 @@ import React from 'react';
 
 interface PhoneShellProps {
   children: React.ReactNode;
-  activeTab: string;
 }
 
 export default function PhoneShell({ children }: PhoneShellProps) {

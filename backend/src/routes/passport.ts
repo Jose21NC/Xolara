@@ -6,7 +6,7 @@ const router = Router();
 
 router.get('/', authMiddleware, async (req: Request, res: Response) => {
   const result = await query(
-    `SELECT id, title, category, date, icon_type, color, created_at
+    `SELECT id, title, category, date, icon_type, color, experience_id, created_at
      FROM public.passport_stamps
      WHERE user_id = $1
      ORDER BY created_at DESC`,

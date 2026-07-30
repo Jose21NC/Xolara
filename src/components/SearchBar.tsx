@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
+import { useT } from '../contexts/I18nContext';
 
 interface SearchBarProps {
   value: string;
@@ -14,8 +15,9 @@ export default function SearchBar({
   onChange,
   onSearch,
   onFilter,
-  placeholder = '¿A dónde quieres ir?',
+  placeholder,
 }: SearchBarProps) {
+  const { t } = useT();
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') onSearch();
   };
@@ -26,7 +28,7 @@ export default function SearchBar({
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-text-muted w-5 h-5" />
         <input
           type="text"
-          placeholder={placeholder}
+          placeholder={placeholder || t('search.placeholder')}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -37,14 +39,14 @@ export default function SearchBar({
             onClick={onSearch}
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-brand-primary text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-brand-primary/90 transition-all"
           >
-            Buscar
+            {t('search.button')}
           </button>
         )}
       </div>
       <button
         onClick={onFilter}
         className="bg-brand-primary text-white rounded-full p-3.5 flex items-center justify-center shadow-ios transition-apple tap-feedback hover:shadow-ios-lg"
-        title="Filtros"
+        title={t('search.filters')}
       >
         <SlidersHorizontal className="w-5 h-5 text-white" />
       </button>

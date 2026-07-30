@@ -11,6 +11,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   role        TEXT NOT NULL DEFAULT 'traveler'
               CHECK (role IN ('visitor', 'traveler', 'guide', 'admin')),
   avatar_url  TEXT,
+  subtitle    TEXT,
+  location    TEXT,
+  bio         TEXT,
+  is_approved_guide BOOLEAN DEFAULT false,
   created_at  TIMESTAMPTZ DEFAULT now()
 );
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;

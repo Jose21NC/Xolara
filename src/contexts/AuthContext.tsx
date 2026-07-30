@@ -6,6 +6,10 @@ interface User {
   email: string;
   displayName: string;
   role: 'visitor' | 'traveler' | 'guide' | 'admin';
+  avatarUrl?: string | null;
+  subtitle?: string | null;
+  location?: string | null;
+  bio?: string | null;
 }
 
 interface AuthContextType {
@@ -15,6 +19,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, displayName: string, role?: string) => Promise<void>;
   signOut: () => void;
+  updateUser: (partial: Partial<User>) => void;
   error: string | null;
 }
 
@@ -50,9 +55,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (stored) {
       setUser(stored.user);
       setToken(stored.token);
-      // Verify token is still valid
       authApi.me()
-        .then(() => setLoading(false))
+        .then((userData) => {
+          setUser(prev => prev ? {
+            ...prev,
+            displayName: userData.display_name,
+            role: userData.role as User['role'],
+            avatarUrl: userData.avatar_url,
+            subtitle: userData.subtitle,
+            location: userData.location,
+            bio: userData.bio,
+          } : prev);
+          setLoading(false);
+        })
         .catch(() => {
           clearSession();
           setUser(null);
@@ -110,6 +125,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const updateUser = useCallback((partial: Partial<User>) => {
+    setUser(prev => prev ? { ...prev, ...partial } : null);
+    if (partial) {
+      try {
+        const raw = localStorage.getItem('xolara_session_v2');
+        if (raw) {
+          const stored = JSON.parse(raw);
+          stored.user = { ...stored.user, ...partial };
+          localStorage.setItem('xolara_session_v2', JSON.stringify(stored));
+        }
+      } catch (err) {
+        console.warn('[AuthContext] Failed to persist user changes:', err);
+      }
+    }
+  }, []);
+
   const signOut = useCallback(() => {
     setUser(null);
     setToken(null);
@@ -117,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, signIn, signUp, signOut, error }}>
+    <AuthContext.Provider value={{ user, token, loading, signIn, signUp, signOut, updateUser, error }}>
       {children}
     </AuthContext.Provider>
   );

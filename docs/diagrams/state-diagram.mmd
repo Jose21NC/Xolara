@@ -33,16 +33,21 @@ stateDiagram-v2
     Passport --> Configuration : tap config
     Profile --> Configuration : tap config
 
-    Explore --> CreateExperience : tap create
-    Experiences --> CreateExperience : tap create
+    Explore --> CreateExperience : tap create (guide/admin)
+    Experiences --> CreateExperience : tap create (guide/admin)
 
-    Explore --> Map : tap map
+    Explore --> Map : tap map preview
+
+    Profile --> AdminPanel : tap "Panel de Gestión" (guide/admin)
+    AdminPanel --> CreateExperience : tap "+"
+    AdminPanel --> CreateExperience : tap edit (pre-filled)
+    AdminPanel --> Explore : back
 
     Detail --> Explore : back / close
     Reservation --> Detail : back
     Confirmed --> Explore : done
     Configuration --> Explore : back
-    CreateExperience --> Explore : back / cancel
+    CreateExperience --> Explore : back / cancel / success
     Map --> Explore : back
 
     note right of Explore : currentScreen = 'explore'<br/>Bottom nav: VISIBLE
@@ -52,3 +57,4 @@ stateDiagram-v2
     note right of Configuration : currentScreen = 'configuration'<br/>Bottom nav: HIDDEN
     note right of CreateExperience : currentScreen = 'create_exp'<br/>Bottom nav: HIDDEN
     note right of Map : currentScreen = 'map'<br/>Bottom nav: HIDDEN
+    note right of AdminPanel : currentScreen = 'admin_panel'<br/>Bottom nav: HIDDEN

@@ -1,4 +1,5 @@
 import { Compass, Sparkles, Award, User } from 'lucide-react';
+import { useT } from '../contexts/I18nContext';
 
 interface NavItem {
   key: 'explore' | 'experiences' | 'passport' | 'profile';
@@ -6,21 +7,24 @@ interface NavItem {
   Icon: typeof Compass;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { key: 'explore', label: 'Explora', Icon: Compass },
-  { key: 'experiences', label: 'Experiencias', Icon: Sparkles },
-  { key: 'passport', label: 'Pasaporte', Icon: Award },
-  { key: 'profile', label: 'Perfil', Icon: User },
-];
-
 interface BottomNavBarProps {
   activeTab: NavItem['key'];
   onTabClick: (tab: NavItem['key']) => void;
+  hidden?: boolean;
 }
 
-export default function BottomNavBar({ activeTab, onTabClick }: BottomNavBarProps) {
+export default function BottomNavBar({ activeTab, onTabClick, hidden }: BottomNavBarProps) {
+  const { t } = useT();
+  const NAV_ITEMS: NavItem[] = [
+    { key: 'explore', label: t('nav.explore'), Icon: Compass },
+    { key: 'experiences', label: t('nav.experiences'), Icon: Sparkles },
+    { key: 'passport', label: t('nav.passport'), Icon: Award },
+    { key: 'profile', label: t('nav.profile'), Icon: User },
+  ];
+
+  if (hidden) return null;
   return (
-    <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-[22rem] z-50 flex justify-around items-center px-3 py-2.5 glass-chrome rounded-full animate-slide-up">
+    <nav className="fixed bottom-3 left-1/2 -translate-x-1/2 w-[calc(100%-1.5rem)] max-w-[22rem] z-40 flex justify-around items-center px-3 py-2.5 glass-chrome rounded-full animate-slide-up" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {NAV_ITEMS.map(({ key, label, Icon }) => {
         const isActive = activeTab === key;
         return (

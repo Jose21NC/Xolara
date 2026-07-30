@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Clock, CalendarDays, Plus, Minus, Heart, ArrowRight, AlertCircle } from 'lucide-react';
 import { Experience } from '../types';
+import { useT } from '../contexts/I18nContext';
 import { bookingSchema } from '../lib/validation/schemas';
-import { sanitizeInput } from '../lib/security/sanitize';
+
 
 interface ReservationScreenProps {
   experience: Experience;
@@ -13,7 +14,6 @@ interface ReservationScreenProps {
     time: string;
     adultsCount: number;
     childrenCount: number;
-    totalPrice: number;
   }) => void;
 }
 
@@ -22,20 +22,27 @@ export default function ReservationScreen({
   onBack,
   onConfirmBooking
 }: ReservationScreenProps) {
-  const [selectedDateIndex, setSelectedDateIndex] = useState(2);
+  const { t } = useT();
+  const [selectedDateIndex, setSelectedDateIndex] = useState(0);
   const [selectedTime, setSelectedTime] = useState('11:30 AM');
   const [adultsCount, setAdultsCount] = useState(2);
   const [childrenCount, setChildrenCount] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
 
-  const dates = [
-    { label: 'Lun', num: '12' },
-    { label: 'Mar', num: '13' },
-    { label: 'Mié', num: '14' },
-    { label: 'Jue', num: '15' },
-    { label: 'Vie', num: '16' },
-    { label: 'Sáb', num: '17' }
-  ];
+  const dates = React.useMemo(() => {
+    const days = [t('reservation.dom'), t('reservation.lun'), t('reservation.mar'), t('reservation.mie'), t('reservation.jue'), t('reservation.vie'), t('reservation.sab')];
+    const today = new Date();
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      return {
+        label: days[d.getDay()],
+        num: d.getDate().toString(),
+        fullDate: d.toISOString().split('T')[0],
+        month: d.toLocaleDateString('es', { month: 'long', year: 'numeric' }),
+      };
+    });
+  }, [t]);
 
   const times = ['09:00 AM', '11:30 AM', '02:00 PM', '04:00 PM'];
 
@@ -44,13 +51,22 @@ export default function ReservationScreen({
 
   const handleConfirm = () => {
     const selectedDateObj = dates[selectedDateIndex];
+    const match = selectedTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    let time24 = selectedTime;
+    if (match) {
+      let hours = parseInt(match[1], 10);
+      const minutes = match[2];
+      const period = match[3].toUpperCase();
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      time24 = `${String(hours).padStart(2, '0')}:${minutes}`;
+    }
     const data = {
       experienceId: experience.id,
-      date: sanitizeInput(`Miércoles, Oct ${selectedDateObj.num}`),
-      time: sanitizeInput(selectedTime),
+      date: selectedDateObj.fullDate,
+      time: time24,
       adultsCount,
       childrenCount,
-      totalPrice,
     };
 
     const result = bookingSchema.safeParse(data);
@@ -73,7 +89,7 @@ export default function ReservationScreen({
         >
           <ArrowLeft className="w-5 h-5 text-brand-text-dark" strokeWidth={2.5} />
         </button>
-        <h2 className="font-serif text-xl font-semibold text-brand-text-dark">Reserva</h2>
+        <h2 className="font-serif text-xl font-semibold text-brand-text-dark">{t('reservation.title')}</h2>
       </header>
 
       {/* Experience Summary Thumbnail block */}
@@ -100,8 +116,8 @@ export default function ReservationScreen({
       {/* SELECT DATE section */}
       <section className="px-5 flex flex-col gap-2">
         <div className="flex justify-between items-baseline mb-1">
-          <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest">Selecciona Fecha</h4>
-          <span className="text-[11px] font-semibold text-brand-primary">Octubre 2023</span>
+          <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest">{t('reservation.date')}</h4>
+          <span className="text-[11px] font-semibold text-brand-primary">{dates[selectedDateIndex]?.month || ''}</span>
         </div>
 
         {/* Days horizontally scrolling */}
@@ -128,22 +144,22 @@ export default function ReservationScreen({
 
       {/* SELECT TIME chips section */}
       <section className="px-5 flex flex-col gap-2">
-        <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest mb-1">Horario</h4>
+        <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest mb-1">{t('reservation.time')}</h4>
         
         <div className="grid grid-cols-2 gap-2.5">
-          {times.map(t => {
-            const isSelected = selectedTime === t;
+          {times.map(tm => {
+            const isSelected = selectedTime === tm;
             return (
               <button
-                key={t}
-                onClick={() => setSelectedTime(t)}
+                key={tm}
+                onClick={() => setSelectedTime(tm)}
                 className={`py-3 px-4 rounded-xl text-xs font-semibold border transition-all text-center leading-none tap-feedback ${
                   isSelected
                     ? 'bg-brand-primary/10 text-brand-primary border-brand-primary/40'
                     : 'bg-surface text-brand-text-dark border-black/5 hover:border-brand-primary/30'
                 }`}
               >
-                {t}
+                {tm}
               </button>
             );
           })}
@@ -152,14 +168,14 @@ export default function ReservationScreen({
 
       {/* PARTICIPANTS selector row fields */}
       <section className="px-5 flex flex-col gap-3">
-        <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest mb-1">Participantes</h4>
+        <h4 className="text-[11px] font-semibold text-brand-text-muted uppercase tracking-widest mb-1">{t('reservation.participants')}</h4>
 
         <div className="flex flex-col gap-2.5">
           {/* Adults counter */}
           <div className="p-3.5 surface-card flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-brand-text-dark">Adultos</span>
-              <span className="text-[10px] text-brand-text-muted tracking-wide mt-0.5">Mayores de 13 años</span>
+              <span className="text-xs font-bold text-brand-text-dark">{t('reservation.adults')}</span>
+              <span className="text-[10px] text-brand-text-muted tracking-wide mt-0.5">{t('reservation.adults_desc')}</span>
             </div>
             
             <div className="flex items-center gap-3">
@@ -182,8 +198,8 @@ export default function ReservationScreen({
           {/* Children counter */}
           <div className="p-3.5 surface-card flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="text-xs font-bold text-brand-text-dark">Niños</span>
-              <span className="text-[10px] text-brand-text-muted tracking-wide mt-0.5">Edad de 2 a 12 años</span>
+              <span className="text-xs font-bold text-brand-text-dark">{t('reservation.children')}</span>
+              <span className="text-[10px] text-brand-text-muted tracking-wide mt-0.5">{t('reservation.children_desc')}</span>
             </div>
             
             <div className="flex items-center gap-3">
@@ -224,7 +240,7 @@ export default function ReservationScreen({
             <Heart className="w-4 h-4 fill-brand-secondary/20" />
           </div>
           <p className="text-[10px] text-[#224f39] leading-relaxed font-semibold">
-            <span className="font-extrabold text-brand-secondary">Impacto Local:</span> Tu visita apoya directamente a <span className="font-extrabold">familias locales</span> de la región, contribuyendo a la educación agrícola sostenible y la infraestructura comunitaria.
+            <span className="font-extrabold text-brand-secondary">{t('reservation.local_impact')}</span> {t('reservation.impact_text')}
           </p>
         </div>
       </div>
@@ -233,7 +249,7 @@ export default function ReservationScreen({
       <div className="fixed bottom-0 left-0 w-full z-40 glass-chrome px-5 py-3.5 max-w-sm rounded-t-[var(--radius-sheet)] left-1/2 -translate-x-1/2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="text-[9px] text-brand-text-muted uppercase tracking-wider font-semibold">Total ({totalQuantity} Pers)</span>
+            <span className="text-[9px] text-brand-text-muted uppercase tracking-wider font-semibold">{t('reservation.total_pers', { n: totalQuantity })}</span>
             <span className="text-xl font-semibold text-brand-text-dark tabular-nums">${totalPrice}</span>
           </div>
 
@@ -241,7 +257,7 @@ export default function ReservationScreen({
             onClick={handleConfirm}
             className="flex-1 bg-brand-primary hover:bg-brand-primary/95 text-white active:scale-95 transition-all text-xs font-semibold py-3.5 px-5 rounded-full flex items-center justify-center gap-1.5 shadow-ios leading-none"
           >
-            <span>Confirmar Reserva</span>
+            <span>{t('reservation.confirm')}</span>
             <ArrowRight className="w-3.5 h-3.5 text-white stroke-[2.5]" />
           </button>
         </div>

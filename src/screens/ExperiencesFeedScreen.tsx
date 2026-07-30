@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Star, Clock, MapPin, Heart } from 'lucide-react';
 import { Experience } from '../types';
+import { useT } from '../contexts/I18nContext';
+import { useOverlayModal } from '../contexts/OverlayContext';
 import SearchBar from '../components/SearchBar';
 import CategoryPills from '../components/CategoryPills';
 import SectionHeader from '../components/SectionHeader';
@@ -23,14 +25,16 @@ export default function ExperiencesFeedScreen({
   experiences,
   initialSearchQuery
 }: ExperiencesFeedScreenProps) {
+  const { t } = useT();
   const [activeTagFilter, setActiveTagFilter] = useState('All');
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  useOverlayModal('experiences-filter', isFilterModalOpen);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredExperiences, setFilteredExperiences] = useState<Experience[]>(experiences);
 
-  const tags = ['All', 'Agriculture', 'Crafts', 'Culinary'];
+  const tags = ['All', 'Crafts', 'Culinary', 'Agriculture', 'Nature', 'Music'];
 
-  const categories = tags.map(t => ({ name: t, icon: null }));
+  const categories = tags.map(tag => ({ name: tag, icon: null }));
 
   useEffect(() => {
     if (initialSearchQuery) {
@@ -58,9 +62,9 @@ export default function ExperiencesFeedScreen({
   return (
     <div className="flex flex-col gap-6 pb-24 font-body">
       <div className="px-5 pt-5">
-        <SectionHeader title="Experiencias" />
+        <SectionHeader title={t('feed.title')} />
         <p className="text-xs text-brand-text-muted font-medium max-w-[42ch] leading-relaxed mt-2">
-          Descubre e inscríbete en nuestros recorridos inmersivos creados íntegramente por guías locales.
+          {t('feed.description')}
         </p>
       </div>
 
@@ -73,7 +77,7 @@ export default function ExperiencesFeedScreen({
           }}
           onSearch={handleSearch}
           onFilter={() => setIsFilterModalOpen(true)}
-          placeholder="Buscar experiencias..."
+          placeholder={t('feed.search')}
         />
       </div>
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sparkles, BookOpen, AlertCircle, Compass, CheckCircle2, MessageSquare, Search, Languages } from 'lucide-react';
+import { X, Sparkles, AlertCircle, Compass, CheckCircle2, Search, Languages } from 'lucide-react';
 import { Booking, AppConfig } from '../types';
 
 interface CulturalTipsPopupProps {
@@ -16,10 +16,10 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
   if (!isOpen) return null;
 
   // 1. Analyze Booked Locations to build Context-Aware state flags
-  const hasGranada = bookings.some(b => b.experienceId === 'cooking-masterclass') || bookings.some(b => b.experienceTitle.toLowerCase().includes('granada'));
-  const hasMasayaCeramics = bookings.some(b => b.experienceId === 'weaving-workshop' || b.experienceTitle.toLowerCase().includes('cerámica') || b.experienceTitle.toLowerCase().includes('juan de oriente'));
-  const hasMasayaVolcano = bookings.some(b => b.experienceId === 'market-walk' || b.experienceTitle.toLowerCase().includes('masaya') || b.experienceTitle.toLowerCase().includes('volcán masaya'));
-  const hasMatagalpaCoffee = bookings.some(b => b.experienceId === 'coffee-journey' || b.experienceTitle.toLowerCase().includes('café') || b.experienceTitle.toLowerCase().includes('matagalpa'));
+  const hasGranada = bookings.some(b => b.experienceTitle.toLowerCase().includes('granada') || b.experienceTitle.toLowerCase().includes('cocina') || b.experienceTitle.toLowerCase().includes('vigorón'));
+  const hasMasayaCeramics = bookings.some(b => b.experienceTitle.toLowerCase().includes('cerámica') || b.experienceTitle.toLowerCase().includes('juan de oriente') || b.experienceTitle.toLowerCase().includes('alfarería'));
+  const hasMasayaVolcano = bookings.some(b => b.experienceTitle.toLowerCase().includes('masaya') || b.experienceTitle.toLowerCase().includes('volcán') || b.experienceTitle.toLowerCase().includes('senderismo'));
+  const hasMatagalpaCoffee = bookings.some(b => b.experienceTitle.toLowerCase().includes('café') || b.experienceTitle.toLowerCase().includes('matagalpa'));
 
   // Calculate total customized regions
   const totalCustomizedRegions = [hasGranada, hasMasayaCeramics, hasMasayaVolcano, hasMatagalpaCoffee].filter(Boolean).length;
@@ -68,7 +68,7 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
   );
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/40 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
       <div className="glass-chrome w-full max-w-sm rounded-[var(--radius-sheet)] flex flex-col max-h-[85vh] relative overflow-hidden animate-scale-in text-brand-text-dark font-sans">
 
         {/* Clay header banner */}
@@ -364,9 +364,9 @@ export default function CulturalTipsPopup({ isOpen, onClose, bookings, config }:
         <div className="p-3 bg-surface-2/60 border-t border-black/5 flex items-center justify-between text-[8px] text-brand-text-muted font-semibold flex-shrink-0">
           <span className="flex items-center gap-1">
             <CheckCircle2 className="w-3.5 h-3.5 text-brand-secondary" />
-            Auditado por Cooperativa Agrícola
+            Cultura Viva Nicaragua
           </span>
-          <span className="font-mono text-stone-400">Ver: XLR-COOP-26</span>
+          <span className="font-mono text-stone-400">Consejos Culturales</span>
         </div>
 
       </div>

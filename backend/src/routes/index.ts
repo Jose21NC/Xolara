@@ -6,6 +6,7 @@ import likeRoutes from './likes.js';
 import passportRoutes from './passport.js';
 import guideRoutes from './guides.js';
 import configRoutes from './config.js';
+import adminRoutes from './admin.js';
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.use('/likes', likeRoutes);
 router.use('/passport', passportRoutes);
 router.use('/guides', guideRoutes);
 router.use('/config', configRoutes);
+router.use('/admin', adminRoutes);
 
 router.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

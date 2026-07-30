@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Share2, Heart, CheckCircle2, ShieldCheck, Trophy, ArrowRight } from 'lucide-react';
 import { Experience } from '../types';
+import { useT } from '../contexts/I18nContext';
 import DetailHero from '../components/DetailHero';
 import InfoStats from '../components/InfoStats';
 import CTABar from '../components/CTABar';
@@ -20,6 +21,7 @@ export default function DetailScreen({
   isLiked,
   onToggleLike
 }: DetailScreenProps) {
+  const { t } = useT();
   return (
     <div className="relative h-full flex flex-col overflow-hidden">
       {/* Top Nav buttons bar */}
@@ -27,21 +29,22 @@ export default function DetailScreen({
         <button
           onClick={onBack}
           className="glass-chrome text-brand-text-dark rounded-full p-2.5 transition-apple tap-feedback"
-          title="Volver"
+          title={t('detail.back')}
         >
           <ArrowLeft className="w-4 h-4 text-brand-text-dark" strokeWidth={2.5} />
         </button>
         <div className="flex gap-2">
           <button
+            onClick={() => { try { navigator.share?.({ title: experience.title, text: experience.aboutCommunity }); } catch (err) { console.warn('[DetailScreen] navigator.share failed:', err); } }}
             className="glass-chrome text-brand-text-dark rounded-full p-2.5 transition-apple tap-feedback hover:shadow-ios-lg"
-            title="Compartir"
+            title={t('detail.share')}
           >
             <Share2 className="w-4 h-4 text-brand-text-dark" />
           </button>
           <button
             onClick={onToggleLike}
             className="glass-chrome text-brand-text-dark rounded-full p-2.5 transition-apple tap-feedback hover:shadow-ios-lg"
-            title="Favorito"
+            title={t('detail.favorite')}
           >
             <Heart
               className={`w-4 h-4 transition-apple ${
@@ -71,7 +74,7 @@ export default function DetailScreen({
 
         {/* About Community */}
         <section className="px-5 flex flex-col gap-2">
-          <h3 className="font-heading text-lg font-semibold text-[#412c21]">Sobre la Comunidad</h3>
+          <h3 className="font-heading text-lg font-semibold text-[#412c21]">{t('detail.about_community')}</h3>
           <p className="text-xs text-brand-text-muted leading-relaxed font-body font-medium max-w-[60ch]">
             {experience.aboutCommunity}
           </p>
@@ -79,7 +82,7 @@ export default function DetailScreen({
 
         {/* What you will do */}
         <section className="px-5 flex flex-col gap-3">
-          <h3 className="font-heading text-lg font-semibold text-[#412c21]">¿Qué harás?</h3>
+          <h3 className="font-heading text-lg font-semibold text-[#412c21]">{t('detail.what_do')}</h3>
           <div className="flex flex-col gap-3.5">
             {experience.whatYouWillDo.map((todo, idx) => (
               <div key={idx} className="flex gap-3 items-start">
@@ -98,8 +101,8 @@ export default function DetailScreen({
         {/* Gallery */}
         <section className="px-5 flex flex-col gap-3">
           <div className="flex justify-between items-baseline">
-            <h3 className="font-heading text-lg font-semibold text-[#412c21]">Momentos del Viajero</h3>
-            <span className="text-[11px] font-semibold text-brand-primary hover:underline cursor-pointer">Ver todas</span>
+            <h3 className="font-heading text-lg font-semibold text-[#412c21]">{t('detail.traveler_moments')}</h3>
+            <span className="text-[11px] font-semibold text-brand-primary hover:underline cursor-pointer">{t('detail.see_all')}</span>
           </div>
           <div className="grid grid-cols-3 gap-2">
             {experience.galleryImages.slice(0, 3).map((imgUrl, idx) => (
@@ -124,7 +127,7 @@ export default function DetailScreen({
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1.5">
                 <span className="font-heading text-xl font-semibold text-brand-primary tabular-nums">{experience.authenticityScore}</span>
-                <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">/ 100 de Autenticidad</span>
+                <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">{t('detail.authenticity_score')}</span>
               </div>
               <p className="text-[10px] text-brand-text-muted mt-1 leading-normal">
                 Esta experiencia ha sido verificada a fondo para asegurar la participación directa de la comunidad local y la preservación de técnicas tradicionales.
@@ -138,7 +141,7 @@ export default function DetailScreen({
           <div className="p-4 bg-brand-secondary/5 border border-brand-secondary/25 rounded-2xl flex flex-col gap-2 shadow-sm">
             <div className="flex items-center gap-1.5 text-brand-secondary">
               <Trophy className="w-4 h-4 fill-brand-secondary/10" />
-              <h4 className="text-[11px] font-bold uppercase tracking-wider text-brand-secondary leading-none">Impacto en la Comunidad</h4>
+              <h4 className="text-[11px] font-bold uppercase tracking-wider text-brand-secondary leading-none">{t('detail.impact_title')}</h4>
             </div>
             <p className="text-xs text-brand-text-dark font-medium leading-relaxed">
               {experience.communityImpactText}

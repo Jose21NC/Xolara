@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import { z } from 'zod';
 import { query } from '../db/pool.js';
 import { bookingSchema } from '../validators/schemas.js';
 import { authMiddleware } from '../middleware/auth.js';
@@ -80,8 +81,16 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
+const updateBookingSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha inválida (YYYY-MM-DD)').optional(),
+  time: z.string().regex(/^\d{2}:\d{2}$/, 'Hora inválida (HH:MM)').optional(),
+});
+
 router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
-  const { date, time } = req.body;
+  const parsed = updateBookingSchema.safeParse(req.body);
+  if (!parsed.success) throw new AppError(400, parsed.error.issues.map((i: { message: string }) => i.message).join(', '));
+
+  const { date, time } = parsed.data;
   if (!date && !time) throw new AppError(400, 'Debes proporcionar fecha o hora');
 
   const existing = await query(

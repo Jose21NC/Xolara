@@ -297,7 +297,17 @@ GoTrue provee:
 
 El backend es un proyecto Node.js standalone dentro del monorepo. Usar npm simplifica el Dockerfile (no necesita pnpm). El frontend sigue usando pnpm.
 
-### 8.4 ¿Por qué hash con PBKDF2 y no bcrypt?
+### 8.4 Admin Panel / Panel de Gestión
+
+El `AdminPanelScreen` es accesible desde `ProfileScreen` para usuarios con rol `guide` o `admin`. Permite:
+- Listar experiencias propias (guías) o todas (admin)
+- Editar y eliminar experiencias
+- Crear nuevas experiencias (reutiliza `CreateExperienceScreen` con `editExperience` opcional)
+- Dashboard con estadísticas de impacto
+
+La gestión se implementa vía el mismo state machine que el resto de la app: `currentScreen = 'admin_panel'`.
+
+### 8.5 ¿Por qué hash con PBKDF2 y no bcrypt?
 
 `crypto.pbkdf2Sync` es nativo de Node.js — no requiere dependencias adicionales, lo que simplifica el Dockerfile (no necesita `bcrypt` ni `bcryptjs`). SHA-512 con 1000 iteraciones es seguro para este contexto.
 

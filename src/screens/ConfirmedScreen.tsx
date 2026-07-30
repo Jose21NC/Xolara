@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, CheckCircle2, Calendar, Clock, Users, ArrowRight, MapPin, PhoneCall, HelpCircle, CornerDownRight } from 'lucide-react';
 import { Experience, Booking } from '../types';
+import { useT } from '../contexts/I18nContext';
 
 interface ConfirmedScreenProps {
   booking: Booking;
@@ -17,10 +18,11 @@ export default function ConfirmedScreen({
   onContactGuide,
   onManageReservation
 }: ConfirmedScreenProps) {
+  const { t } = useT();
   const [directionsStatus, setDirectionsStatus] = useState<string | null>(null);
 
   const handleDirections = () => {
-    setDirectionsStatus('Cargando mapa en Google Maps...');
+    setDirectionsStatus(t('confirmed.loading_map'));
     setTimeout(() => {
       setDirectionsStatus(null);
       window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(experience.howToGetThere.title + ' ' + experience.howToGetThere.description)}`, '_blank');
@@ -35,7 +37,7 @@ export default function ConfirmedScreen({
         <button 
           onClick={onBack}
           className="text-brand-text-dark hover:bg-neutral-100 rounded-full p-2"
-          title="Ir a Inicio"
+          title={t('confirmed.home_tooltip')}
         >
           <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
         </button>
@@ -57,7 +59,7 @@ export default function ConfirmedScreen({
           <div className="absolute bottom-16 left-5">
             <div className="inline-flex items-center gap-1.5 bg-brand-secondary/95 backdrop-blur-sm px-3 py-1 rounded-full text-white shadow-sm">
               <CheckCircle2 className="w-4 h-4 text-white" />
-              <span className="text-[10px] uppercase font-bold tracking-wider">Confirmado</span>
+              <span className="text-[10px] uppercase font-bold tracking-wider">{t('confirmed.badge')}</span>
             </div>
           </div>
 
@@ -77,7 +79,7 @@ export default function ConfirmedScreen({
         >
           {/* Left parameters mapping column */}
           <div className="flex-1 flex flex-col gap-4 w-full">
-            <h3 className="font-serif text-lg font-semibold text-brand-text-dark leading-none">Datos de la Reserva</h3>
+            <h3 className="font-serif text-lg font-semibold text-brand-text-dark leading-none">{t('confirmed.booking_data')}</h3>
             
             <div className="flex flex-col gap-3">
               {/* Date */}
@@ -86,7 +88,7 @@ export default function ConfirmedScreen({
                   <Calendar className="w-4 h-4" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">Fecha</span>
+                  <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">{t('confirmed.date')}</span>
                   <span className="text-xs font-bold text-brand-text-dark leading-none mt-1">{booking.date}</span>
                 </div>
               </div>
@@ -97,7 +99,7 @@ export default function ConfirmedScreen({
                   <Clock className="w-4 h-4" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">Horario</span>
+                  <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">{t('confirmed.time')}</span>
                   <span className="text-xs font-bold text-brand-text-dark leading-none mt-1">{booking.time} (Aprox {experience.duration})</span>
                 </div>
               </div>
@@ -108,7 +110,7 @@ export default function ConfirmedScreen({
                   <Users className="w-4 h-4" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">Participantes</span>
+                  <span className="text-[9px] text-brand-text-muted font-semibold uppercase tracking-wider">{t('confirmed.participants')}</span>
                   <span className="text-xs font-bold text-brand-text-dark leading-none mt-1">
                     {booking.adultsCount} Adulto{booking.adultsCount > 1 && 's'}
                     {booking.childrenCount > 0 && `, ${booking.childrenCount} Niño${booking.childrenCount > 1 && 's'}`}
@@ -121,11 +123,11 @@ export default function ConfirmedScreen({
           {/* Right custom printable QR scanner card */}
           <div className="w-full md:w-36 flex flex-col items-center justify-center p-3 bg-surface-2 rounded-xl border border-black/5 shrink-0 shadow-ios">
             <div className="p-1.5 bg-surface rounded-lg">
-              <img 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBc6NPH8EtOyctT7-CbwlGWRXocWoZ_QAfVVms6TcIJDABsOY_iPi6qainLR9fgGJiMBQH9jDjKcbK77nI_mV9qwvJlWL3zllx28zLXNcvUX7uaMHiyEvw6RweEBfoCreOdBiKnxm9F1PQ6UGPUlpLp3wIXQa-8WCyyGWe-z-FgxTRC2cqtS4_J8YTKBQFVND2cYN1fNJRKUzZ8MRv7_UfAcoQD2C5JdCLi8nB_yNKhwljdhw0aSWZvEP2m1teXvL0EIgFPmk1adip2"
-                alt="QR Code" 
-                className="w-24 h-24"
-              />
+              <div className="w-24 h-24 bg-white border border-black/10 rounded-lg flex items-center justify-center">
+                <span className="text-[8px] text-brand-text-muted font-mono text-center leading-tight px-1">
+                  {booking.bookingRef}
+                </span>
+              </div>
             </div>
             
             <p className="text-[10px] text-brand-text-muted text-center mt-2 font-medium leading-tight">
@@ -141,13 +143,13 @@ export default function ConfirmedScreen({
         <div className="p-4 surface-card flex flex-col gap-2">
           <div className="flex items-center gap-1.5 text-brand-primary">
             <CheckCircle2 className="w-4 h-4" />
-            <h4 className="text-[10px] font-semibold uppercase tracking-wider leading-none">Impacto Comunitario</h4>
+            <h4 className="text-[10px] font-semibold uppercase tracking-wider leading-none">{t('confirmed.community_impact')}</h4>
           </div>
           <p className="text-xs text-brand-text-dark font-medium leading-relaxed max-w-[60ch]">
-            Tu reserva apoya directamente a <span className="font-semibold text-brand-primary">familias locales</span> preservando sus cultivos de café orgánicos y métodos patrimoniales.
+            {experience.communityImpactText || t('reservation.impact_text')}
           </p>
           <button className="text-[10px] font-semibold text-brand-primary hover:underline flex items-center gap-1.5 self-start mt-1 bg-brand-primary/5 py-1 px-2.5 rounded-full border border-brand-primary/5">
-            <span>Leer su historia</span>
+            <span>{t('confirmed.read_story')}</span>
             <CornerDownRight className="w-3 h-3 text-brand-primary" />
           </button>
         </div>
@@ -169,7 +171,7 @@ export default function ConfirmedScreen({
           </div>
           
           <div className="p-4 flex flex-col">
-            <span className="text-[10px] font-semibold text-brand-text-muted uppercase tracking-wider">Cómo llegar</span>
+            <span className="text-[10px] font-semibold text-brand-text-muted uppercase tracking-wider">{t('confirmed.how_to_get')}</span>
             <span className="text-xs font-semibold text-brand-text-dark mt-1 leading-tight">{experience.howToGetThere.title}</span>
             <span className="text-[11px] text-brand-text-muted mt-0.5 leading-normal">{experience.howToGetThere.description}</span>
             
@@ -178,7 +180,7 @@ export default function ConfirmedScreen({
               disabled={directionsStatus !== null}
               className="mt-3.5 text-center border border-brand-primary/30 text-brand-primary hover:bg-brand-primary hover:text-white px-4 py-2.5 rounded-full text-xs font-semibold transition-all active:scale-95"
             >
-              {directionsStatus || 'Obtener Direcciones'}
+              {directionsStatus || t('confirmed.get_directions')}
             </button>
           </div>
         </div>
@@ -190,14 +192,14 @@ export default function ConfirmedScreen({
           onClick={onManageReservation}
           className="w-full bg-brand-primary text-white font-semibold py-3.5 px-6 rounded-full shadow-ios active:scale-95 transition-transform flex items-center justify-center gap-2 text-xs"
         >
-          <span>Gestionar Reservas</span>
+          <span>{t('confirmed.manage_bookings')}</span>
         </button>
 
         <button
           onClick={onContactGuide}
           className="w-full glass-chrome text-brand-text-dark font-semibold py-3.5 px-6 rounded-full active:scale-95 transition-transform flex items-center justify-center gap-2 text-xs"
         >
-          <span>Contactar con el Guía</span>
+          <span>{t('confirmed.contact_guide')}</span>
         </button>
       </div>
 

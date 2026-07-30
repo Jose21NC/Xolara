@@ -44,7 +44,17 @@ export interface Booking {
   bookingRef: string;
   confirmedAt: string;
   createdAt?: any;
-  status: 'Confirmed' | 'Pending' | 'Completed';
+  status: 'Confirmed' | 'Pending' | 'Completed' | 'Cancelled';
+}
+
+export interface UserProfile {
+  id: string;
+  display_name: string;
+  role: string;
+  avatar_url: string | null;
+  subtitle: string | null;
+  location: string | null;
+  bio: string | null;
 }
 
 export interface PassportStamp {
@@ -54,6 +64,15 @@ export interface PassportStamp {
   date: string;
   iconType: 'mountain' | 'utensils' | 'palette' | 'coffee';
   color: string;
+  experience_id?: string;
+}
+
+export interface GuideInfo {
+  id: string;
+  name: string;
+  avatar: string | null;
+  welcome: string;
+  faq: Record<string, string>;
 }
 
 export interface AppConfig {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Leaf, Users, TrendingUp } from 'lucide-react';
+import { useT } from '../contexts/I18nContext';
 
 interface ImpactMetric {
   label: string;
@@ -14,36 +15,22 @@ interface ImpactDashboardProps {
   metrics?: ImpactMetric[];
 }
 
-const DEFAULT_METRICS: ImpactMetric[] = [
-  {
-    label: 'CO2 Mitigado',
-    value: '120',
-    unit: 'kg',
-    icon: <Leaf className="w-5 h-5" />,
-    color: 'text-[#47654f]',
-  },
-  {
-    label: 'Familias Impactadas',
-    value: '12',
-    icon: <Users className="w-5 h-5" />,
-    color: 'text-[#47654f]',
-  },
-  {
-    label: 'Inversión Local',
-    value: '$320',
-    unit: 'USD',
-    icon: <TrendingUp className="w-5 h-5" />,
-    color: 'text-[#47654f]',
-  },
-];
-
 export default function ImpactDashboard({
-  title = 'Impacto en la comunidad',
-  metrics = DEFAULT_METRICS,
+  title,
+  metrics,
 }: ImpactDashboardProps) {
+  const { t } = useT();
+  if (!metrics || metrics.length === 0) {
+    return (
+      <section className="flex flex-col gap-6 w-full">
+        <h2 className="font-heading text-lg font-semibold text-[#412c21]">{title || t('detail.impact_title')}</h2>
+        <p className="text-xs text-brand-text-muted">Sin datos aún. Reserva una experiencia para ver tu impacto.</p>
+      </section>
+    );
+  }
   return (
     <section className="flex flex-col gap-6 w-full">
-      <h2 className="figma-heading-md text-[#412c21]">{title}</h2>
+      <h2 className="figma-heading-md text-[#412c21]">{title || t('detail.impact_title')}</h2>
       <div className="grid grid-cols-3 gap-3">
         {metrics.map((metric, idx) => (
           <div

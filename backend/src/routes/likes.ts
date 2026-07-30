@@ -15,24 +15,21 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
 router.post('/:experienceId', authMiddleware, async (req: Request, res: Response) => {
   const { experienceId } = req.params;
 
-  const existing = await query(
-    'SELECT 1 FROM public.likes WHERE user_id = $1 AND experience_id = $2',
+  const result = await query(
+    `WITH deleted AS (
+       DELETE FROM public.likes
+       WHERE user_id = $1 AND experience_id = $2
+       RETURNING 1
+     )
+     INSERT INTO public.likes (user_id, experience_id)
+     SELECT $1, $2
+     WHERE NOT EXISTS (SELECT 1 FROM deleted)
+     ON CONFLICT (user_id, experience_id) DO NOTHING
+     RETURNING 1`,
     [req.user!.userId, experienceId]
   );
 
-  if (existing.rows.length > 0) {
-    await query(
-      'DELETE FROM public.likes WHERE user_id = $1 AND experience_id = $2',
-      [req.user!.userId, experienceId]
-    );
-    res.json({ liked: false });
-  } else {
-    await query(
-      'INSERT INTO public.likes (user_id, experience_id) VALUES ($1, $2)',
-      [req.user!.userId, experienceId]
-    );
-    res.json({ liked: true });
-  }
+  res.json({ liked: result.rowCount !== null && result.rowCount > 0 });
 });
 
 export default router;

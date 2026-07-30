@@ -1,16 +1,27 @@
-import React from 'react';
-import { ArrowLeft, Globe, Sparkles, User, CreditCard, HelpCircle, ClipboardList } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Globe, Sparkles, User, CreditCard, HelpCircle, ClipboardList, LogOut } from 'lucide-react';
 import { AppConfig } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import { useT } from '../contexts/I18nContext';
+import { useOverlayModal } from '../contexts/OverlayContext';
+import ComingSoon from '../components/ComingSoon';
 
 interface ConfigurationScreenProps {
   onBack: () => void;
   config: AppConfig;
   onUpdateConfig: (newConfig: AppConfig) => void;
+  onSignOut?: () => void;
+  onEditAccount?: () => void;
 }
 
-export default function ConfigurationScreen({ onBack, config, onUpdateConfig }: ConfigurationScreenProps) {
+export default function ConfigurationScreen({ onBack, config, onUpdateConfig, onSignOut, onEditAccount }: ConfigurationScreenProps) {
+  const { user } = useAuth();
+  const { t } = useT();
+  const [comingSoon, setComingSoon] = useState<string | null>(null);
+
+  useOverlayModal('config-coming-soon', !!comingSoon);
   const handleLanguageChange = (lang: 'es' | 'en') => {
-    onUpdateConfig({ ...config, language: lang as any, greetingTone: 'traditional' });
+    onUpdateConfig({ ...config, language: lang as any });
   };
 
   const toggleTipFocus = (focus: string) => {
@@ -28,51 +39,51 @@ export default function ConfigurationScreen({ onBack, config, onUpdateConfig }: 
           <ArrowLeft className="w-5 h-5 text-brand-text-dark" strokeWidth={2} />
         </button>
         <div>
-          <h2 className="font-serif text-[18px] font-semibold text-brand-text-dark leading-tight">Configuración</h2>
-          <p className="text-[10px] text-brand-text-muted font-medium tracking-wide uppercase mt-0.5">Ajustes de la App</p>
+          <h2 className="font-serif text-[18px] font-semibold text-brand-text-dark leading-tight">{t('config.title')}</h2>
+          <p className="text-[10px] text-brand-text-muted font-medium tracking-wide uppercase mt-0.5">{t('config.subtitle')}</p>
         </div>
       </header>
 
       <div className="px-5 flex flex-col gap-6 overflow-y-auto hide-scrollbar flex-grow">
         <section className="flex flex-col gap-2">
-          <h3 className="text-[11px] font-black text-brand-text-muted uppercase tracking-wider px-1">Cuenta</h3>
+          <h3 className="text-[11px] font-black text-brand-text-muted uppercase tracking-wider px-1">{t('config.account')}</h3>
           <div className="bg-white rounded-xl shadow-sm divide-y divide-black/5 overflow-hidden">
             <div className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
               <div className="flex items-center gap-3">
                 <User className="w-4 h-4 text-brand-text-muted" />
                 <div>
-                  <span className="block text-xs font-bold text-brand-text-dark">Elena Santos</span>
-                  <span className="block text-[9px] text-brand-text-muted">elena@example.com</span>
+                  <span className="block text-xs font-bold text-brand-text-dark">{user?.displayName || 'Elena Santos'}</span>
+                  <span className="block text-[9px] text-brand-text-muted">{user?.email || 'elena@example.com'}</span>
                 </div>
               </div>
             </div>
-            <div className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
+            <div onClick={onEditAccount} className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
               <div className="flex items-center gap-3">
                 <ClipboardList className="w-4 h-4 text-brand-text-muted" />
-                <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">Configuración de Cuenta</span>
+                <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">{t('config.account_settings')}</span>
               </div>
             </div>
-            <div className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
+            <div onClick={() => setComingSoon('payment')} className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
               <div className="flex items-center gap-3">
                 <CreditCard className="w-4 h-4 text-brand-text-muted" />
-                <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">Métodos de Pago</span>
+                <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">{t('config.payment_methods')}</span>
               </div>
             </div>
           </div>
         </section>
 
         <section className="flex flex-col gap-2">
-          <h3 className="text-[11px] font-black text-brand-text-muted uppercase tracking-wider px-1">Preferencias</h3>
+          <h3 className="text-[11px] font-black text-brand-text-muted uppercase tracking-wider px-1">{t('config.preferences')}</h3>
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="p-4 border-b border-black/5">
               <div className="flex items-center gap-2 mb-3">
                 <Globe className="w-4 h-4 text-brand-secondary" />
-                <span className="text-xs font-bold text-brand-text-dark">Idioma de Interfaz</span>
+                <span className="text-xs font-bold text-brand-text-dark">{t('config.language')}</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { id: 'es', label: 'Español', desc: 'Idioma nativo' },
-                  { id: 'en', label: 'English', desc: 'Global traveler' }
+                  { id: 'es', label: t('config.language_es'), desc: t('config.language_es_desc') },
+                  { id: 'en', label: t('config.language_en'), desc: t('config.language_en_desc') }
                 ].map(lang => {
                   const active = config.language === lang.id;
                   return (
@@ -88,7 +99,7 @@ export default function ConfigurationScreen({ onBack, config, onUpdateConfig }: 
             <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="w-4 h-4 text-brand-tertiary" />
-                <span className="text-xs font-bold text-brand-text-dark">Categorías de Interés</span>
+                <span className="text-xs font-bold text-brand-text-dark">{t('config.interests')}</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -113,17 +124,33 @@ export default function ConfigurationScreen({ onBack, config, onUpdateConfig }: 
         </section>
 
         <section className="flex flex-col gap-2">
-          <h3 className="text-[11px] font-black text-brand-text-muted uppercase tracking-wider px-1">General</h3>
+          <h3 className="text-[11px] font-black text-brand-text-muted uppercase tracking-wider px-1">{t('config.general')}</h3>
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="p-3.5 flex items-center justify-between hover:bg-neutral-50 transition-colors cursor-pointer group">
               <div className="flex items-center gap-3">
                 <HelpCircle className="w-4 h-4 text-brand-text-muted" />
-                <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">Soporte Comunitario Xolara</span>
+                <span className="text-xs font-bold text-brand-text-dark group-hover:text-brand-primary transition-colors">{t('config.support')}</span>
               </div>
             </div>
           </div>
         </section>
+
+        {onSignOut && (
+          <button
+            onClick={() => { if (confirm(t('config.logout_confirm'))) onSignOut(); }}
+            className="flex items-center gap-3 p-3.5 text-red-600 hover:bg-red-50 rounded-xl transition-colors w-full"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="text-xs font-bold">{t('config.logout')}</span>
+          </button>
+        )}
       </div>
+
+      <ComingSoon
+        isOpen={comingSoon === 'payment'}
+        onClose={() => setComingSoon(null)}
+        message={t('coming_soon.payment')}
+      />
     </div>
   );
 }

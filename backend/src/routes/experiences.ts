@@ -10,8 +10,9 @@ router.get('/', async (_req: Request, res: Response) => {
   const result = await query(
     `SELECT id, title, location, country, category, duration, duration_hours,
             group_size, rating, reviews_count, price_per_person, image,
-            about_community, authenticity_score, tags, gallery_images, lat, lng,
-            host_name, created_at
+            about_community, what_you_will_do, community_impact_text,
+            community_impact_bullets, how_to_get_there, authenticity_score,
+            tags, gallery_images, lat, lng, host_name, created_at
      FROM public.experiences
      ORDER BY created_at DESC`
   );
@@ -28,8 +29,19 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 router.post('/', authMiddleware, async (req: Request, res: Response) => {
-  if (req.user!.userRole !== 'guide' && req.user!.userRole !== 'admin') {
+  const role = req.user!.userRole;
+  if (role !== 'guide' && role !== 'admin') {
     throw new AppError(403, 'Solo guías y administradores pueden crear experiencias');
+  }
+
+  if (role === 'guide') {
+    const approval = await query(
+      `SELECT is_approved_guide FROM public.profiles WHERE id = $1`,
+      [req.user!.userId]
+    );
+    if (approval.rows.length === 0 || !approval.rows[0].is_approved_guide) {
+      throw new AppError(403, 'Tu cuenta de guía aún no fue aprobada por un administrador');
+    }
   }
 
   const parsed = experienceSchema.safeParse(req.body);
@@ -48,8 +60,19 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
 });
 
 router.put('/:id', authMiddleware, async (req: Request, res: Response) => {
-  if (req.user!.userRole !== 'guide' && req.user!.userRole !== 'admin') {
+  const role = req.user!.userRole;
+  if (role !== 'guide' && role !== 'admin') {
     throw new AppError(403, 'Solo guías y administradores pueden editar experiencias');
+  }
+
+  if (role === 'guide') {
+    const approval = await query(
+      `SELECT is_approved_guide FROM public.profiles WHERE id = $1`,
+      [req.user!.userId]
+    );
+    if (approval.rows.length === 0 || !approval.rows[0].is_approved_guide) {
+      throw new AppError(403, 'Tu cuenta de guía aún no fue aprobada por un administrador');
+    }
   }
 
   const existing = await query('SELECT created_by FROM public.experiences WHERE id = $1', [req.params.id]);

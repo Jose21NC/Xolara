@@ -1,4 +1,5 @@
 import { User } from 'lucide-react';
+import { useT } from '../contexts/I18nContext';
 
 interface ProfileHeaderProps {
   name: string;
@@ -15,6 +16,7 @@ export default function ProfileHeader({
   avatarUrl,
   onEdit,
 }: ProfileHeaderProps) {
+  const { t } = useT();
   return (
     <div className="flex flex-col items-center gap-6 w-full">
       <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[#d3c3bd] shadow-md">
@@ -43,7 +45,7 @@ export default function ProfileHeader({
             onClick={onEdit}
             className="figma-body-sm text-[#d7b061] mt-2 hover:underline"
           >
-            Editar perfil
+            {t('profile.edit')}
           </button>
         )}
       </div>

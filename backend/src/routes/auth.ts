@@ -2,11 +2,32 @@ import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { query } from '../db/pool.js';
 import { config } from '../config.js';
 import { signUpSchema, signInSchema } from '../validators/schemas.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { authMiddleware } from '../middleware/auth.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const avatarStorage = multer.diskStorage({
+  destination: path.resolve(__dirname, '../../uploads/avatars'),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname) || '.jpg';
+    cb(null, `avatar-${uuidv4()}${ext}`);
+  },
+});
+const upload = multer({
+  storage: avatarStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, allowed.includes(ext));
+  },
+});
 
 const router = Router();
 
@@ -128,7 +149,7 @@ router.post('/signin', async (req: Request, res: Response) => {
 
 router.get('/me', authMiddleware, async (req: Request, res: Response) => {
   const result = await query(
-    `SELECT id, display_name, role, avatar_url, created_at
+    `SELECT id, display_name, role, avatar_url, subtitle, location, bio, created_at
      FROM public.profiles WHERE id = $1`,
     [req.user!.userId]
   );
@@ -139,6 +160,60 @@ router.get('/me', authMiddleware, async (req: Request, res: Response) => {
   }
 
   res.json(result.rows[0]);
+});
+
+router.patch('/profile', authMiddleware, async (req: Request, res: Response) => {
+  const { displayName, subtitle, location, bio } = req.body;
+
+  const updates: string[] = [];
+  const values: any[] = [];
+  let idx = 1;
+
+  if (displayName && typeof displayName === 'string' && displayName.trim().length >= 2) {
+    updates.push(`display_name = $${idx++}`);
+    values.push(displayName.trim());
+  }
+  if (subtitle !== undefined) {
+    updates.push(`subtitle = $${idx++}`);
+    values.push(subtitle);
+  }
+  if (location !== undefined) {
+    updates.push(`location = $${idx++}`);
+    values.push(location);
+  }
+  if (bio !== undefined) {
+    updates.push(`bio = $${idx++}`);
+    values.push(bio);
+  }
+
+  if (updates.length === 0) {
+    res.status(400).json({ error: 'No hay campos válidos para actualizar' });
+    return;
+  }
+
+  values.push(req.user!.userId);
+  await query(
+    `UPDATE public.profiles SET ${updates.join(', ')} WHERE id = $${idx}`,
+    values
+  );
+
+  res.json({ success: true });
+});
+
+router.post('/avatar', authMiddleware, upload.single('avatar'), async (req: Request, res: Response) => {
+  if (!req.file) {
+    res.status(400).json({ error: 'No se recibió ninguna imagen' });
+    return;
+  }
+
+  const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+
+  await query(
+    `UPDATE public.profiles SET avatar_url = $1 WHERE id = $2`,
+    [avatarUrl, req.user!.userId]
+  );
+
+  res.json({ success: true, avatarUrl });
 });
 
 export default router;

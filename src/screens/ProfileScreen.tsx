@@ -1,13 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Settings, Share2, Star, 
   Trash2, ArrowRight, X, Calendar, Clock, MessageSquare, Send, Check, AlertCircle, RefreshCw,
   Mountain, Utensils, Coffee
 } from 'lucide-react';
 import { Booking } from '../types';
-import { RECENT_PASSPORT_STAMPS } from '../data';
+
+import { authApi, guidesApi, ApiError } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
+import { useOverlayModal } from '../contexts/OverlayContext';
 import ProfileHeader from '../components/ProfileHeader';
 import PassportStampList from '../components/PassportStampList';
+import ComingSoon from '../components/ComingSoon';
 
 interface ProfileScreenProps {
   bookings: Booking[];
@@ -15,56 +19,28 @@ interface ProfileScreenProps {
   onSelectBooking: (id: string) => void;
   onUpdateBooking?: (id: string, date: string, time: string) => void;
   onOpenConfig: () => void;
+  onOpenAdminPanel?: () => void;
 }
 
-// Database of local verified guides for the experiences
-const GUIDE_INFO: Record<string, { name: string; avatar: string; welcome: string; faq: Record<string, string> }> = {
-  'weaving-workshop': {
-    name: 'Don Néstor Guerrero',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150',
-    welcome: '¡Hola Elena! Soy Néstor Guerrero. Estoy afinando las arcillas de la Laguna de Apoyo para moldear tu vasija precolombina. ¿Tienes alguna pregunta sobre el taller?',
-    faq: {
-      '¿Qué ropa debo usar?': 'Te sugiero venir con ropa cómoda que no te importe manchar con arcilla natural. Te daremos un delantal autóctono de manta rústica.',
-      '¿Cómo llego al taller?': 'El taller familiar queda detrás de la parroquia de San Juan de Oriente, verás un rótulo pintado a mano de vasijas de barro. ¡Facilísimo de encontrar!'
-    }
-  },
-  'coffee-journey': {
-    name: 'Asociación La Hermandad',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=150',
-    welcome: '¡Saludos cordiales desde Matagalpa, Elena! La nebliselva está preciosa y el vivero ecológico floreciendo. ¿Tienes alguna duda de la ruta caficultora?',
-    faq: {
-      '¿Cómo estará el clima rural?': 'Suele refrescar por las tardes en las faldas arboladas de Selva Negra. Trae un abrigo cortavientos y calzado firme para los senderos húmedos.',
-      '¿Se incluye comida nica?': '¡Por supuesto! Compartiremos un almuerzo criollo a la leña en el patio rústico preparado por las señoras de la cooperativa.'
-    }
-  },
-  'cooking-masterclass': {
-    name: 'Doña Auxiliadora',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150',
-    welcome: '¡Elena, mi reina! Ya compré la yuca suave y las hojas frescas de chagüite al amanecer. ¿Tienes alguna intolerancia que deba contemplar en la cocina?',
-    faq: {
-      '¿Tienen opción vegetariana?': '¡Claro que sí, amor! En lugar de chicharrón, preparamos un vigorón con tajadas de queso criollo frito artesanal delicioso.',
-      '¿El cacao es muy dulce?': 'Moleremos el cacao puro con arroz y canela frente a ti. Tú regulas el azúcar dulce de caña a tu preferencia exacta.'
-    }
-  },
-  'market-walk': {
-    name: 'Orlando (Guardaparques Masaya)',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150',
-    welcome: '¡Qué tal Elena! Todo listo para explorar la geología colosal del Volcán Masaya y reforestar las laderas. ¿Qué te gustaría consultar del trek?',
-    faq: {
-      '¿Es difícil la caminata?': 'Es un sendero de lava solidificada plano y seguro de nivel bajo. Iremos a tu ritmo recolectando semillas autóctonas de madero negro.',
-      '¿Qué tal por respirar gases?': 'En el cráter activo hay ráfagas de gases leves. Si tienes sensibilidad, te facilitamos mascarillas protectoras en el módulo guardaparques.'
-    }
-  }
-};
+interface GuideData {
+  name: string;
+  avatar: string;
+  welcome: string;
+  faq: Record<string, string>;
+}
+
+
 
 export default function ProfileScreen({
   bookings,
   onCancelBooking,
   onSelectBooking,
   onUpdateBooking,
-  onOpenConfig
+  onOpenConfig,
+  onOpenAdminPanel
 }: ProfileScreenProps) {
-  const [profileName, setProfileName] = useState('Elena Santos');
+  const { user, updateUser } = useAuth();
+  const [profileName, setProfileName] = useState(user?.displayName || 'Viajero');
   const [isEditing, setIsEditing] = useState(false);
   const [editVal, setEditVal] = useState(profileName);
 
@@ -74,11 +50,24 @@ export default function ProfileScreen({
   const [reschedDate, setReschedDate] = useState('');
   const [reschedTime, setReschedTime] = useState('10:00 AM');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [comingSoon, setComingSoon] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl || 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200');
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  useOverlayModal('profile-managing-booking', !!managingBooking);
+  useOverlayModal('profile-coming-soon', !!comingSoon);
 
   // CHAT SYSTEM STATE
   const [isChatting, setIsChatting] = useState(false);
   const [messages, setMessages] = useState<{ sender: 'user' | 'guide'; text: string; time: string }[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+
+  const [loadedGuides, setLoadedGuides] = useState<Record<string, GuideData>>({});
+  const [chatLoading, setChatLoading] = useState(false);
+
+  const getGuide = useCallback((experienceId: string): GuideData | null => {
+    return loadedGuides[experienceId] || null;
+  }, [loadedGuides]);
 
   // Automatically refresh managingBooking when bookings array changes so the UI reflects newly edited dates
   useEffect(() => {
@@ -92,17 +81,49 @@ export default function ProfileScreen({
     }
   }, [bookings]);
 
-  // Handle direct message simulation
-  const handleStartChat = (booking: Booking) => {
-    const guide = GUIDE_INFO[booking.experienceId] || GUIDE_INFO['weaving-workshop'];
-    setMessages([
-      {
-        sender: 'guide',
-        text: guide.welcome,
-        time: 'Hace un momento'
+  const handleStartChat = async (booking: Booking) => {
+    setChatLoading(true);
+    setManagingBooking(booking);
+    try {
+      const data = await guidesApi.getByExperience(booking.experienceId);
+      if (data) {
+        const guide: GuideData = {
+          name: data.name,
+          avatar: data.avatar || '',
+          welcome: data.welcome,
+          faq: data.faq,
+        };
+        setLoadedGuides(prev => ({ ...prev, [booking.experienceId]: guide }));
+        setMessages([
+          {
+            sender: 'guide',
+            text: guide.welcome,
+            time: 'Hace un momento',
+          },
+        ]);
+      } else {
+        setMessages([
+          {
+            sender: 'guide',
+            text: 'Aún no hay un guía asignado para esta experiencia. Pronto nos pondremos en contacto.',
+            time: 'Hace un momento',
+          },
+        ]);
       }
-    ]);
-    setIsChatting(true);
+      setIsChatting(true);
+    } catch (err) {
+      console.warn('[ProfileScreen] Failed to load guide', err);
+      setMessages([
+        {
+          sender: 'guide',
+          text: 'No pudimos conectar con el guía. Inténtalo de nuevo más tarde.',
+          time: 'Hace un momento',
+        },
+      ]);
+      setIsChatting(true);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   const handleSendCustomMessage = (text: string) => {
@@ -142,37 +163,54 @@ export default function ProfileScreen({
     }, 1200);
   };
 
-  // Perform date rescheduling
   const handleApplyReschedule = () => {
     if (!reschedDate) return;
-    
-    // Parse nice date format
-    const [year, month, day] = reschedDate.split('-');
-    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-    const monthName = months[parseInt(month, 10) - 1] || 'Junio';
-    const formattedDate = `${parseInt(day, 10)} de ${monthName}, ${year}`;
+
+    const match = reschedTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    let time24 = reschedTime;
+    if (match) {
+      let hours = parseInt(match[1], 10);
+      const minutes = match[2];
+      const period = match[3].toUpperCase();
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      time24 = `${String(hours).padStart(2, '0')}:${minutes}`;
+    }
 
     if (onUpdateBooking && managingBooking) {
-      onUpdateBooking(managingBooking.id, formattedDate, reschedTime);
+      onUpdateBooking(managingBooking.id, reschedDate, time24);
       setIsRescheduling(false);
-      
       setToastMessage('📅 ¡Reserva reprogramada con éxito!');
       setTimeout(() => setToastMessage(null), 3000);
     }
   };
 
-  // Dynamic metrics calculation
-  const baseFamilies = 12;
-  const baseCO2 = 45;
-  const baseInvested = 320;
+  const totalInvestedActive = bookings.reduce((sum, b) => sum + b.totalPrice, 0);
+  const totalFamiliesActive = bookings.length > 0 ? Math.ceil(bookings.length * 1.5) : 0;
+  const totalCO2Active = bookings.length > 0 ? bookings.length * 10 : 0;
 
-  const totalFamiliesActive = baseFamilies + (bookings.length * 4);
-  const totalCO2Active = baseCO2 + (bookings.length * 15);
-  const totalInvestedActive = baseInvested + bookings.reduce((sum, b) => sum + b.totalPrice, 0);
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const result = await authApi.uploadAvatar(file);
+      setAvatarUrl(result.avatarUrl);
+    } catch (err) {
+      const message = err instanceof ApiError ? err.message : 'Error al subir imagen';
+      alert(message);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (editVal.trim()) {
       setProfileName(editVal.trim());
+      try {
+        await authApi.updateProfile({ displayName: editVal.trim() });
+        updateUser({ displayName: editVal.trim() });
+      } catch { /* local only */ }
     }
     setIsEditing(false);
   };
@@ -197,22 +235,74 @@ export default function ProfileScreen({
           <Settings className="w-5 h-5 text-brand-text-dark" strokeWidth={1.8} />
         </button>
         <span className="font-heading text-lg font-semibold text-[#412c21]">Mi Perfil</span>
-        <button className="text-brand-text-dark hover:bg-black/5 p-2 rounded-full" title="Compartir Perfil">
+        <button onClick={() => setComingSoon('share')} className="text-brand-text-dark hover:bg-black/5 p-2 rounded-full" title="Compartir Perfil">
           <Share2 className="w-5 h-5 text-brand-text-dark" strokeWidth={1.8} />
         </button>
       </header>
 
       {/* Profile Section */}
       <div className="px-5">
-        <ProfileHeader
-          name={profileName}
-          title="Exploradora en León, Nicaragua"
-          avatarUrl="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200"
-          onEdit={() => {
-            setEditVal(profileName);
-            setIsEditing(!isEditing);
-          }}
-        />
+        {isEditing ? (
+          <div className="flex flex-col items-center gap-3">
+            <label className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[#d3c3bd] shadow-md cursor-pointer group">
+              <img
+                src={avatarUrl}
+                alt={profileName}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-white text-[10px] font-bold">{uploadingAvatar ? '...' : 'Cambiar'}</span>
+              </div>
+              <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" disabled={uploadingAvatar} />
+            </label>
+            <input
+              type="text"
+              value={editVal}
+              onChange={(e) => setEditVal(e.target.value)}
+              className="w-full text-center text-xl font-heading font-semibold text-[#412c21] bg-white border border-black/10 rounded-xl px-4 py-2 focus:outline-none focus:border-brand-primary"
+              placeholder="Tu nombre"
+              autoFocus
+            />
+            <input
+              type="text"
+              value={user?.subtitle || ''}
+              onChange={(e) => updateUser({ subtitle: e.target.value })}
+              className="w-full text-center text-xs text-brand-text-muted bg-white border border-black/10 rounded-xl px-4 py-2 focus:outline-none focus:border-brand-primary"
+              placeholder="Subtítulo (ej: Guía certificado)"
+            />
+            <input
+              type="text"
+              value={user?.location || ''}
+              onChange={(e) => updateUser({ location: e.target.value })}
+              className="w-full text-center text-xs text-brand-text-muted bg-white border border-black/10 rounded-xl px-4 py-2 focus:outline-none focus:border-brand-primary"
+              placeholder="Ubicación (ej: Granada, Nicaragua)"
+            />
+            <div className="flex gap-2 mt-1">
+              <button
+                onClick={() => setIsEditing(false)}
+                className="px-5 py-2 rounded-xl border border-black/10 text-xs font-semibold text-brand-text-dark bg-white"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveProfile}
+                className="px-5 py-2 rounded-xl bg-brand-primary text-white text-xs font-semibold"
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        ) : (
+          <ProfileHeader
+            name={profileName}
+            title={user?.subtitle || user?.location || 'Explorador en Nicaragua'}
+            avatarUrl={avatarUrl}
+            onEdit={() => {
+              setEditVal(profileName);
+              setIsEditing(!isEditing);
+            }}
+          />
+        )}
       </div>
 
       {/* Community Impact highlights board */}
@@ -255,6 +345,25 @@ export default function ProfileScreen({
         </div>
       </section>
 
+      {/* Admin Panel entry for guides/admins */}
+      {(user?.role === 'guide' || user?.role === 'admin') && onOpenAdminPanel && (
+        <section className="px-5">
+          <button
+            onClick={onOpenAdminPanel}
+            className="w-full p-4 surface-card flex items-center justify-between active:scale-98 transition-all group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary text-lg">⚙️</div>
+              <div className="text-left">
+                <span className="block text-xs font-black text-brand-text-dark group-hover:text-brand-primary transition-colors">Panel de Gestión</span>
+                <span className="block text-[9px] text-brand-text-muted mt-0.5 font-semibold uppercase tracking-tight">Administra tus experiencias</span>
+              </div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-brand-text-muted/60" />
+          </button>
+        </section>
+      )}
+
       {/* NEW: DEDICATED APARTADO PARA GESTIONAR RESERVAS Y PARA CONTACTAR AL GUIA */}
       <section className="px-5 flex flex-col gap-3 font-sans">
         <h4 className="font-serif text-sm font-semibold text-brand-text-dark flex items-center justify-between pb-1.5 border-b border-black/5">
@@ -267,7 +376,7 @@ export default function ProfileScreen({
         {bookings.length > 0 ? (
           <div className="flex flex-col gap-3">
             {bookings.map((booking) => {
-              const guide = GUIDE_INFO[booking.experienceId] || GUIDE_INFO['weaving-workshop'];
+    const guide = getGuide(booking.experienceId);
               return (
                 <div
                   key={booking.id}
@@ -301,31 +410,32 @@ export default function ProfileScreen({
                     </span>
                   </div>
 
-                  {/* Guide connection segment */}
-                  <div className="bg-surface-2 border border-black/5 rounded-xl p-2.5 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <img 
-                        src={guide.avatar} 
-                        alt={guide.name} 
-                        className="w-8 h-8 rounded-full object-cover border border-brand-primary/15" 
-                      />
-                      <div>
-                        <span className="block text-[8px] font-black text-brand-text-muted uppercase tracking-wider">Tu Guía Local:</span>
-                        <span className="font-serif text-[10px] font-semibold text-brand-text-dark">{guide.name}</span>
+                  {guide && (
+                    <div className="bg-surface-2 border border-black/5 rounded-xl p-2.5 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <img 
+                          src={guide.avatar} 
+                          alt={guide.name} 
+                          className="w-8 h-8 rounded-full object-cover border border-brand-primary/15" 
+                        />
+                        <div>
+                          <span className="block text-[8px] font-black text-brand-text-muted uppercase tracking-wider">Tu Guía Local:</span>
+                          <span className="font-serif text-[10px] font-semibold text-brand-text-dark">{guide.name}</span>
+                        </div>
                       </div>
-                    </div>
 
-                    <button
-                      onClick={() => {
-                        setManagingBooking(booking);
-                        handleStartChat(booking);
-                      }}
-                      className="bg-brand-primary text-white text-[10px] font-semibold py-1.5 px-3 rounded-xl flex items-center gap-1 shadow-ios active:scale-95 transition-all hover:bg-brand-primary/95"
-                    >
-                      <MessageSquare className="w-3 h-3" />
-                      Contactar
-                    </button>
-                  </div>
+                      <button
+                        onClick={() => {
+                          setManagingBooking(booking);
+                          handleStartChat(booking);
+                        }}
+                        className="bg-brand-primary text-white text-[10px] font-semibold py-1.5 px-3 rounded-xl flex items-center gap-1 shadow-ios active:scale-95 transition-all hover:bg-brand-primary/95"
+                      >
+                        <MessageSquare className="w-3 h-3" />
+                        Contactar
+                      </button>
+                    </div>
+                  )}
 
                   {/* Direct buttons for quick management inside list */}
                   <div className="flex gap-2.5 border-t border-dashed border-brand-primary/10 pt-2.5">
@@ -372,24 +482,13 @@ export default function ProfileScreen({
       <section className="px-5 flex flex-col gap-3 font-body">
         <PassportStampList
           title="Sellos recientes"
-          stamps={[
-            ...RECENT_PASSPORT_STAMPS.map(s => ({
-              id: s.id,
-              title: s.title,
-              date: s.date,
-              color: s.color,
-              icon: s.iconType === 'mountain' ? <Mountain className="w-5 h-5" strokeWidth={2} /> :
-                    s.iconType === 'utensils' ? <Utensils className="w-5 h-5" strokeWidth={2} /> :
-                    <Coffee className="w-5 h-5" strokeWidth={2} />,
-            })),
-            ...bookings.map(b => ({
-              id: `dynamic-${b.id}`,
-              title: b.experienceTitle,
-              date: 'Oct 2023',
-              color: '#a8472f',
-              icon: <Coffee className="w-5 h-5" strokeWidth={2} />,
-            })),
-          ]}
+          stamps={bookings.map(b => ({
+            id: `dynamic-${b.id}`,
+            title: b.experienceTitle,
+            date: b.confirmedAt ? new Date(b.confirmedAt).toLocaleDateString('es', { month: 'short', year: 'numeric' }) : '',
+            color: '#a8472f',
+            icon: <Coffee className="w-5 h-5" strokeWidth={2} />,
+          }))}
         />
       </section>
 
@@ -397,8 +496,8 @@ export default function ProfileScreen({
       {/* OVERLAY RESERVATION MANAGER drawer & CHAT CONTAINER PANEL */}
       {/* ========================================================================= */}
       {managingBooking && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-end justify-center backdrop-blur-sm transition-opacity duration-300">
-          <div className="glass-chrome w-full max-w-md rounded-t-[var(--radius-sheet)] flex flex-col max-h-[85vh] relative animate-slide-up">
+        <div className="fixed inset-0 bg-black/40 z-[60] flex items-end justify-center backdrop-blur-sm transition-opacity duration-300" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          <div className="glass-chrome w-full max-w-md rounded-t-[var(--radius-sheet)] flex flex-col max-h-[85dvh] relative animate-slide-up">
             
             {/* Drawer Drag handle visual element */}
             <div className="w-12 h-1 bg-brand-text-muted/20 rounded-full mx-auto my-3 flex-shrink-0" />
@@ -431,7 +530,16 @@ export default function ProfileScreen({
               {/* IF CHATTING: Render Chat interface with local guide */}
               {isChatting ? (
                 <div className="flex flex-col h-full min-h-[350px] justify-between">
-                  
+
+                  {chatLoading && (
+                    <div className="flex items-center gap-2 text-[10px] text-brand-text-muted mb-2">
+                      <span className="w-1.5 h-1.5 bg-brand-text-muted rounded-full animate-bounce" />
+                      <span className="w-1.5 h-1.5 bg-brand-text-muted rounded-full animate-bounce [animation-delay:0.2s]" />
+                      <span className="w-1.5 h-1.5 bg-brand-text-muted rounded-full animate-bounce [animation-delay:0.4s]" />
+                      <span className="ml-1">Conectando con el guía...</span>
+                    </div>
+                  )}
+
                   {/* Message bubble stream */}
                   <div className="flex flex-col gap-3 mb-4 max-h-[260px] overflow-y-auto pr-1">
                     {messages.map((m, idx) => {
@@ -442,7 +550,7 @@ export default function ProfileScreen({
                           className={`flex flex-col max-w-[80%] ${isUser ? 'self-end items-end' : 'self-start items-start'}`}
                         >
                           <span className="text-[7.5px] text-brand-text-muted mr-1 mb-0.5 font-bold uppercase tracking-wider">
-                            {isUser ? 'Tú (Elena)' : (GUIDE_INFO[managingBooking.experienceId] || GUIDE_INFO['weaving-workshop']).name}
+                            {isUser ? 'Tú (Elena)' : getGuide(managingBooking.experienceId)?.name || 'Guía Local'}
                           </span>
                           
                           <div 
@@ -483,7 +591,7 @@ export default function ProfileScreen({
                     </span>
                     
                     <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
-                      {Object.entries((GUIDE_INFO[managingBooking.experienceId] || GUIDE_INFO['weaving-workshop']).faq).map(([q, ans]) => (
+                      {Object.entries(getGuide(managingBooking.experienceId)?.faq || {}).map(([q, ans]) => (
                         <button
                           key={q}
                           onClick={() => handleSendFAQMessage(q, ans)}
@@ -662,10 +770,7 @@ export default function ProfileScreen({
 
                     {/* Show PDF voucher */}
                     <button
-                      onClick={() => {
-                        onSelectBooking(managingBooking.id);
-                        setManagingBooking(null);
-                      }}
+                      onClick={() => setComingSoon('voucher')}
                       className="p-3 bg-[#e2f0e5]/30 hover:bg-[#e2f0e5]/50 border border-brand-secondary/15 rounded-xl flex items-center justify-between text-left transition-all active:scale-98 group"
                     >
                       <div className="flex items-center gap-3">
@@ -714,6 +819,17 @@ export default function ProfileScreen({
           </div>
         </div>
       )}
+
+      <ComingSoon
+        isOpen={comingSoon === 'share'}
+        onClose={() => setComingSoon(null)}
+        message="Compartir perfil estará disponible en producción para que otros viajeros puedan conocer tu impacto y experiencias comunitarias."
+      />
+      <ComingSoon
+        isOpen={comingSoon === 'voucher'}
+        onClose={() => setComingSoon(null)}
+        message="Los comprobantes de impacto estarán disponibles cuando implementemos el sistema de pagos y facturación comunitaria."
+      />
 
     </div>
   );

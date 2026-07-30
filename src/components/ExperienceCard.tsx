@@ -1,5 +1,6 @@
 import React from 'react';
 import { Heart, Star, MapPin } from 'lucide-react';
+import { useT } from '../contexts/I18nContext';
 
 interface ExperienceCardProps {
   id: string;
@@ -29,6 +30,7 @@ export default function ExperienceCard({
   onSelect,
   onToggleLike,
 }: ExperienceCardProps) {
+  const { t } = useT();
   return (
     <div
       onClick={() => onSelect(id)}
@@ -71,7 +73,7 @@ export default function ExperienceCard({
         </div>
         <div className="flex justify-between items-center pt-2.5 border-t border-black/5">
           <div className="flex flex-col">
-            <span className="text-[9px] text-brand-text-muted uppercase tracking-wider">Desde</span>
+            <span className="text-[9px] text-brand-text-muted uppercase tracking-wider">{t('card.from')}</span>
             <span className="text-sm font-semibold text-[#412c21] tabular-nums">${pricePerPerson}</span>
           </div>
           <button
@@ -81,7 +83,7 @@ export default function ExperienceCard({
             }}
             className="bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all active:scale-95"
           >
-            Reservar
+            {t('card.book')}
           </button>
         </div>
       </div>
